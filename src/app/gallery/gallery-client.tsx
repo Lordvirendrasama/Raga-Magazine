@@ -107,7 +107,7 @@ export function GalleryClient({ post }: GalleryClientProps) {
               key={wall.id}
               className="wall absolute flex h-[500px] w-[850px] flex-col items-center justify-start border border-primary/20 bg-card p-6 text-card-foreground shadow-lg"
               style={{
-                transform: `rotateY(${index * 90}deg) translateZ(450px)`,
+                transform: `rotateY(${index * 90}deg) translateZ(425px) rotateY(180deg)`,
                 backfaceVisibility: 'hidden',
               }}
             >
