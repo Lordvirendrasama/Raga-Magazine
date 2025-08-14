@@ -1,5 +1,6 @@
 import type { Post } from '@/components/article-card';
 
+// This file is now a fallback and will be removed in a future step.
 export const mockPosts: Post[] = [
   {
     id: 1,

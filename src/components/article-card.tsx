@@ -99,7 +99,7 @@ export function ArticleCard({ post, variant, className }: ArticleCardProps) {
           </span>
         </h3>
         {variant !== 'compact' && (
-          <p className="mt-2 text-sm text-muted-foreground flex-grow">{post.excerpt}</p>
+          <p className="mt-2 text-sm text-muted-foreground flex-grow" dangerouslySetInnerHTML={{ __html: post.excerpt }} />
         )}
         <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
           <span>{post.author.name}</span>
