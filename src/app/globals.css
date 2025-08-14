@@ -69,7 +69,7 @@
 
 @layer utilities {
   .page-flipper {
-    perspective: 2000px;
+    perspective: 3000px;
     perspective-origin: center;
     overflow: hidden;
   }
@@ -79,30 +79,31 @@
     height: 100%;
     transform-style: preserve-3d;
     backface-visibility: hidden;
+    transform-origin: left center;
   }
 
   .page-flipper-content.flipping-out {
-    animation: flip-out 0.7s ease-in-out forwards;
+    animation: book-flip-out 1s ease-in-out forwards;
   }
   
   .page-flipper-content.flipping-in {
-    animation: flip-in 0.7s ease-in-out forwards;
+    animation: book-flip-in 1s ease-in-out forwards;
   }
 
-  @keyframes flip-out {
+  @keyframes book-flip-out {
     from {
       transform: rotateY(0deg);
       opacity: 1;
     }
     to {
-      transform: rotateY(-90deg);
+      transform: rotateY(-180deg);
       opacity: 0;
     }
   }
 
-  @keyframes flip-in {
+  @keyframes book-flip-in {
     from {
-      transform: rotateY(90deg);
+      transform: rotateY(180deg);
       opacity: 0;
     }
     to {

@@ -34,8 +34,8 @@ export function PageFlipper({ children }: { children: React.ReactNode }) {
         timeoutRef.current = setTimeout(() => {
           setIsAnimating(false);
           setAnimationClass('');
-        }, 700); // Duration of the flip-in animation
-      }, 700); // Duration of the flip-out animation
+        }, 1000); // Duration of the flip-in animation
+      }, 1000); // Duration of the flip-out animation
     }
   }, [pathname, children, currentChildren]);
 
