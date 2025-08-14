@@ -6,6 +6,7 @@ import { Search, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchOverlay } from './search-overlay';
 import { getCategories } from '@/lib/wp';
+import { ThemeToggle } from './theme-toggle';
 
 interface NavLink {
   name: string;
@@ -56,6 +57,7 @@ export function Header() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)} aria-label="Open search">
               <Search className="h-5 w-5" />
             </Button>
