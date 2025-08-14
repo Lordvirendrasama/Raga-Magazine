@@ -22,7 +22,7 @@ export function Header() {
     async function fetchMenu() {
       try {
         const categories = await getCategories();
-        const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0);
+        const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0 && cat.slug !== 'events');
         const links = filteredCategories.map((cat: any) => ({
           name: cat.name,
           href: `/category/${cat.slug}`,
@@ -42,7 +42,7 @@ export function Header() {
     fetchMenu();
   }, []);
 
-  const allLinks = [...navLinks];
+  const allLinks: NavLink[] = [{ name: 'Events', href: '/events' }, ...navLinks];
 
   return (
     <>
