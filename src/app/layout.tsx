@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/theme-provider';
+import MouseFollower from '@/components/mouse-follower';
 
 export const metadata: Metadata = {
   title: 'RagaMagazine',
@@ -29,6 +30,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
         >
+          <MouseFollower />
           {children}
           <Toaster />
         </ThemeProvider>
