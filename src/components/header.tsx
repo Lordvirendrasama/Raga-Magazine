@@ -22,7 +22,8 @@ export function Header() {
     async function fetchMenu() {
       try {
         const categories = await getCategories();
-        const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0 && cat.slug !== 'events');
+        // Filter out "Uncategorized" and any other system categories
+        const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0);
         const links = filteredCategories.map((cat: any) => ({
           name: cat.name,
           href: `/category/${cat.slug}`,

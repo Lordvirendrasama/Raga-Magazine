@@ -28,6 +28,19 @@ export async function getPosts(params: Record<string, any> = {}) {
 }
 
 /**
+ * Fetches a list of events from the custom post type endpoint.
+ * @param params - Optional query parameters.
+ */
+export async function getEvents(params: Record<string, any> = {}) {
+    const query = new URLSearchParams({
+      per_page: '12',
+      _embed: '1',
+      ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
+    });
+    return fetchAPI(`/events?${query.toString()}`);
+}
+
+/**
  * Fetches a single post by its slug.
  * @param slug - The slug of the post.
  */
