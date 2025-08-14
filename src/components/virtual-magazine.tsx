@@ -20,12 +20,12 @@ interface VirtualMagazineProps {
 export function VirtualMagazine({ posts }: VirtualMagazineProps) {
   const [currentPage, setCurrentPage] = useState(0);
 
-  // Each post takes 2 pages (cover + content) + 1 for the main cover
-  const totalPages = posts.length * 2 + 1; 
+  // Each post takes 1 page + 1 for the main cover
+  const totalPages = posts.length + 1; 
 
   const handleNextPage = () => {
     // We step by 2 pages to flip a whole spread
-    setCurrentPage((prev) => Math.min(prev + 2, totalPages -1));
+    setCurrentPage((prev) => Math.min(prev + 2, totalPages - (totalPages % 2)));
   };
 
   const handlePrevPage = () => {
@@ -34,26 +34,19 @@ export function VirtualMagazine({ posts }: VirtualMagazineProps) {
   };
   
   const renderPageContent = (pageIndex: number) => {
-    // page 0 is the back of the main cover, which is the front of the first article page
-    if (pageIndex === 0) {
-      if (!posts[0]) return <div className="bg-card" />;
-      return renderArticleCover(posts[0]);
-    }
-    
-    // Determine if it's a left (content) or right (cover) page
-    const isContentPage = pageIndex % 2 !== 0;
-    const postIndex = Math.floor((pageIndex) / 2);
+    const postIndex = pageIndex -1;
 
-    if (postIndex >= posts.length) {
+    if (postIndex < 0 || postIndex >= posts.length) {
       return <div className="bg-card" />;
     }
 
     const post = posts[postIndex];
+    const isCoverPage = pageIndex % 2 !== 0;
 
-    if (isContentPage) {
-      return renderArticleContent(post);
+    if (isCoverPage) {
+        return renderArticleCover(post);
     } else {
-      return renderArticleCover(post);
+        return renderArticleContent(post);
     }
   }
 
@@ -120,30 +113,36 @@ export function VirtualMagazine({ posts }: VirtualMagazineProps) {
               </div>
             </div>
             <div className="page-back">
-                {renderPageContent(0)}
+                {renderPageContent(1)}
             </div>
           </div>
           
           {/* Article Pages */}
-          {posts.map((post, index) => {
-            const pageNumber = index + 1; // Starts from 1
+          {posts.slice(1).map((post, index) => {
+            const pageNumber = index + 2; 
             const zIndex = totalPages - pageNumber;
-            const isFlipped = currentPage >= (pageNumber * 2);
+            const isFlipped = currentPage >= pageNumber;
             
-            return(
-              <div 
-                key={`page-spread-${post.id}`} 
-                className={cn('book-page book-page--right visible', {'flipped': isFlipped})}
-                style={{ zIndex: zIndex}}
-              >
-                <div className="page-front">
-                  {renderPageContent(pageNumber * 2 - 1)}
+            const isRightPage = pageNumber % 2 !== 0;
+
+            if (isRightPage) {
+              return (
+                <div 
+                  key={`page-spread-${post.id}`} 
+                  className={cn('book-page book-page--right visible', {'flipped': isFlipped})}
+                  style={{ zIndex: zIndex}}
+                >
+                  <div className="page-front">
+                    {renderPageContent(pageNumber)}
+                  </div>
+                  <div className="page-back">
+                    {renderPageContent(pageNumber + 1)}
+                  </div>
                 </div>
-                <div className="page-back">
-                  {renderPageContent(pageNumber * 2)}
-                </div>
-              </div>
-            )
+              )
+            }
+            return null;
+           
           })}
 
 
