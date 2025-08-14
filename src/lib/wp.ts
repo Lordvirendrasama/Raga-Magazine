@@ -37,7 +37,8 @@ export async function getEvents(params: Record<string, any> = {}) {
       _embed: '1',
       ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
     });
-    return fetchAPI(`/events?${query.toString()}`);
+    // The CPT slug is likely 'event', not 'events'
+    return fetchAPI(`/event?${query.toString()}`);
 }
 
 
