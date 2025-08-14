@@ -67,6 +67,7 @@ export interface Post {
   };
   date: string;
   excerpt: string;
+  fullContent?: string; // Optional full content for gallery
   tags: string[];
   views: number;
 }
