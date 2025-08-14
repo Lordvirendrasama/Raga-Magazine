@@ -9,47 +9,38 @@ export function PageFlipper({ children }: { children: React.ReactNode }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentChildren, setCurrentChildren] = useState(children);
   const [animationClass, setAnimationClass] = useState('');
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const previousPathname = useRef(pathname);
 
   useEffect(() => {
-    // Clear any pending timeouts on component unmount
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    const previousPathname = (currentChildren as any)?.props?.childProp?.segment;
-    // Only trigger animation if the pathname changes
-    if (pathname !== previousPathname) {
-      setIsAnimating(true);
+    if (previousPathname.current !== pathname) {
       setAnimationClass('flipping-out');
+      setIsAnimating(true);
 
-      // Wait for the 'out' animation to finish
-      timeoutRef.current = setTimeout(() => {
-        // Set the new content, but keep animating
+      const timeoutId = setTimeout(() => {
         setCurrentChildren(children);
         setAnimationClass('flipping-in');
+        previousPathname.current = pathname;
         
-        // Wait for the 'in' animation to finish before stopping animation
-        timeoutRef.current = setTimeout(() => {
-          setIsAnimating(false);
-          setAnimationClass('');
-        }, 1000); // Duration of the flip-in animation
-      }, 1000); // Duration of the flip-out animation
-    }
-  }, [pathname, children]); // Remove currentChildren from dependencies to avoid re-triggering
+        const secondTimeoutId = setTimeout(() => {
+            setIsAnimating(false);
+            setAnimationClass('');
+        }, 500); // Must match the "in" animation duration
 
-  // Determine which content to render. If animating, always show the state's `currentChildren`.
-  // Otherwise, show the latest `children` from props.
-  const contentToRender = isAnimating ? currentChildren : children;
+        return () => clearTimeout(secondTimeoutId);
+      }, 500); // Must match the "out" animation duration
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [pathname, children]);
 
   return (
     <div className="page-flipper">
-      <div className={`page-flipper-content ${animationClass}`} key={pathname}>
-        {contentToRender}
+      <div className={`page-flipper-content ${animationClass}`} key={previousPathname.current}>
+        {isAnimating && animationClass === 'flipping-in' ? null : currentChildren}
+      </div>
+      {/* Pre-render the next page but keep it visually hidden to have it ready */}
+      <div className="absolute opacity-0 pointer-events-none">
+        {animationClass === 'flipping-in' && currentChildren}
       </div>
     </div>
   );

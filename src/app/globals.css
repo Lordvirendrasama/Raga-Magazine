@@ -96,11 +96,11 @@
   }
 
   .page-flipper-content.flipping-out {
-    animation: book-flip-out 1s ease-in-out forwards;
+    animation: book-flip-out 0.5s ease-in-out forwards;
   }
   
   .page-flipper-content.flipping-in {
-    animation: book-flip-in 1s ease-in-out forwards;
+    animation: book-flip-in 0.5s ease-in-out forwards;
   }
 
   @keyframes book-flip-out {
