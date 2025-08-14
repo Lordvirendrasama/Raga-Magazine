@@ -3,13 +3,42 @@
 import { Twitter, Facebook, Instagram } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from './ui/button';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getCategories } from '@/lib/wp';
+
+interface CategoryLink {
+  name: string;
+  href: string;
+}
 
 export function Footer() {
-  const [currentYear, setCurrentYear] = React.useState<number | null>(null);
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
+  const [categoryLinks, setCategoryLinks] = useState<CategoryLink[]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentYear(new Date().getFullYear());
+
+    async function fetchCategories() {
+      try {
+        const categories = await getCategories();
+        const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0);
+        const links = filteredCategories.slice(0, 4).map((cat: any) => ({
+          name: cat.name,
+          href: `/category/${cat.slug}`,
+        }));
+        setCategoryLinks(links);
+      } catch (error) {
+        console.error('Failed to fetch categories for footer:', error);
+        // Fallback for case where API fails
+        setCategoryLinks([
+            { name: 'Technology', href: '#' },
+            { name: 'Culture', href: '#' },
+            { name: 'Design', href: '#' },
+            { name: 'Business', href: '#' },
+        ]);
+      }
+    }
+    fetchCategories();
   }, []);
 
   return (
@@ -24,10 +53,13 @@ export function Footer() {
             <div className="md:justify-self-center">
               <h3 className="font-semibold uppercase tracking-wider text-foreground">Categories</h3>
               <ul className="mt-4 space-y-2">
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Technology</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-accent">Culture</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Design</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-accent">Business</Link></li>
+                {categoryLinks.map((link, index) => (
+                    <li key={link.name}>
+                        <Link href={link.href} className={`text-sm text-muted-foreground hover:text-${index % 2 === 0 ? 'primary' : 'accent'}`}>
+                            {link.name}
+                        </Link>
+                    </li>
+                ))}
               </ul>
             </div>
             <div className="md:justify-self-end">
