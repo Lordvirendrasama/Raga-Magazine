@@ -29,12 +29,15 @@ function transformEventPost(wpPost: any): Post {
 }
 
 export function EventCalendar() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(undefined);
   const [events, setEvents] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Set the initial date only on the client side to avoid hydration mismatch
+    setDate(new Date());
+
     async function fetchEvents() {
       try {
         setLoading(true);
@@ -80,6 +83,7 @@ export function EventCalendar() {
                 modifiersClassNames={{
                   'event-day': 'day-with-event',
                 }}
+                disabled={loading}
              />
           </CardContent>
         </Card>
