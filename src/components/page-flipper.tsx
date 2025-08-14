@@ -20,7 +20,7 @@ export function PageFlipper({ children }: { children: React.ReactNode }) {
       const timeoutId = setTimeout(() => {
         setPreviousChildren(null);
         setAnimationClass('');
-      }, 500); // Must match the "out" animation duration
+      }, 1000); // Must match the "out" animation duration
 
       previousPathname.current = pathname;
       return () => clearTimeout(timeoutId);
