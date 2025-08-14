@@ -47,6 +47,19 @@ export async function getCategories() {
 }
 
 /**
+ * Fetches a category by its slug.
+ * @param slug - The slug of the category.
+ */
+export async function getCategoryBySlug(slug: string) {
+    const categories = await fetchAPI(`/categories?slug=${slug}`);
+    if (!categories || categories.length === 0) {
+        return null;
+    }
+    return categories[0];
+}
+
+
+/**
  * Fetches all tags.
  */
 export async function getTags() {
