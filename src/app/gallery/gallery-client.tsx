@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -16,8 +16,24 @@ interface GalleryClientProps {
 export function GalleryClient({ post }: GalleryClientProps) {
   const [rotation, setRotation] = useState(0);
 
-  const rotateLeft = () => setRotation(rotation + 90);
-  const rotateRight = () => setRotation(rotation - 90);
+  const rotateLeft = useCallback(() => setRotation(r => r + 90), []);
+  const rotateRight = useCallback(() => setRotation(r => r - 90), []);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft') {
+        rotateLeft();
+      } else if (event.key === 'ArrowRight') {
+        rotateRight();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [rotateLeft, rotateRight]);
 
   const walls = [
     {
