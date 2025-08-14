@@ -38,7 +38,21 @@ export default async function EventsPage() {
   const category = await getCategoryBySlug('events');
 
   if (!category) {
-    notFound();
+    // Even if category fetch fails, we can show an empty state gracefully
+    return (
+        <div className="flex min-h-screen flex-col bg-background">
+          <Header />
+          <main className="flex-1">
+            <div className="container mx-auto px-4 py-8 lg:py-12">
+              <h1 className="mb-8 font-headline text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+                Events
+              </h1>
+              <p className="text-center text-muted-foreground">Could not load the 'Events' category. Please try again later.</p>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      );
   }
 
   const posts = await getPosts({ categories: category.id, per_page: 12 });

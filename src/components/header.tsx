@@ -32,10 +32,10 @@ export function Header() {
         console.error('Failed to fetch categories:', error);
         // Fallback to static links in case of an error
         setNavLinks([
-          { name: 'Technology', href: '#' },
-          { name: 'Culture', href: '#' },
-          { name: 'Design', href: '#' },
-          { name: 'Business', href: '#' },
+          { name: 'Technology', href: '/category/technology' },
+          { name: 'Culture', href: '/category/culture' },
+          { name: 'Design', href: '/category/design' },
+          { name: 'Business', href: '/category/business' },
         ]);
       }
     }
