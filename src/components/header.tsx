@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -43,7 +44,7 @@ export function Header() {
     fetchMenu();
   }, []);
 
-  const allLinks: NavLink[] = [{ name: 'Events', href: '/events' }, ...navLinks];
+  const allLinks: NavLink[] = [...navLinks, { name: 'Events', href: '/events' }];
 
   return (
     <>
