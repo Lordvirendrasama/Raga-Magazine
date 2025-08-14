@@ -1,4 +1,4 @@
-import { getPosts, getFeaturedImage } from '@/lib/wp';
+import { getPosts } from '@/lib/wp';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { ArticleCard, type Post } from '@/components/article-card';
@@ -8,7 +8,8 @@ function transformEventPost(wpPost: any): Post {
   return {
     id: wpPost.id,
     title: wpPost.title,
-    slug: wpPost.slug,
+    // The link for events should point to /events/[slug]
+    slug: `/events/${wpPost.slug}`,
     category: wpPost.categories?.[0]?.name || 'Event',
     imageUrl: wpPost.image?.url || 'https://placehold.co/800x450',
     imageHint: wpPost.title.split(' ').slice(0, 2).join(' ').toLowerCase(),

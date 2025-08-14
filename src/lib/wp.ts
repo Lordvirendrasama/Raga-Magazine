@@ -26,13 +26,13 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
   
   const query = new URLSearchParams({
     per_page: '12',
-    _embed: '1',
     ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
   });
 
-  if (isEventsCalendar) {
+  if (!isEventsCalendar) {
+    query.set('_embed', '1');
+  } else {
     // The Events Calendar uses different parameter names
-    query.delete('_embed'); 
     query.set('status', 'publish');
   }
 
@@ -42,16 +42,27 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
   return isEventsCalendar ? result.events : result;
 }
 
+
 /**
  * Fetches a single post by its slug.
  * @param slug - The slug of the post.
  */
 export async function getPostBySlug(slug: string) {
-  const posts = await getPosts({ slug, _embed: '1' });
+  const posts = await getPosts({ slug, _embed: '1' }, 'posts');
   if (!posts || posts.length === 0) {
     return null;
   }
   return posts[0];
+}
+
+/**
+ * Fetches a single event by its slug from The Events Calendar API.
+ * @param slug - The slug of the event.
+ */
+export async function getEventBySlug(slug: string) {
+  // The Events Calendar API for a single post is typically /tribe/events/v1/events/by-slug/:slug
+  const result = await fetchAPI(`/tribe/events/v1/events/by-slug/${slug}`);
+  return result;
 }
 
 /**

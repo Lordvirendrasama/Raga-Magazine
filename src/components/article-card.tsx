@@ -78,9 +78,12 @@ interface ArticleCardProps extends VariantProps<typeof cardVariants> {
 }
 
 export function ArticleCard({ post, variant, className }: ArticleCardProps) {
+  // If the slug doesn't start with a slash, assume it's a post
+  const href = post.slug.startsWith('/') ? post.slug : `/posts/${post.slug}`;
+  
   return (
     <article className={cn(cardVariants({ variant }), className)}>
-      <Link href={`/posts/${post.slug}`} className="absolute inset-0 z-10" aria-label={post.title} />
+      <Link href={href} className="absolute inset-0 z-10" aria-label={post.title} />
       <div className={cn(imageContainerVariants({ variant }))}>
         <Image
           src={post.imageUrl}
