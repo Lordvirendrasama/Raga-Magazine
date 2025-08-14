@@ -29,11 +29,11 @@ function transformPost(wpPost: any): Post {
 }
 
 export default async function Home() {
-  const allPosts = await getPosts({ per_page: 20 });
+  const allPosts = await getPosts({ per_page: 20, _embed: true }).catch(() => []);
   const transformedPosts = allPosts.map(transformPost);
 
-  const featuredPosts = transformedPosts.filter(p => p.tags.includes('featured')).slice(0, 3);
-  const magazinePosts = transformedPosts; // Using all posts for the magazine grid for now
+  const featuredPosts = transformedPosts.filter(p => p.tags.includes('featured')).slice(0, 5);
+  const magazinePosts = transformedPosts.slice(0, 9);
   const trendingPosts = [...transformedPosts].sort((a, b) => {
     // Basic trending sort by date as views are not available
     return new Date(b.date).getTime() - new Date(a.date).getTime();
