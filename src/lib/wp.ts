@@ -40,12 +40,13 @@ export async function getEvents(params: Record<string, any> = {}) {
     return fetchAPI(`/events?${query.toString()}`);
 }
 
+
 /**
  * Fetches a single post by its slug.
  * @param slug - The slug of the post.
  */
 export async function getPostBySlug(slug: string) {
-  const posts = await getPosts({ slug });
+  const posts = await getPosts({ slug, _embed: '1' });
   if (!posts || posts.length === 0) {
     return null;
   }
