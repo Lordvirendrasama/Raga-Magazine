@@ -91,7 +91,6 @@
     width: 100%;
     height: 100%;
     transform-style: preserve-3d;
-    backface-visibility: hidden;
     transform-origin: left center;
   }
 
@@ -101,6 +100,8 @@
   
   .page-flipper-content.flipping-in {
     animation: book-flip-in 0.5s ease-in-out forwards;
+    /* The new page starts invisible and becomes visible during the animation */
+    opacity: 0;
   }
 
   @keyframes book-flip-out {
