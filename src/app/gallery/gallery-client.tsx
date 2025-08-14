@@ -25,9 +25,9 @@ export function GalleryClient({ post }: GalleryClientProps) {
       title: 'The Article',
       icon: BookOpen,
       content: (
-        <ScrollArea className="h-full w-full">
+        <ScrollArea className="h-full w-full pr-4">
             <h3 className="mb-4 font-headline text-2xl font-bold" dangerouslySetInnerHTML={{ __html: post.title }} />
-            <div className="prose prose-sm dark:prose-invert" dangerouslySetInnerHTML={{ __html: post.fullContent || post.excerpt }} />
+            <div className="prose prose-lg dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: post.fullContent || post.excerpt }} />
         </ScrollArea>
       ),
     },
@@ -75,29 +75,29 @@ export function GalleryClient({ post }: GalleryClientProps) {
   ];
 
   return (
-    <div className="flex h-[80vh] flex-col items-center justify-center overflow-hidden bg-black text-white">
+    <div className="flex h-[85vh] flex-col items-center justify-center overflow-hidden bg-background text-foreground">
       <div className="w-full max-w-5xl text-center mb-8 px-4">
         <h1 className="font-headline text-4xl font-bold tracking-tight md:text-5xl">Latest from the Magazine</h1>
         <p className="mt-2 text-muted-foreground">An immersive look at our newest feature.</p>
       </div>
 
-      <div className="perspective-[1200px] w-full h-[500px]">
+      <div className="perspective-[1500px] w-full h-[550px]">
         <div
           className="scene relative w-full h-full"
-          style={{ transformStyle: 'preserve-3d', transform: `rotateY(${rotation}deg)`, transition: 'transform 0.7s ease-in-out' }}
+          style={{ transformStyle: 'preserve-3d', transform: `rotateY(${rotation}deg)`, transition: 'transform 0.8s ease-out' }}
         >
           {walls.map((wall, index) => (
             <div
               key={wall.id}
-              className="wall absolute flex h-[480px] w-[800px] flex-col items-center justify-start border border-primary/20 bg-card p-6 text-card-foreground shadow-lg"
+              className="wall absolute flex h-[500px] w-[850px] flex-col items-center justify-start border border-primary/20 bg-card p-6 text-card-foreground shadow-lg"
               style={{
-                transform: `rotateY(${index * 90}deg) translateZ(400px)`,
+                transform: `rotateY(${index * 90}deg) translateZ(450px)`,
                 backfaceVisibility: 'hidden',
               }}
             >
-              <div className="flex w-full items-center gap-2 border-b pb-2 mb-4">
+              <div className="flex w-full items-center gap-3 border-b border-border pb-3 mb-4">
                 <wall.icon className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-semibold">{wall.title}</h2>
+                <h2 className="text-lg font-semibold tracking-wide">{wall.title}</h2>
               </div>
               <div className="h-full w-full flex-grow overflow-hidden">
                 {wall.content}
@@ -107,7 +107,7 @@ export function GalleryClient({ post }: GalleryClientProps) {
         </div>
       </div>
       
-      <div className="mt-8 flex gap-4">
+      <div className="mt-10 flex gap-4">
         <Button onClick={rotateLeft} size="lg" aria-label="Rotate left">
           <ArrowLeft className="mr-2" />
           Previous
