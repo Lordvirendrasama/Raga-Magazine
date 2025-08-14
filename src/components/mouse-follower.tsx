@@ -17,6 +17,7 @@ const MusicNoteIcon = ({ className }: { className?: string }) => (
 
 export function MouseFollower() {
   const [position, setPosition] = useState({ x: -100, y: -100 });
+  const [smoothedPosition, setSmoothedPosition] = useState({ x: -100, y: -100 });
   const [isVisible, setIsVisible] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
 
@@ -46,13 +47,27 @@ export function MouseFollower() {
     document.documentElement.addEventListener('mouseleave', handleMouseLeave);
 
 
+    let animationFrameId: number;
+
+    const animate = () => {
+      setSmoothedPosition(current => {
+        const newX = current.x + (position.x - current.x) * 0.1;
+        const newY = current.y + (position.y - current.y) * 0.1;
+        return { x: newX, y: newY };
+      });
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
       document.documentElement.removeEventListener('mouseleave', handleMouseLeave);
+      cancelAnimationFrame(animationFrameId);
     };
-  }, [isVisible]);
+  }, [isVisible, position.x, position.y]);
 
   return (
     <div
@@ -62,8 +77,8 @@ export function MouseFollower() {
         isVisible ? 'opacity-100' : 'opacity-0'
       )}
       style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
+        left: `${smoothedPosition.x}px`,
+        top: `${smoothedPosition.y}px`,
         transform: `translate(-50%, -50%) scale(${isClicked ? 0.8 : 1})`,
       }}
     >
