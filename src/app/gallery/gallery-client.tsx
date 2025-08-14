@@ -97,41 +97,42 @@ export function GalleryClient({ post }: GalleryClientProps) {
         <p className="mt-2 text-muted-foreground">An immersive look at our newest feature.</p>
       </div>
 
-      <div className="perspective-[1500px] w-full h-[550px]">
-        <div
-          className="scene relative w-full h-full"
-          style={{ transformStyle: 'preserve-3d', transform: `rotateY(${rotation}deg)`, transition: 'transform 0.8s ease-out' }}
-        >
-          {walls.map((wall, index) => (
+      <div className="relative w-full h-[550px]">
+        <div className="perspective-[1500px] w-full h-full">
             <div
-              key={wall.id}
-              className="wall absolute flex h-[500px] w-[850px] flex-col items-center justify-start border border-primary/20 bg-card p-6 text-card-foreground shadow-lg"
-              style={{
-                transform: `rotateY(${index * 90}deg) translateZ(425px) rotateY(180deg)`,
-                backfaceVisibility: 'hidden',
-              }}
+            className="scene relative w-full h-full"
+            style={{ transformStyle: 'preserve-3d', transform: `rotateY(${rotation}deg)`, transition: 'transform 0.8s ease-out' }}
             >
-              <div className="flex w-full items-center gap-3 border-b border-border pb-3 mb-4">
-                <wall.icon className="h-5 w-5 text-primary" />
-                <h2 className="text-lg font-semibold tracking-wide">{wall.title}</h2>
-              </div>
-              <div className="h-full w-full flex-grow overflow-auto">
-                {wall.content}
-              </div>
+            {walls.map((wall, index) => (
+                <div
+                key={wall.id}
+                className="wall absolute flex h-[500px] w-[850px] flex-col items-center justify-start border border-primary/20 bg-card p-6 text-card-foreground shadow-lg"
+                style={{
+                    transform: `rotateY(${index * 90}deg) translateZ(425px) rotateY(180deg)`,
+                    backfaceVisibility: 'hidden',
+                }}
+                >
+                <div className="flex w-full items-center gap-3 border-b border-border pb-3 mb-4">
+                    <wall.icon className="h-5 w-5 text-primary" />
+                    <h2 className="text-lg font-semibold tracking-wide">{wall.title}</h2>
+                </div>
+                <div className="h-full w-full flex-grow overflow-auto">
+                    {wall.content}
+                </div>
+                </div>
+            ))}
             </div>
-          ))}
         </div>
-      </div>
-      
-      <div className="mt-10 flex gap-4">
-        <Button onClick={rotateLeft} size="lg" aria-label="Rotate left">
-          <ArrowLeft className="mr-2" />
-          Previous
-        </Button>
-        <Button onClick={rotateRight} size="lg" aria-label="Rotate right">
-          Next
-          <ArrowRight className="ml-2" />
-        </Button>
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10 flex gap-4">
+            <Button onClick={rotateLeft} size="lg" aria-label="Rotate left">
+            <ArrowLeft className="mr-2" />
+            Previous
+            </Button>
+            <Button onClick={rotateRight} size="lg" aria-label="Rotate right">
+            Next
+            <ArrowRight className="ml-2" />
+            </Button>
+        </div>
       </div>
     </div>
   );
