@@ -17,6 +17,9 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [navLinks, setNavLinks] = useState<NavLink[]>([]);
+  const [staticLinks, setStaticLinks] = useState<NavLink[]>([
+    { name: 'Gallery', href: '/gallery' },
+  ]);
 
   useEffect(() => {
     async function fetchMenu() {
@@ -42,6 +45,8 @@ export function Header() {
     fetchMenu();
   }, []);
 
+  const allLinks = [...navLinks, ...staticLinks];
+
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
@@ -50,7 +55,7 @@ export function Header() {
             <h1 className="font-headline text-2xl font-bold tracking-tighter md:text-3xl">RagaMagazine</h1>
           </Link>
           <nav className="hidden md:flex md:items-center md:gap-6">
-            {navLinks.map((link) => (
+            {allLinks.map((link) => (
               <Link key={link.name} href={link.href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
                 {link.name}
               </Link>
@@ -69,7 +74,7 @@ export function Header() {
         {isMenuOpen && (
           <div className="md:hidden">
             <nav className="flex flex-col items-center gap-4 px-4 pb-4">
-              {navLinks.map((link) => (
+              {allLinks.map((link) => (
                 <Link key={link.name} href={link.href} className="w-full rounded-md py-2 text-center text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground" onClick={() => setIsMenuOpen(false)}>
                   {link.name}
                 </Link>
