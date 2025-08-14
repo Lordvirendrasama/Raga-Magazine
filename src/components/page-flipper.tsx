@@ -2,40 +2,45 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 
 export function PageFlipper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [currentChildren, setCurrentChildren] = useState(children);
+  const [previousChildren, setPreviousChildren] = useState<React.ReactNode>(null);
   const [animationClass, setAnimationClass] = useState('');
   const previousPathname = useRef(pathname);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (previousPathname.current !== pathname) {
       setAnimationClass('flipping-out');
+      setPreviousChildren(currentChildren);
+      setCurrentChildren(children);
 
       const timeoutId = setTimeout(() => {
-        // After the 'out' animation, we set the new children and start the 'in' animation.
-        // The old content is gone because of the opacity in the `flipping-out` animation.
-        setCurrentChildren(children);
-        setAnimationClass('flipping-in');
-        previousPathname.current = pathname;
-        
-        const secondTimeoutId = setTimeout(() => {
-            // Clean up animation classes after the 'in' animation completes.
-            setAnimationClass('');
-        }, 500); // Must match the "in" animation duration
-
-        return () => clearTimeout(secondTimeoutId);
+        setPreviousChildren(null);
+        setAnimationClass('');
       }, 500); // Must match the "out" animation duration
 
+      previousPathname.current = pathname;
       return () => clearTimeout(timeoutId);
+    } else if (!currentChildren) {
+      // Set initial children if it's the first render
+      setCurrentChildren(children);
     }
-  }, [pathname, children]);
+  }, [pathname, children, currentChildren]);
 
   return (
     <div className="page-flipper">
-      <div className={`page-flipper-content ${animationClass}`} key={previousPathname.current}>
+      {previousChildren && (
+        <div
+          className={`page-flipper-content ${animationClass}`}
+          key={previousPathname.current}
+        >
+          {previousChildren}
+        </div>
+      )}
+      <div className="page-flipper-content" key={pathname}>
         {currentChildren}
       </div>
     </div>

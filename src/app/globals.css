@@ -82,6 +82,7 @@
 
 @layer utilities {
   .page-flipper {
+    position: relative;
     perspective: 3000px;
     perspective-origin: center;
     overflow: hidden;
@@ -95,15 +96,13 @@
   }
 
   .page-flipper-content.flipping-out {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
     animation: book-flip-out 0.5s ease-in-out forwards;
   }
   
-  .page-flipper-content.flipping-in {
-    animation: book-flip-in 0.5s ease-in-out forwards;
-    /* The new page starts invisible and becomes visible during the animation */
-    opacity: 0;
-  }
-
   @keyframes book-flip-out {
     from {
       transform: rotateY(0deg);
@@ -112,17 +111,6 @@
     to {
       transform: rotateY(-180deg);
       opacity: 0;
-    }
-  }
-
-  @keyframes book-flip-in {
-    from {
-      transform: rotateY(180deg);
-      opacity: 0;
-    }
-    to {
-      transform: rotateY(0deg);
-      opacity: 1;
     }
   }
 }
