@@ -1,9 +1,10 @@
 // @/lib/wp.ts
-const BASE_URL = 'https://ragamagazine.com/wp-json/wp/v2';
+const BASE_URL = 'https://ragamagazine.com/wp-json';
 
 // Generic fetch function with error handling
 async function fetchAPI(endpoint: string, options: RequestInit = {}) {
-  const url = `${BASE_URL}${endpoint}`;
+  // Use the full URL if provided, otherwise prepend BASE_URL
+  const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
   const defaultOptions: RequestInit = {
     next: { revalidate: 300 }, // Revalidate every 5 minutes
   };
@@ -20,12 +21,25 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
  * @param postType - The type of post to fetch (e.g., 'posts', 'event').
  */
 export async function getPosts(params: Record<string, any> = {}, postType: string = 'posts') {
+  const isEventsCalendar = postType === 'event';
+  const apiPath = isEventsCalendar ? '/tribe/events/v1/events' : `/wp/v2/${postType}`;
+  
   const query = new URLSearchParams({
     per_page: '12',
     _embed: '1',
     ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
   });
-  return fetchAPI(`/${postType}?${query.toString()}`);
+
+  if (isEventsCalendar) {
+    // The Events Calendar uses different parameter names
+    query.delete('_embed'); 
+    query.set('status', 'publish');
+  }
+
+  const result = await fetchAPI(`${apiPath}?${query.toString()}`);
+  
+  // The Events Calendar nests posts under an 'events' key
+  return isEventsCalendar ? result.events : result;
 }
 
 /**
@@ -44,7 +58,7 @@ export async function getPostBySlug(slug: string) {
  * Fetches all categories.
  */
 export async function getCategories() {
-  return fetchAPI('/categories');
+  return fetchAPI('/wp/v2/categories');
 }
 
 /**
@@ -52,7 +66,7 @@ export async function getCategories() {
  * @param slug - The slug of the category.
  */
 export async function getCategoryBySlug(slug: string) {
-    const categories = await fetchAPI(`/categories?slug=${slug}`);
+    const categories = await fetchAPI(`/wp/v2/categories?slug=${slug}`);
     if (!categories || categories.length === 0) {
         return null;
     }
@@ -64,7 +78,7 @@ export async function getCategoryBySlug(slug: string) {
  * Fetches all tags.
  */
 export async function getTags() {
-  return fetchAPI('/tags');
+  return fetchAPI('/wp/v2/tags');
 }
 
 /**
@@ -73,6 +87,11 @@ export async function getTags() {
  * @returns The URL of the featured image or a placeholder.
  */
 export function getFeaturedImage(post: any): string {
+  // Handle The Events Calendar image format
+  if (post?.image?.url) {
+    return post.image.url;
+  }
+  
   const featuredMedia = post?._embedded?.['wp:featuredmedia'];
   if (featuredMedia && featuredMedia[0]?.source_url) {
     return featuredMedia[0].source_url;

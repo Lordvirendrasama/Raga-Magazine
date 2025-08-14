@@ -3,26 +3,22 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { ArticleCard, type Post } from '@/components/article-card';
 
-// Helper function to transform WordPress posts to the app's Post format
-function transformPost(wpPost: any): Post {
-  // Custom post types might not have categories in the same way.
-  // We'll assign a static category or look for a custom taxonomy if available.
-  const category = 'Event'; 
-  
+// Helper function to transform The Events Calendar posts to the app's Post format
+function transformEventPost(wpPost: any): Post {
   return {
     id: wpPost.id,
-    title: wpPost.title.rendered,
+    title: wpPost.title,
     slug: wpPost.slug,
-    category: category,
-    imageUrl: getFeaturedImage(wpPost),
-    imageHint: wpPost.title.rendered.split(' ').slice(0, 2).join(' ').toLowerCase(),
+    category: wpPost.categories?.[0]?.name || 'Event',
+    imageUrl: wpPost.image?.url || 'https://placehold.co/800x450',
+    imageHint: wpPost.title.split(' ').slice(0, 2).join(' ').toLowerCase(),
     author: {
-      name: wpPost._embedded?.author?.[0]?.name || 'RagaMagazine Staff',
-      avatarUrl: wpPost._embedded?.author?.[0]?.avatar_urls?.['96'] || 'https://placehold.co/40x40',
+      name: wpPost.author?.display_name || 'RagaMagazine Staff',
+      avatarUrl: 'https://secure.gravatar.com/avatar/?s=96&d=mm&r=g', // Gravatar default
     },
-    date: wpPost.date_gmt,
-    excerpt: wpPost.excerpt.rendered.replace(/<[^>]+>/g, ''), // Strip HTML tags
-    tags: wpPost._embedded?.['wp:term']?.[1]?.map((tag: any) => tag.name) || [],
+    date: wpPost.start_date,
+    excerpt: wpPost.description?.replace(/<[^>]+>/g, '') || '', // Strip HTML tags
+    tags: wpPost.tags?.map((tag: any) => tag.name) || [],
     views: 0,
   };
 }
@@ -40,8 +36,8 @@ export default async function EventsPage() {
   let fetchError = false;
 
   try {
-    const posts = await getPosts({ per_page: 12 }, 'event');
-    transformedPosts = posts.map(transformPost);
+    const events = await getPosts({}, 'event');
+    transformedPosts = events.map(transformEventPost);
   } catch (error) {
     console.error("Failed to fetch events:", error);
     fetchError = true;
