@@ -17,9 +17,7 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [navLinks, setNavLinks] = useState<NavLink[]>([]);
-  const [staticLinks, setStaticLinks] = useState<NavLink[]>([
-    { name: 'Gallery', href: '/gallery' },
-  ]);
+  const [staticLinks, setStaticLinks] = useState<NavLink[]>([]);
 
   useEffect(() => {
     async function fetchMenu() {
