@@ -17,7 +17,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     };
   }
 
+  // The Events Calendar API returns a plain string for the title
   const title = event.title;
+  // The description might contain HTML, so we strip it for the metadata
   const excerpt = event.description.replace(/<[^>]+>/g, '');
 
   return {
@@ -47,6 +49,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
   }
 
   const category = event.categories?.[0]?.name || 'Event';
+  // Author data might be structured differently in The Events Calendar
   const authorName = event.author?.display_name || 'RagaMagazine Staff';
   const authorAvatar = 'https://secure.gravatar.com/avatar/?s=96&d=mm&r=g'; // Default avatar
   const featuredImageUrl = event.image?.url || 'https://placehold.co/1200x630';
@@ -73,7 +76,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
             <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-12">
               <div className="container mx-auto">
                 <Badge variant="default">{category}</Badge>
-                <h1 className="mt-4 font-headline text-3xl font-bold text-white shadow-2xl md:text-5xl lg:text-6xl max-w-4xl" dangerouslySetInnerHTML={{ __html: event.title }} />
+                <h1 className="mt-4 font-headline text-3xl font-bold text-white shadow-2xl md:text-5xl lg:text-6xl max-w-4xl">{event.title}</h1>
                 <div className="mt-4 flex items-center gap-4">
                   <Avatar>
                     <AvatarImage src={authorAvatar} alt={authorName} />
