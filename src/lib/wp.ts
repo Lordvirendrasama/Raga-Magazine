@@ -17,30 +17,16 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 /**
  * Fetches a list of posts from the WordPress REST API.
  * @param params - Optional query parameters.
+ * @param postType - The type of post to fetch (e.g., 'posts', 'event').
  */
-export async function getPosts(params: Record<string, any> = {}) {
+export async function getPosts(params: Record<string, any> = {}, postType: string = 'posts') {
   const query = new URLSearchParams({
     per_page: '12',
     _embed: '1',
     ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
   });
-  return fetchAPI(`/posts?${query.toString()}`);
+  return fetchAPI(`/${postType}?${query.toString()}`);
 }
-
-/**
- * Fetches a list of events from the custom post type endpoint.
- * @param params - Optional query parameters.
- */
-export async function getEvents(params: Record<string, any> = {}) {
-    const query = new URLSearchParams({
-      per_page: '12',
-      _embed: '1',
-      ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
-    });
-    // The CPT slug is likely 'event', not 'events'
-    return fetchAPI(`/event?${query.toString()}`);
-}
-
 
 /**
  * Fetches a single post by its slug.

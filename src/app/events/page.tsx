@@ -1,4 +1,4 @@
-import { getEvents, getFeaturedImage } from '@/lib/wp';
+import { getPosts, getFeaturedImage } from '@/lib/wp';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { ArticleCard, type Post } from '@/components/article-card';
@@ -40,7 +40,7 @@ export default async function EventsPage() {
   let fetchError = false;
 
   try {
-    const posts = await getEvents({ per_page: 12 });
+    const posts = await getPosts({ per_page: 12 }, 'event');
     transformedPosts = posts.map(transformPost);
   } catch (error) {
     console.error("Failed to fetch events:", error);
