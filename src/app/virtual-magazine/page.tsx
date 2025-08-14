@@ -32,23 +32,19 @@ export default async function VirtualMagazinePage() {
   const magazinePosts = allPosts.map(transformPost);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex h-screen flex-col bg-background">
       <Header />
-      <main className="flex-1 overflow-hidden">
-        <div className="container mx-auto flex h-full flex-col items-center justify-center px-4 py-8 lg:py-12">
-          <h1 className="mb-8 font-headline text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-            Virtual Magazine
-          </h1>
+      <main className="flex-1 overflow-hidden p-4 md:p-8">
           {magazinePosts.length > 0 ? (
             <VirtualMagazine posts={magazinePosts} />
           ) : (
-            <p className="text-muted-foreground">
-              The magazine is currently empty. Check back soon!
-            </p>
+            <div className="flex h-full items-center justify-center">
+                <p className="text-muted-foreground">
+                The magazine is currently empty. Check back soon!
+                </p>
+            </div>
           )}
-        </div>
       </main>
-      <Footer />
     </div>
   );
 }
