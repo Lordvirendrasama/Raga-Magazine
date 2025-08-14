@@ -157,6 +157,11 @@
   .book-page--right.flipped {
     transform: rotateY(-180deg);
   }
+  
+  .book-page--left.flipped {
+      transform: rotateY(-180deg);
+  }
+
 
   .page-front,
   .page-back {

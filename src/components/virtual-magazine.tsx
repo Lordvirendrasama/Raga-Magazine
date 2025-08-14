@@ -148,7 +148,7 @@ export function VirtualMagazine({ posts }: VirtualMagazineProps) {
           variant="outline"
           size="icon"
           onClick={handleNextPage}
-          disabled={currentPage >= posts.length}
+          disabled={currentPage >= totalPages -1 }
           className="absolute right-2 top-1/2 -translate-y-1/2 z-50 rounded-full h-12 w-12 bg-background/50 hover:bg-background/80"
         >
           <ChevronRight className="h-6 w-6" />
@@ -156,4 +156,3 @@ export function VirtualMagazine({ posts }: VirtualMagazineProps) {
     </div>
   );
 }
-

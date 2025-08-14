@@ -28,7 +28,7 @@ function transformPost(wpPost: any): Post {
 }
 
 export default async function VirtualMagazinePage() {
-  const allPosts = await getPosts({ per_page: 20 });
+  const allPosts = await getPosts({ per_page: 10 });
   const magazinePosts = allPosts.map(transformPost);
 
   return (
