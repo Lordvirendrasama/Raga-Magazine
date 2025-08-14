@@ -19,8 +19,10 @@ interface VirtualMagazineProps {
 export function VirtualMagazine({ posts }: VirtualMagazineProps) {
   const [currentPage, setCurrentPage] = useState(0);
 
+  const totalPages = posts.length + 1; // +1 for the main cover
+
   const handleNextPage = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(posts.length / 2) + 1));
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
   const handlePrevPage = () => {
@@ -61,13 +63,11 @@ export function VirtualMagazine({ posts }: VirtualMagazineProps) {
     </div>
   );
 
-  const totalPages = Math.ceil(posts.length / 2) + 1;
-
   return (
     <div className="relative h-full w-full flex items-center justify-center">
       <div className="book-container w-full h-full max-w-[1400px] aspect-[16/9] lg:aspect-[2/1.2]">
         <div className="book">
-          {/* Cover Page */}
+          {/* Main Magazine Cover */}
           <div
             className={cn('book-page book-page--right visible', {
               'flipped': currentPage >= 1,
@@ -77,11 +77,11 @@ export function VirtualMagazine({ posts }: VirtualMagazineProps) {
             <div className="page-front">
               <div className="relative h-full w-full">
                   <Image
-                      src={posts[0].imageUrl}
-                      alt={posts[0].title}
+                      src={posts[0]?.imageUrl || 'https://placehold.co/800x600'}
+                      alt="RagaMagazine Cover"
                       fill
                       className="object-cover"
-                      data-ai-hint={posts[0].imageHint}
+                      data-ai-hint={posts[0]?.imageHint}
                   />
                   <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/80" />
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-8">
@@ -91,25 +91,23 @@ export function VirtualMagazine({ posts }: VirtualMagazineProps) {
               </div>
             </div>
             <div className="page-back">
-              {renderCoverPage(posts[0])}
+              {/* This is the back of the main cover, which is the first article's content page */}
+               {posts[0] ? renderArticlePage(posts[0]) : <div className="bg-card"/>}
             </div>
           </div>
 
-          {/* Inside Pages */}
+          {/* Inside Pages for each article */}
           {posts.map((post, index) => {
-            const spreadIndex = Math.floor(index / 2);
-            const pageNumber = spreadIndex + 2; // +1 for cover, +1 for 0-index
-            const isFlipped = currentPage >= pageNumber;
-            const zIndex = totalPages - (spreadIndex + 1);
+             // We start from the second article since the first is tied to the cover
+            if (index === 0) return null;
             
-            if(index % 2 !== 0) return null; // Only create one element per spread
-
-            const leftPost = posts[index];
-            const rightPost = posts[index + 1];
+            const pageNumber = index + 1;
+            const isFlipped = currentPage >= pageNumber;
+            const zIndex = totalPages - index;
 
             return (
               <div
-                key={`page-${leftPost.id}`}
+                key={`page-${post.id}`}
                 className={cn(
                   'book-page book-page--right visible',
                    {'flipped': isFlipped}
@@ -117,10 +115,12 @@ export function VirtualMagazine({ posts }: VirtualMagazineProps) {
                 style={{ zIndex }}
               >
                 <div className="page-front">
-                  {rightPost ? renderCoverPage(rightPost) : <div className="bg-card"/> }
+                  {/* The front of this page is the cover of the current article */}
+                  {renderCoverPage(post)}
                 </div>
                 <div className="page-back">
-                   {renderArticlePage(leftPost)}
+                   {/* The back of this page is the content of the current article */}
+                   {renderArticlePage(post)}
                 </div>
               </div>
             );
@@ -140,7 +140,7 @@ export function VirtualMagazine({ posts }: VirtualMagazineProps) {
           variant="outline"
           size="icon"
           onClick={handleNextPage}
-          disabled={currentPage >= totalPages}
+          disabled={currentPage >= totalPages -1}
           className="absolute right-2 top-1/2 -translate-y-1/2 z-50 rounded-full h-12 w-12 bg-background/50 hover:bg-background/80"
         >
           <ChevronRight className="h-6 w-6" />
