@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/theme-provider';
 import MouseFollower from '@/components/mouse-follower';
+import { PageFlipper } from '@/components/page-flipper';
 
 export const metadata: Metadata = {
   title: 'RagaMagazine',
@@ -31,7 +32,7 @@ export default function RootLayout({
             disableTransitionOnChange
         >
           <MouseFollower />
-          {children}
+          <PageFlipper>{children}</PageFlipper>
           <Toaster />
         </ThemeProvider>
       </body>

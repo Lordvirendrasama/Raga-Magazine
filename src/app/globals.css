@@ -66,3 +66,48 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .page-flipper {
+    perspective: 2000px;
+    perspective-origin: center;
+    overflow: hidden;
+  }
+
+  .page-flipper-content {
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+  }
+
+  .page-flipper-content.flipping-out {
+    animation: flip-out 0.7s ease-in-out forwards;
+  }
+  
+  .page-flipper-content.flipping-in {
+    animation: flip-in 0.7s ease-in-out forwards;
+  }
+
+  @keyframes flip-out {
+    from {
+      transform: rotateY(0deg);
+      opacity: 1;
+    }
+    to {
+      transform: rotateY(-90deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes flip-in {
+    from {
+      transform: rotateY(90deg);
+      opacity: 0;
+    }
+    to {
+      transform: rotateY(0deg);
+      opacity: 1;
+    }
+  }
+}
