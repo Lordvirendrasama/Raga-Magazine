@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -80,7 +81,7 @@ export function GalleryClient({ post }: GalleryClientProps) {
         <p className="mt-2 text-muted-foreground">An immersive look at our newest feature.</p>
       </div>
 
-      <div className="perspective-[1000px] w-full h-[450px]">
+      <div className="perspective-[1200px] w-full h-[500px]">
         <div
           className="scene relative w-full h-full"
           style={{ transformStyle: 'preserve-3d', transform: `rotateY(${rotation}deg)`, transition: 'transform 0.7s ease-in-out' }}
@@ -88,9 +89,9 @@ export function GalleryClient({ post }: GalleryClientProps) {
           {walls.map((wall, index) => (
             <div
               key={wall.id}
-              className="wall absolute flex h-[450px] w-[700px] flex-col items-center justify-start border border-primary/20 bg-card p-6 text-card-foreground shadow-lg"
+              className="wall absolute flex h-[480px] w-[800px] flex-col items-center justify-start border border-primary/20 bg-card p-6 text-card-foreground shadow-lg"
               style={{
-                transform: `rotateY(${index * 90}deg) translateZ(350px)`,
+                transform: `rotateY(${index * 90}deg) translateZ(400px)`,
                 backfaceVisibility: 'hidden',
               }}
             >
