@@ -82,7 +82,7 @@ export function MouseFollower() {
         transform: `translate(-50%, -50%) scale(${isClicked ? 0.8 : 1})`,
       }}
     >
-      <TrebleClefIcon className="h-12 w-12 text-primary/80 drop-shadow-lg" />
+      <TrebleClefIcon />
     </div>
   );
 }
