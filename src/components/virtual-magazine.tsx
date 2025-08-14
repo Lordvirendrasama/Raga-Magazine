@@ -17,14 +17,14 @@ interface VirtualMagazineProps {
 }
 
 export function VirtualMagazine({ posts }: VirtualMagazineProps) {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
 
   const handleNextPage = () => {
-    setCurrentPageIndex((prev) => Math.min(prev + 2, posts.length));
+    setCurrentPage((prev) => Math.min(prev + 1, posts.length));
   };
 
   const handlePrevPage = () => {
-    setCurrentPageIndex((prev) => Math.max(prev - 2, 0));
+    setCurrentPage((prev) => Math.max(prev - 1, 0));
   };
   
   const renderCoverPage = (post: Post) => (
@@ -60,102 +60,76 @@ export function VirtualMagazine({ posts }: VirtualMagazineProps) {
       </div>
     </div>
   );
-  
-  const renderBlankPage = () => <div className="w-full h-full bg-card"></div>
-
-  const pages = posts.reduce((acc, post) => {
-      acc.push({type: 'cover', post});
-      acc.push({type: 'article', post});
-      return acc;
-  }, [] as Array<{type: 'cover' | 'article', post: Post}>);
-
 
   return (
     <div className="relative w-full max-w-7xl aspect-[4/3] flex items-center justify-center">
       <div className="book-container w-full h-full">
         <div className="book">
-            {/* Cover Page */}
-            {posts.length > 0 && (
-                 <div className={cn("book-page book-page--left visible")}>
-                    <div className="page-front">
-                        {currentPageIndex === 0 ? (
-                           <div className="relative h-full w-full">
-                                <Image
-                                    src={posts[0].imageUrl}
-                                    alt={posts[0].title}
-                                    fill
-                                    className="object-cover"
-                                    data-ai-hint={posts[0].imageHint}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/80" />
-                                <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-8">
-                                    <h1 className="font-headline text-5xl md:text-7xl font-bold">RagaMagazine</h1>
-                                    <p className="mt-4 text-lg md:text-xl text-balance">The best of our collection. Click to open.</p>
-                                </div>
-                            </div>
-                        ) : renderBlankPage() }
-                    </div>
-                    <div className="page-back">
-                        {renderArticlePage(posts[0])}
-                    </div>
-                </div>
-            )}
+          {posts.map((post, index) => {
+            const pageNumber = index + 1;
+            const isFlipped = currentPage >= pageNumber;
+            const zIndex = posts.length - index;
             
-            {posts.map((post, index) => {
-                if (index === 0) return null; // Skip first post, it is handled by the cover
-                
-                const isLeftPageVisible = currentPageIndex === index && index % 2 === 0;
-                const isRightPageVisible = currentPageIndex -1 === index && index % 2 !== 0;
+            // The first page is the cover, which is a right page that flips open.
+            if (index === 0) {
+              return (
+                <div
+                  key={`page-${post.id}`}
+                  className={cn('book-page book-page--right visible', {
+                    'flipped': isFlipped,
+                  })}
+                  style={{ zIndex }}
+                >
+                  <div className="page-front">
+                    <div className="relative h-full w-full">
+                        <Image
+                            src={post.imageUrl}
+                            alt={post.title}
+                            fill
+                            className="object-cover"
+                            data-ai-hint={post.imageHint}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/80" />
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-8">
+                            <h1 className="font-headline text-5xl md:text-7xl font-bold">RagaMagazine</h1>
+                            <p className="mt-4 text-lg md:text-xl text-balance">The best of our collection. Click to open.</p>
+                        </div>
+                    </div>
+                  </div>
+                  <div className="page-back">
+                    {renderCoverPage(post)}
+                  </div>
+                </div>
+              );
+            }
 
-                const isLeftPageFlipped = currentPageIndex > index && index % 2 === 0;
-
-                return (
-                    <>
-                     {/* Left Page of a spread */}
-                      <div
-                        key={`left-${post.id}`}
-                        className={cn(
-                          "book-page book-page--left",
-                          { 'flipped': isLeftPageFlipped,
-                           'visible': isLeftPageVisible }
-                        )}
-                        style={{ zIndex: posts.length - index }}
-                      >
-                         <div className="page-front">
-                            {renderArticlePage(posts[index-1])}
-                         </div>
-                         <div className="page-back">
-                            {renderCoverPage(posts[index-1])}
-                         </div>
-                      </div>
-
-                     {/* Right Page of a spread */}
-                      <div
-                        key={`right-${post.id}`}
-                        className={cn(
-                          "book-page book-page--right",
-                           {'visible': isRightPageVisible || currentPageIndex === 0 }
-                        )}
-                         style={{ zIndex: posts.length - index }}
-                      >
-                         <div className="page-front">
-                            {renderCoverPage(post)}
-                         </div>
-                         <div className="page-back">
-                             {renderArticlePage(post)}
-                         </div>
-                      </div>
-                    </>
-                )
-            })}
-
+            // Subsequent pages
+            return (
+              <div
+                key={`page-${post.id}`}
+                className={cn(
+                  'book-page visible',
+                   pageNumber % 2 === 0 ? 'book-page--left': 'book-page--right',
+                   {'flipped': isFlipped}
+                )}
+                style={{ zIndex }}
+              >
+                <div className="page-front">
+                  {pageNumber % 2 === 0 ? renderArticlePage(post) : renderCoverPage(post)}
+                </div>
+                <div className="page-back">
+                   {pageNumber % 2 === 0 ? renderCoverPage(post) : renderArticlePage(post)}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
        <Button
           variant="outline"
           size="icon"
           onClick={handlePrevPage}
-          disabled={currentPageIndex <= 0}
+          disabled={currentPage === 0}
           className="absolute left-0 top-1/2 -translate-y-1/2 z-50 rounded-full h-12 w-12"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -164,7 +138,7 @@ export function VirtualMagazine({ posts }: VirtualMagazineProps) {
           variant="outline"
           size="icon"
           onClick={handleNextPage}
-          disabled={currentPageIndex >= posts.length}
+          disabled={currentPage >= posts.length}
           className="absolute right-0 top-1/2 -translate-y-1/2 z-50 rounded-full h-12 w-12"
         >
           <ChevronRight className="h-6 w-6" />
