@@ -17,7 +17,9 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [navLinks, setNavLinks] = useState<NavLink[]>([]);
-  const [staticLinks, setStaticLinks] = useState<NavLink[]>([]);
+  const [staticLinks, setStaticLinks] = useState<NavLink[]>([
+    { name: 'Virtual Magazine', href: '/virtual-magazine' },
+  ]);
 
   useEffect(() => {
     async function fetchMenu() {
