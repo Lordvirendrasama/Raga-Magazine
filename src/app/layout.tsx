@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/theme-provider';
 import MouseFollower from '@/components/mouse-follower';
 import { PageFlipper } from '@/components/page-flipper';
+import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 
 export const metadata: Metadata = {
   title: 'RagaMagazine',
@@ -31,8 +33,14 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
         >
-          <MouseFollower />
-          <PageFlipper>{children}</PageFlipper>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">
+              <MouseFollower />
+              <PageFlipper>{children}</PageFlipper>
+            </main>
+            <Footer />
+          </div>
           <Toaster />
         </ThemeProvider>
       </body>
