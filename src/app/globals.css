@@ -65,6 +65,19 @@
   body {
     @apply bg-background text-foreground;
   }
+  .day-with-event {
+    @apply relative;
+  }
+  .day-with-event::after {
+    content: '';
+    @apply absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary;
+  }
+  .dark .day-with-event::after {
+     @apply bg-primary;
+  }
+  .rdp-day_selected.day-with-event::after {
+    @apply bg-primary-foreground;
+  }
 }
 
 @layer utilities {
