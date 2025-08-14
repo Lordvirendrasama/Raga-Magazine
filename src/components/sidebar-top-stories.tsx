@@ -21,7 +21,7 @@ export function SidebarTopStories({ posts }: SidebarTopStoriesProps) {
               {String(index + 1).padStart(2, '0')}
             </span>
             <div className="flex-1">
-              <h3 className="font-semibold leading-tight group-hover:text-primary">{post.title}</h3>
+              <h3 className="font-semibold leading-tight group-hover:text-accent">{post.title}</h3>
               <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
                 <span>{post.author.name}</span>
                 <Badge variant="outline">{post.category}</Badge>

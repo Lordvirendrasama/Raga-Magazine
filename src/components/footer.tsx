@@ -25,9 +25,9 @@ export function Footer() {
               <h3 className="font-semibold uppercase tracking-wider text-foreground">Categories</h3>
               <ul className="mt-4 space-y-2">
                 <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Technology</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Culture</Link></li>
+                <li><Link href="#" className="text-sm text-muted-foreground hover:text-accent">Culture</Link></li>
                 <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Design</Link></li>
-                <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary">Business</Link></li>
+                <li><Link href="#" className="text-sm text-muted-foreground hover:text-accent">Business</Link></li>
               </ul>
             </div>
             <div className="md:justify-self-end">

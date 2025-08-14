@@ -67,7 +67,7 @@ export default async function PostPage({ params }: { params: { slug: string } })
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
             <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-12">
               <div className="container mx-auto">
-                <Badge>{category}</Badge>
+                <Badge variant="default">{category}</Badge>
                 <h1 className="mt-4 font-headline text-3xl font-bold text-white shadow-2xl md:text-5xl lg:text-6xl max-w-4xl" dangerouslySetInnerHTML={{ __html: post.title.rendered }} />
                 <div className="mt-4 flex items-center gap-4">
                   <Avatar>
@@ -87,7 +87,7 @@ export default async function PostPage({ params }: { params: { slug: string } })
 
           <div className="container mx-auto max-w-4xl px-4 py-8 lg:py-16">
             <div 
-              className="prose prose-lg dark:prose-invert max-w-none prose-p:text-lg prose-p:leading-relaxed prose-headings:font-headline prose-a:text-primary hover:prose-a:underline"
+              className="prose prose-lg dark:prose-invert max-w-none prose-p:text-lg prose-p:leading-relaxed prose-headings:font-headline prose-a:text-accent hover:prose-a:underline"
               dangerouslySetInnerHTML={{ __html: post.content.rendered }} 
             />
 

@@ -94,7 +94,7 @@ export function ArticleCard({ post, variant, className }: ArticleCardProps) {
           <Badge variant="secondary">{post.category}</Badge>
         </div>
         <h3 className={cn('font-headline text-lg font-bold leading-tight', variant === 'featured' && 'text-2xl md:text-3xl', variant === 'compact' ? 'text-base' : 'text-xl')}>
-          <span className="bg-gradient-to-r from-primary/90 to-primary bg-bottom bg-no-repeat bg-[length:0%_2px] transition-[background-size] duration-500 group-hover:bg-[length:100%_2px] z-20 relative">
+          <span className="bg-gradient-to-r from-accent/90 to-accent bg-bottom bg-no-repeat bg-[length:0%_2px] transition-[background-size] duration-500 group-hover:bg-[length:100%_2px] z-20 relative">
             {post.title}
           </span>
         </h3>
