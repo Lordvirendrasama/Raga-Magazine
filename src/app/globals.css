@@ -101,16 +101,25 @@
     left: 0;
     z-index: 1;
     animation: book-flip-out 1s cubic-bezier(0.6, 0.04, 0.98, 0.335) forwards;
+    backface-visibility: hidden; /* Hide the back of the element */
+  }
+
+  .page-flipper-content.flipping-out::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: hsl(var(--background));
+      transform: rotateY(180deg); /* Flip it to face the back */
+      backface-visibility: hidden; /* Show this pseudo-element on the back */
+      z-index: 2;
   }
   
   @keyframes book-flip-out {
     from {
       transform: rotateY(0deg);
-      opacity: 1;
     }
     to {
       transform: rotateY(-180deg);
-      opacity: 0;
     }
   }
 }
