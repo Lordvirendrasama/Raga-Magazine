@@ -8,33 +8,78 @@ import type { Post } from './article-card';
 import { ScrollArea } from './ui/scroll-area';
 import Link from 'next/link';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import { getPosts } from '@/lib/wp';
 
 interface SearchOverlayProps {
-  posts: Post[];
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function SearchOverlay({ posts, isOpen, onClose }: SearchOverlayProps) {
+// Helper function to transform WordPress posts to the app's Post format
+function transformPost(wpPost: any): Post {
+  const category = wpPost._embedded?.['wp:term']?.[0]?.find((term: any) => term.taxonomy === 'category')?.name || 'Uncategorized';
+  
+  // This function is defined in page.tsx, we need a simplified version or a shared one.
+  const getFeaturedImage = (post: any): string => {
+    const featuredMedia = post?._embedded?.['wp:featuredmedia'];
+    if (featuredMedia && featuredMedia[0]?.source_url) {
+      return featuredMedia[0].source_url;
+    }
+    return 'https://placehold.co/800x450'; // Fallback placeholder
+  }
+
+  return {
+    id: wpPost.id,
+    title: wpPost.title.rendered,
+    slug: wpPost.slug,
+    category: category,
+    imageUrl: getFeaturedImage(wpPost),
+    imageHint: wpPost.title.rendered.split(' ').slice(0, 2).join(' ').toLowerCase(),
+    author: {
+      name: wpPost._embedded?.author?.[0]?.name || 'RagaMagazine Staff',
+      avatarUrl: wpPost._embedded?.author?.[0]?.avatar_urls?.['96'] || 'https://placehold.co/40x40',
+    },
+    date: wpPost.date_gmt,
+    excerpt: wpPost.excerpt.rendered.replace(/<[^>]+>/g, ''), // Strip HTML tags
+    tags: wpPost._embedded?.['wp:term']?.[1]?.map((tag: any) => tag.name) || [],
+    views: 0, // WP API doesn't provide view count by default
+  };
+}
+
+
+export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (searchTerm.length > 1) {
-      const results = posts.filter(post =>
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.category.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredPosts(results);
+  const handleSearch = useCallback(async (term: string) => {
+    if (term.length > 2) {
+      setIsLoading(true);
+      try {
+        const results = await getPosts({ search: term, per_page: 10 });
+        setFilteredPosts(results.map(transformPost));
+      } catch (error) {
+        console.error("Search failed:", error);
+        setFilteredPosts([]);
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       setFilteredPosts([]);
     }
-  }, [searchTerm, posts]);
+  }, []);
+
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      handleSearch(searchTerm);
+    }, 300); // 300ms debounce delay
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm, handleSearch]);
 
   const handleClose = useCallback(() => {
     setSearchTerm('');
+    setFilteredPosts([]);
     onClose();
   }, [onClose]);
 
@@ -76,8 +121,13 @@ export function SearchOverlay({ posts, isOpen, onClose }: SearchOverlayProps) {
           </div>
           <div className="mt-6 flex-1 overflow-hidden">
             <ScrollArea className="h-full pr-4">
-              {searchTerm.length > 1 && filteredPosts.length === 0 && (
-                <p className="text-center text-muted-foreground">No results found.</p>
+              {isLoading && (
+                 <div className="flex justify-center items-center h-full">
+                    <p className="text-center text-muted-foreground">Loading...</p>
+                 </div>
+              )}
+              {!isLoading && searchTerm.length > 2 && filteredPosts.length === 0 && (
+                <p className="text-center text-muted-foreground">No results found for "{searchTerm}".</p>
               )}
               <div className="space-y-4">
                 {filteredPosts.map(post => (
@@ -92,8 +142,8 @@ export function SearchOverlay({ posts, isOpen, onClose }: SearchOverlayProps) {
                       />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-foreground group-hover:text-primary">{post.title}</h3>
-                      <p className="text-sm text-muted-foreground">{post.excerpt}</p>
+                      <h3 className="font-semibold text-foreground group-hover:text-primary" dangerouslySetInnerHTML={{ __html: post.title }} />
+                      <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: post.excerpt }} />
                     </div>
                   </Link>
                 ))}

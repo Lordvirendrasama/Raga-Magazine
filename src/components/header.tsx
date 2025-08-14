@@ -1,24 +1,45 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchOverlay } from './search-overlay';
-import { mockPosts } from '@/data/posts';
-import { cn } from '@/lib/utils';
+import { getCategories } from '@/lib/wp';
 
-const navLinks = [
-  { name: 'Technology', href: '#' },
-  { name: 'Culture', href: '#' },
-  { name: 'Design', href: '#' },
-  { name: 'Business', href: '#' },
-  { name: 'Magazine', href: '#' },
-];
+interface NavLink {
+  name: string;
+  href: string;
+}
 
 export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [navLinks, setNavLinks] = useState<NavLink[]>([]);
+
+  useEffect(() => {
+    async function fetchMenu() {
+      try {
+        const categories = await getCategories();
+        const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0);
+        const links = filteredCategories.map((cat: any) => ({
+          name: cat.name,
+          href: `/category/${cat.slug}`,
+        }));
+        setNavLinks(links);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+        // Fallback to static links in case of an error
+        setNavLinks([
+          { name: 'Technology', href: '#' },
+          { name: 'Culture', href: '#' },
+          { name: 'Design', href: '#' },
+          { name: 'Business', href: '#' },
+        ]);
+      }
+    }
+    fetchMenu();
+  }, []);
 
   return (
     <>
@@ -55,7 +76,7 @@ export function Header() {
           </div>
         )}
       </header>
-      <SearchOverlay posts={mockPosts} isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 }
