@@ -1,3 +1,4 @@
+
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -20,29 +21,35 @@ export function PageFlipper({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const previousPathname = (currentChildren as any)?.props?.childProp?.segment;
     // Only trigger animation if the pathname changes
-    if (pathname !== (currentChildren as any)?.props?.childProp?.segment) {
+    if (pathname !== previousPathname) {
       setIsAnimating(true);
       setAnimationClass('flipping-out');
 
       // Wait for the 'out' animation to finish
       timeoutRef.current = setTimeout(() => {
+        // Set the new content, but keep animating
         setCurrentChildren(children);
         setAnimationClass('flipping-in');
         
-        // Wait for the 'in' animation to finish
+        // Wait for the 'in' animation to finish before stopping animation
         timeoutRef.current = setTimeout(() => {
           setIsAnimating(false);
           setAnimationClass('');
         }, 1000); // Duration of the flip-in animation
       }, 1000); // Duration of the flip-out animation
     }
-  }, [pathname, children, currentChildren]);
+  }, [pathname, children]); // Remove currentChildren from dependencies to avoid re-triggering
+
+  // Determine which content to render. If animating, always show the state's `currentChildren`.
+  // Otherwise, show the latest `children` from props.
+  const contentToRender = isAnimating ? currentChildren : children;
 
   return (
     <div className="page-flipper">
       <div className={`page-flipper-content ${animationClass}`} key={pathname}>
-        {isAnimating ? currentChildren : children}
+        {contentToRender}
       </div>
     </div>
   );
