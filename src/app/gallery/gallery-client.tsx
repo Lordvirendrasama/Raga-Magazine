@@ -99,7 +99,7 @@ export function GalleryClient({ post }: GalleryClientProps) {
                 <wall.icon className="h-5 w-5 text-primary" />
                 <h2 className="text-lg font-semibold tracking-wide">{wall.title}</h2>
               </div>
-              <div className="h-full w-full flex-grow overflow-hidden">
+              <div className="h-full w-full flex-grow overflow-auto">
                 {wall.content}
               </div>
             </div>
