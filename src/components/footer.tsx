@@ -13,32 +13,32 @@ interface CategoryLink {
 
 export function Footer() {
   const [currentYear, setCurrentYear] = useState<number | null>(null);
-  const [categoryLinks, setCategoryLinks] = useState<CategoryLink[]>([]);
+  const [navLinks, setNavLinks] = useState<CategoryLink[]>([]);
 
   useEffect(() => {
     setCurrentYear(new Date().getFullYear());
 
-    async function fetchCategories() {
+    async function fetchLinks() {
       try {
         const categories = await getCategories();
         const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0);
-        const links = filteredCategories.slice(0, 4).map((cat: any) => ({
+        const categoryLinks = filteredCategories.slice(0, 3).map((cat: any) => ({
           name: cat.name,
           href: `/category/${cat.slug}`,
         }));
-        setCategoryLinks(links);
+        setNavLinks([...categoryLinks, { name: 'Events', href: '/events' }]);
       } catch (error) {
         console.error('Failed to fetch categories for footer:', error);
         // Fallback for case where API fails
-        setCategoryLinks([
+        setNavLinks([
             { name: 'Technology', href: '#' },
             { name: 'Culture', href: '#' },
             { name: 'Design', href: '#' },
-            { name: 'Business', href: '#' },
+            { name: 'Events', href: '/events' },
         ]);
       }
     }
-    fetchCategories();
+    fetchLinks();
   }, []);
 
   return (
@@ -51,9 +51,9 @@ export function Footer() {
           </div>
           <div className="grid grid-cols-2 gap-8 md:col-span-2">
             <div className="md:justify-self-center">
-              <h3 className="font-semibold uppercase tracking-wider text-foreground">Categories</h3>
+              <h3 className="font-semibold uppercase tracking-wider text-foreground">Navigate</h3>
               <ul className="mt-4 space-y-2">
-                {categoryLinks.map((link, index) => (
+                {navLinks.map((link, index) => (
                     <li key={link.name}>
                         <Link href={link.href} className={`text-sm text-muted-foreground hover:text-${index % 2 === 0 ? 'primary' : 'accent'}`}>
                             {link.name}
