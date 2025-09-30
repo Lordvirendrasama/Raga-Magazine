@@ -1,3 +1,4 @@
+
 import { getEventBySlug } from '@/lib/wp';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
@@ -7,49 +8,59 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { CalendarIcon, ClockIcon, MapPinIcon } from 'lucide-react';
 
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const event = await getEventBySlug(params.slug);
+  try {
+    const event = await getEventBySlug(params.slug);
 
-  if (!event) {
+    if (!event) {
+      return {
+        title: 'Event Not Found',
+      };
+    }
+
+    const title = event.title;
+    const excerpt = event.description.replace(/<[^>]+>/g, '');
+
+    return {
+      title: `${title} | RagaMagazine`,
+      description: excerpt,
+      openGraph: {
+        title: title,
+        description: excerpt,
+        images: [
+          {
+            url: event.image?.url || 'https://placehold.co/1200x630',
+            width: 1200,
+            height: 630,
+            alt: title,
+          },
+        ],
+      },
+    };
+  } catch (error) {
+    console.error('Failed to generate metadata for event:', error);
     return {
       title: 'Event Not Found',
+      description: 'Could not load event details.',
     };
   }
-
-  // The Events Calendar API returns a plain string for the title
-  const title = event.title;
-  // The description might contain HTML, so we strip it for the metadata
-  const excerpt = event.description.replace(/<[^>]+>/g, '');
-
-  return {
-    title: `${title} | RagaMagazine`,
-    description: excerpt,
-    openGraph: {
-      title: title,
-      description: excerpt,
-      images: [
-        {
-          url: event.image?.url || 'https://placehold.co/1200x630',
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
-    },
-  };
 }
 
-
 export default async function EventPage({ params }: { params: { slug: string } }) {
-  const event = await getEventBySlug(params.slug);
+  let event;
+  try {
+     event = await getEventBySlug(params.slug);
+  } catch (error) {
+    console.error(`Failed to fetch event ${params.slug}:`, error);
+    notFound();
+  }
 
   if (!event) {
     notFound();
   }
 
   const category = event.categories?.[0]?.name || 'Event';
-  // Author data might be structured differently in The Events Calendar
   const authorName = event.author?.display_name || 'RagaMagazine Staff';
-  const authorAvatar = 'https://secure.gravatar.com/avatar/?s=96&d=mm&r=g'; // Default avatar
+  const authorAvatar = 'https://secure.gravatar.com/avatar/?s=96&d=mm&r=g';
   const featuredImageUrl = event.image?.url || 'https://placehold.co/1200x630';
   const tags = event.tags?.map((tag: any) => tag.name) || [];
 
@@ -59,7 +70,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
 
   return (
     <article>
-      <header className="relative h-[60vh] min-h-[400px] w-full">
+      <header className="relative h-[50vh] min-h-[350px] w-full md:h-[60vh]">
         <Image
           src={featuredImageUrl}
           alt={event.title}
@@ -68,7 +79,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-        <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-12">
+        <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 md:p-12">
           <div className="container mx-auto">
             <Badge variant="default">{category}</Badge>
             <h1 className="mt-4 font-headline text-3xl font-bold text-white shadow-2xl md:text-5xl lg:text-6xl max-w-4xl">{event.title}</h1>
@@ -113,7 +124,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
         </div>
 
         <div 
-          className="prose prose-lg dark:prose-invert max-w-none prose-p:text-lg prose-p:leading-relaxed prose-headings:font-headline prose-a:text-accent hover:prose-a:underline"
+          className="wp-content"
           dangerouslySetInnerHTML={{ __html: event.description }} 
         />
 

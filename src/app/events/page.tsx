@@ -10,7 +10,7 @@ export async function generateMetadata() {
 export default function EventsPage() {
   return (
     <div className="container mx-auto px-4 py-8 lg:py-12">
-      <div className="text-center mb-12">
+      <div className="text-center mb-8 md:mb-12">
         <h1 className="mb-4 font-headline text-4xl font-bold tracking-tight text-foreground md:text-5xl">
           Events Calendar
         </h1>

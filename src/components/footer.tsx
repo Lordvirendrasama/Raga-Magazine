@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Twitter, Facebook, Instagram } from 'lucide-react';
@@ -5,15 +6,28 @@ import Link from 'next/link';
 import { Button } from './ui/button';
 import React, { useState, useEffect } from 'react';
 import { getCategories } from '@/lib/wp';
+import { useScalePlayer } from '@/hooks/use-scale-player';
 
 interface CategoryLink {
   name: string;
   href: string;
 }
 
+const fallbackLinks: CategoryLink[] = [
+    { name: 'Technology', href: '/category/technology' },
+    { name: 'Culture', href: '/category/culture' },
+    { name: 'Design', href: '/category/design' },
+];
+
+const allStaticLinks: CategoryLink[] = [
+  { name: 'Timeline', href: '/timeline' },
+  { name: 'Events', href: '/events' },
+];
+
 export function Footer() {
   const [currentYear, setCurrentYear] = useState<number | null>(null);
-  const [navLinks, setNavLinks] = useState<CategoryLink[]>([]);
+  const [navLinks, setNavLinks] = useState<CategoryLink[]>([...fallbackLinks, ...allStaticLinks]);
+  const playNote = useScalePlayer();
 
   useEffect(() => {
     setCurrentYear(new Date().getFullYear());
@@ -21,21 +35,16 @@ export function Footer() {
     async function fetchLinks() {
       try {
         const categories = await getCategories();
-        const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0);
-        const categoryLinks = filteredCategories.slice(0, 3).map((cat: any) => ({
-          name: cat.name,
-          href: `/category/${cat.slug}`,
-        }));
-        setNavLinks([...categoryLinks, { name: 'Events', href: '/events' }]);
+        if (categories && categories.length > 0) {
+            const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0);
+            const categoryLinks = filteredCategories.slice(0, 3).map((cat: any) => ({
+              name: cat.name,
+              href: `/category/${cat.slug}`,
+            }));
+            setNavLinks([...categoryLinks, ...allStaticLinks]);
+        }
       } catch (error) {
-        console.error('Failed to fetch categories for footer:', error);
-        // Fallback for case where API fails
-        setNavLinks([
-            { name: 'Technology', href: '#' },
-            { name: 'Culture', href: '#' },
-            { name: 'Design', href: '#' },
-            { name: 'Events', href: '/events' },
-        ]);
+        console.error('Failed to fetch categories for footer, using fallback:', error);
       }
     }
     fetchLinks();
@@ -55,7 +64,11 @@ export function Footer() {
               <ul className="mt-4 space-y-2">
                 {navLinks.map((link, index) => (
                     <li key={link.name}>
-                        <Link href={link.href} className={`text-sm text-muted-foreground hover:text-${index % 2 === 0 ? 'primary' : 'accent'}`}>
+                        <Link 
+                          href={link.href} 
+                          className={`text-sm text-muted-foreground hover:text-${index % 2 === 0 ? 'primary' : 'accent'}`}
+                          onMouseEnter={() => playNote(index)}
+                        >
                             {link.name}
                         </Link>
                     </li>

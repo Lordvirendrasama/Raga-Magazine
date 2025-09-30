@@ -1,3 +1,6 @@
+
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -5,6 +8,7 @@ import { format } from 'date-fns';
 
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { useScalePlayer } from '@/hooks/use-scale-player';
 
 const cardVariants = cva(
   'group relative flex flex-col overflow-hidden rounded-lg bg-card text-card-foreground shadow-md transition-shadow hover:shadow-xl',
@@ -44,8 +48,8 @@ const contentVariants = cva(
     variants: {
       variant: {
         default: 'p-4',
-        featured: 'p-6',
-        compact: 'p-4 w-2/3',
+        featured: 'p-4 md:p-6',
+        compact: 'p-3 md:p-4 w-2/3',
       },
     },
     defaultVariants: {
@@ -70,19 +74,21 @@ export interface Post {
   fullContent?: string; // Optional full content for gallery
   tags: string[];
   views: number;
+  isEvent?: boolean;
 }
 
 interface ArticleCardProps extends VariantProps<typeof cardVariants> {
   post: Post;
   className?: string;
+  noteIndex?: number;
 }
 
-export function ArticleCard({ post, variant, className }: ArticleCardProps) {
-  // If the slug doesn't start with a slash, assume it's a post
-  const href = post.slug.startsWith('/') ? post.slug : `/posts/${post.slug}`;
+export function ArticleCard({ post, variant, className, noteIndex = 0 }: ArticleCardProps) {
+  const href = post.isEvent ? `/events/${post.slug}` : `/posts/${post.slug}`;
+  const playNote = useScalePlayer();
   
   return (
-    <article className={cn(cardVariants({ variant }), className)}>
+    <article className={cn(cardVariants({ variant }), className)} onMouseEnter={() => playNote(noteIndex)}>
       <Link href={href} className="absolute inset-0 z-10" aria-label={post.title} />
       <div className={cn(imageContainerVariants({ variant }))}>
         <Image
@@ -97,13 +103,13 @@ export function ArticleCard({ post, variant, className }: ArticleCardProps) {
         <div className="mb-2 flex items-center gap-2">
           <Badge variant="secondary">{post.category}</Badge>
         </div>
-        <h3 className={cn('font-headline text-lg font-bold leading-tight', variant === 'featured' && 'text-2xl md:text-3xl', variant === 'compact' ? 'text-base' : 'text-xl')}>
+        <h3 className={cn('font-headline font-bold leading-tight', variant === 'featured' ? 'text-2xl md:text-3xl' : 'text-lg', variant === 'compact' && 'text-base')}>
           <span className="bg-gradient-to-r from-accent/90 to-accent bg-bottom bg-no-repeat bg-[length:0%_2px] transition-[background-size] duration-500 group-hover:bg-[length:100%_2px] z-20 relative">
             {post.title}
           </span>
         </h3>
         {variant !== 'compact' && (
-          <p className="mt-2 text-sm text-muted-foreground flex-grow" dangerouslySetInnerHTML={{ __html: post.excerpt }} />
+          <p className="mt-2 text-sm text-muted-foreground flex-grow">{post.excerpt}</p>
         )}
         <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
           <span>{post.author.name}</span>

@@ -1,0 +1,20 @@
+
+{
+  "images": [
+    { "url": "https://picsum.photos/seed/1/1200/800", "hint": "instrument music" },
+    { "url": "https://picsum.photos/seed/2/1200/800", "hint": "concert stage" },
+    { "url": "https://picsum.photos/seed/3/1200/800", "hint": "musician portrait" },
+    { "url": "https://picsum.photos/seed/4/1200/800", "hint": "vinyl record" },
+    { "url": "https://picsum.photos/seed/5/1200/800", "hint": "performance art" },
+    { "url": "https://picsum.photos/seed/6/1200/800", "hint": "guitar acoustic" },
+    { "url": "https://picsum.photos/seed/7/1200/800", "hint": "piano keys" },
+    { "url": "https://picsum.photos/seed/8/1200/800", "hint": "audience crowd" },
+    { "url": "https://picsum.photos/seed/9/1200/800", "hint": "classical music" },
+    { "url": "https://picsum.photos/seed/10/1200/800", "hint": "singer vocalist" },
+    { "url": "https://picsum.photos/seed/11/800/1200", "hint": "musician profile" },
+    { "url": "https://picsum.photos/seed/12/1200/800", "hint": "event concert" },
+    { "url": "https://picsum.photos/seed/13/1200/800", "hint": "stage lights" },
+    { "url": "https://picsum.photos/seed/14/1200/800", "hint": "sitar instrument" },
+    { "url": "https://picsum.photos/seed/15/1200/800", "hint": "music festival" }
+  ]
+}

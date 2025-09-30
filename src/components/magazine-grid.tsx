@@ -28,12 +28,14 @@ export function MagazineGrid({ initialPosts }: MagazineGridProps) {
       <h2 className="mb-6 font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
         From the Magazine
       </h2>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {posts.map((post, index) => (
           <ArticleCard
             key={post.id}
             post={post}
             variant={index === 0 ? 'featured' : 'default'}
+            className={index === 0 ? "md:col-span-2" : ""}
+            noteIndex={index}
           />
         ))}
       </div>

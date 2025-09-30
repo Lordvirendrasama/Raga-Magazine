@@ -1,6 +1,7 @@
+
 'use client';
 
-import * as React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Autoplay from 'embla-carousel-autoplay';
@@ -15,16 +16,18 @@ import {
 import { Badge } from '@/components/ui/badge';
 import type { Post } from './article-card';
 import { cn } from '@/lib/utils';
+import { useScalePlayer } from '@/hooks/use-scale-player';
 
 interface HeroCarouselProps {
   posts: Post[];
 }
 
 export function HeroCarousel({ posts }: HeroCarouselProps) {
-  const [api, setApi] = React.useState<CarouselApi>();
-  const [current, setCurrent] = React.useState(0);
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+  const playNote = useScalePlayer();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!api) {
       return;
     }
@@ -42,9 +45,17 @@ export function HeroCarousel({ posts }: HeroCarouselProps) {
     };
   }, [api]);
 
-  const plugin = React.useRef(
+  const plugin = useRef(
     Autoplay({ delay: 5000, stopOnInteraction: true })
   );
+
+  if (!posts || posts.length === 0) {
+    return (
+        <div className="relative h-[50vh] min-h-[350px] w-full md:h-[65vh] bg-muted flex items-center justify-center">
+            <p className="text-muted-foreground">Could not load featured posts.</p>
+        </div>
+    );
+  }
 
   return (
     <div className="relative w-full">
@@ -56,9 +67,9 @@ export function HeroCarousel({ posts }: HeroCarouselProps) {
         onMouseLeave={plugin.current.reset}
       >
         <CarouselContent>
-          {posts.map((post) => (
-            <CarouselItem key={post.id}>
-              <div className="relative h-[60vh] min-h-[400px] w-full md:h-[70vh]">
+          {posts.map((post, index) => (
+            <CarouselItem key={post.id} onMouseEnter={() => playNote(index)}>
+              <div className="relative h-[50vh] min-h-[350px] w-full md:h-[65vh] overflow-hidden">
                 <Image
                   src={post.imageUrl}
                   alt={post.title}
@@ -68,15 +79,15 @@ export function HeroCarousel({ posts }: HeroCarouselProps) {
                   priority={posts.indexOf(post) === 0}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-12">
+                <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 md:p-12">
                   <div className="container mx-auto">
                     <Badge>{post.category}</Badge>
-                    <h2 className="mt-4 font-headline text-3xl font-bold text-white shadow-2xl md:text-5xl lg:text-6xl max-w-4xl">
+                    <h2 className="mt-4 font-headline text-2xl font-bold text-white shadow-2xl sm:text-3xl md:text-5xl lg:text-6xl max-w-4xl">
                       <Link href={`/posts/${post.slug}`} className="hover:underline">
                         {post.title}
                       </Link>
                     </h2>
-                    <p className="mt-2 max-w-2xl text-base text-gray-300 md:text-lg">
+                    <p className="mt-2 max-w-2xl text-sm text-gray-300 md:text-base lg:text-lg">
                       {post.excerpt}
                     </p>
                   </div>

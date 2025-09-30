@@ -1,18 +1,35 @@
+
 // @/lib/wp.ts
+import { decode } from 'html-entities';
+import type { Post } from '@/components/article-card';
+import placeholderImages from '@/app/lib/placeholder-images.json';
+
+
 const BASE_URL = 'https://ragamagazine.com/wp-json';
 
-// Generic fetch function with error handling
+// Generic fetch function with robust error handling
 async function fetchAPI(endpoint: string, options: RequestInit = {}) {
-  // Use the full URL if provided, otherwise prepend BASE_URL
   const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
-  const defaultOptions: RequestInit = {
-    next: { revalidate: 300 }, // Revalidate every 5 minutes
-  };
-  const res = await fetch(url, { ...defaultOptions, ...options });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${url}: ${res.statusText}`);
+  
+  try {
+    const res = await fetch(url, { cache: 'no-store', ...options });
+
+    if (!res.ok) {
+      console.error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
+      // Don't return the body content for failed requests
+      return null;
+    }
+    // Check for empty response body before parsing JSON
+    const text = await res.text();
+    if (!text) {
+        return null;
+    }
+    return JSON.parse(text);
+  } catch (error) {
+    // This will catch network errors (e.g., "fetch failed")
+    console.error(`Network error fetching ${url}:`, error);
+    return null;
   }
-  return res.json();
 }
 
 /**
@@ -32,13 +49,15 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
   if (!isEventsCalendar) {
     query.set('_embed', '1');
   } else {
-    // The Events Calendar uses different parameter names
     query.set('status', 'publish');
   }
 
   const result = await fetchAPI(`${apiPath}?${query.toString()}`);
   
-  // The Events Calendar nests posts under an 'events' key
+  if (!result) {
+    return null; // Propagate null on fetch failure
+  }
+
   return isEventsCalendar ? result.events : result;
 }
 
@@ -55,14 +74,14 @@ export async function getPostBySlug(slug: string) {
   return posts[0];
 }
 
+
 /**
  * Fetches a single event by its slug from The Events Calendar API.
  * @param slug - The slug of the event.
  */
 export async function getEventBySlug(slug: string) {
-  // The Events Calendar API for a single post is typically /tribe/events/v1/events/by-slug/:slug
   const result = await fetchAPI(`/tribe/events/v1/events/by-slug/${slug}`);
-  return result;
+  return result; // Will be null if fetch fails
 }
 
 /**
@@ -74,7 +93,6 @@ export async function getCategories() {
 
 /**
  * Fetches a category by its slug.
- * @param slug - The slug of the category.
  */
 export async function getCategoryBySlug(slug: string) {
     const categories = await fetchAPI(`/wp/v2/categories?slug=${slug}`);
@@ -84,7 +102,6 @@ export async function getCategoryBySlug(slug: string) {
     return categories[0];
 }
 
-
 /**
  * Fetches all tags.
  */
@@ -93,19 +110,91 @@ export async function getTags() {
 }
 
 /**
- * Extracts the featured image URL from a post object.
- * @param post - The post object from the WP API.
+ * Extracts the featured image URL from a WordPress post object.
+ * Provides a fallback to a placeholder if no image is found.
+ * @param post - The post object from WordPress.
  * @returns The URL of the featured image or a placeholder.
  */
-export function getFeaturedImage(post: any): string {
-  // Handle The Events Calendar image format
-  if (post?.image?.url) {
-    return post.image.url;
-  }
+export function getFeaturedImage(post: any): { url: string; hint?: string } {
+    const defaultImage = placeholderImages.images[0] || { url: 'https://picsum.photos/seed/1/1200/800', hint: 'abstract music' };
+
+    if (!post) {
+      return defaultImage;
+    }
+
+    // For standard posts
+    const featuredMedia = post?._embedded?.['wp:featuredmedia']?.[0];
+    if (featuredMedia?.source_url) {
+        return { url: featuredMedia.source_url, hint: post.slug };
+    }
+
+    // For The Events Calendar events
+    if (post?.image?.url) {
+        return { url: post.image.url, hint: post.slug };
+    }
+    
+    // Fallback to a random placeholder from our list if no image is found
+    if (post?.id) {
+        const index = post.id % placeholderImages.images.length;
+        if (placeholderImages.images[index]) {
+            return placeholderImages.images[index];
+        }
+    }
+
+    return defaultImage;
+}
+
+
+/**
+ * Transforms a WordPress post object (from REST API) into the app's Post format.
+ * This function handles both standard posts and The Events Calendar event posts.
+ * @param wpPost - The post object from WordPress.
+ * @returns A Post object.
+ */
+export function transformPost(wpPost: any): Post {
+  const isEvent = wpPost?.type === 'tribe_events' || wpPost?.hasOwnProperty('start_date');
+
+  const title = decode(wpPost?.title?.rendered || wpPost?.title || 'Untitled');
+  const excerpt = decode((wpPost?.excerpt?.rendered || wpPost?.description || '').replace(/<[^>]+>/g, ''));
   
-  const featuredMedia = post?._embedded?.['wp:featuredmedia'];
-  if (featuredMedia && featuredMedia[0]?.source_url) {
-    return featuredMedia[0].source_url;
+  let category = 'Uncategorized';
+  const terms = wpPost?._embedded?.['wp:term']?.[0]; // This is an array of term objects
+  if (terms && Array.isArray(terms) && terms.length > 0) {
+      // Find the term with taxonomy 'category'
+      const categoryTerm = terms.find((term: any) => term.taxonomy === 'category');
+      if (categoryTerm) {
+        category = categoryTerm.name;
+      }
+  } else if (isEvent && wpPost?.categories?.[0]?.name) {
+      category = wpPost.categories[0].name;
   }
-  return 'https://placehold.co/800x450'; // Fallback placeholder
+
+  const slug = wpPost.slug;
+  
+  const authorName = wpPost?._embedded?.author?.[0]?.name || wpPost?.author?.display_name || 'RagaMagazine Staff';
+  const authorAvatar = wpPost?._embedded?.author?.[0]?.avatar_urls?.['96'] || 'https://secure.gravatar.com/avatar/?s=96&d=mm&r=g';
+
+  // Safely access tags
+  const wpTags = wpPost?._embedded?.['wp:term']?.[1] || wpPost?.tags || [];
+  const tags = Array.isArray(wpTags) ? wpTags.map((tag: any) => tag.name) : [];
+
+  const { url: imageUrl, hint: imageHint } = getFeaturedImage(wpPost);
+
+  return {
+    id: wpPost.id,
+    title,
+    slug,
+    category,
+    imageUrl,
+    imageHint,
+    author: {
+      name: authorName,
+      avatarUrl: authorAvatar,
+    },
+    date: wpPost.date_gmt || wpPost.start_date,
+    excerpt,
+    tags,
+    views: 0,
+    isEvent,
+  };
 }

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -8,49 +9,20 @@ import type { Post } from './article-card';
 import { ScrollArea } from './ui/scroll-area';
 import Link from 'next/link';
 import Image from 'next/image';
-import { getPosts } from '@/lib/wp';
+import { getPosts, transformPost } from '@/lib/wp';
+import { useScalePlayer } from '@/hooks/use-scale-player';
+import GlitchLoader from './glitch-loader';
 
 interface SearchOverlayProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-// Helper function to transform WordPress posts to the app's Post format
-function transformPost(wpPost: any): Post {
-  const category = wpPost._embedded?.['wp:term']?.[0]?.find((term: any) => term.taxonomy === 'category')?.name || 'Uncategorized';
-  
-  // This function is defined in page.tsx, we need a simplified version or a shared one.
-  const getFeaturedImage = (post: any): string => {
-    const featuredMedia = post?._embedded?.['wp:featuredmedia'];
-    if (featuredMedia && featuredMedia[0]?.source_url) {
-      return featuredMedia[0].source_url;
-    }
-    return 'https://placehold.co/800x450'; // Fallback placeholder
-  }
-
-  return {
-    id: wpPost.id,
-    title: wpPost.title.rendered,
-    slug: wpPost.slug,
-    category: category,
-    imageUrl: getFeaturedImage(wpPost),
-    imageHint: wpPost.title.rendered.split(' ').slice(0, 2).join(' ').toLowerCase(),
-    author: {
-      name: wpPost._embedded?.author?.[0]?.name || 'RagaMagazine Staff',
-      avatarUrl: wpPost._embedded?.author?.[0]?.avatar_urls?.['96'] || 'https://placehold.co/40x40',
-    },
-    date: wpPost.date_gmt,
-    excerpt: wpPost.excerpt.rendered.replace(/<[^>]+>/g, ''), // Strip HTML tags
-    tags: wpPost._embedded?.['wp:term']?.[1]?.map((tag: any) => tag.name) || [],
-    views: 0, // WP API doesn't provide view count by default
-  };
-}
-
-
 export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const playNote = useScalePlayer();
 
   const handleSearch = useCallback(async (term: string) => {
     if (term.length > 2) {
@@ -122,31 +94,32 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
           <div className="mt-6 flex-1 overflow-hidden">
             <ScrollArea className="h-full pr-4">
               {isLoading && (
-                 <div className="flex justify-center items-center h-full">
-                    <p className="text-center text-muted-foreground">Loading...</p>
-                 </div>
+                 <GlitchLoader />
               )}
               {!isLoading && searchTerm.length > 2 && filteredPosts.length === 0 && (
                 <p className="text-center text-muted-foreground">No results found for "{searchTerm}".</p>
               )}
               <div className="space-y-4">
-                {filteredPosts.map(post => (
-                  <Link href={`/posts/${post.slug}`} key={post.id} onClick={handleClose} className="group flex items-center gap-4 rounded-lg p-2 transition-colors hover:bg-accent/50">
-                    <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md">
-                      <Image
-                        src={post.imageUrl}
-                        alt={post.title}
-                        fill
-                        data-ai-hint={post.imageHint}
-                        className="object-cover"
-                      />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground group-hover:text-primary" dangerouslySetInnerHTML={{ __html: post.title }} />
-                      <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: post.excerpt }} />
-                    </div>
-                  </Link>
-                ))}
+                {filteredPosts.map((post, index) => {
+                  const href = post.isEvent ? `/events/${post.slug}` : `/posts/${post.slug}`;
+                  return (
+                    <Link href={href} key={post.id} onClick={handleClose} className="group flex items-center gap-4 rounded-lg p-2 transition-colors hover:bg-accent/50" onMouseEnter={() => playNote(index)}>
+                      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md">
+                        <Image
+                          src={post.imageUrl}
+                          alt={post.title}
+                          fill
+                          data-ai-hint={post.imageHint}
+                          className="object-cover"
+                        />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground group-hover:text-primary">{post.title}</h3>
+                        <p className="text-sm text-muted-foreground">{post.excerpt}</p>
+                      </div>
+                    </Link>
+                  )
+                })}
               </div>
             </ScrollArea>
           </div>
