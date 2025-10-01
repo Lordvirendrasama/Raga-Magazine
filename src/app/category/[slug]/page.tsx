@@ -31,7 +31,7 @@ export default async function CategoryPage({ params }: { params: { slug: string 
     category = await getCategoryBySlug(params.slug);
   } catch (error) {
     console.error(`Failed to fetch category ${params.slug}:`, error);
-    notFound();
+    // Let the check below handle it
   }
 
   if (!category) {

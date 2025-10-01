@@ -51,7 +51,7 @@ export default async function EventPage({ params }: { params: { slug: string } }
      event = await getEventBySlug(params.slug);
   } catch (error) {
     console.error(`Failed to fetch event ${params.slug}:`, error);
-    notFound();
+    // Let the check below handle it
   }
 
   if (!event) {

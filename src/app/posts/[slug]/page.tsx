@@ -55,7 +55,7 @@ export default async function PostPage({ params }: { params: { slug: string } })
     postData = await getPostBySlug(params.slug);
   } catch (error) {
     console.error(`Failed to fetch post ${params.slug}:`, error);
-    notFound();
+    // This will be caught by the check below and trigger notFound()
   }
 
   if (!postData) {
@@ -124,4 +124,5 @@ export default async function PostPage({ params }: { params: { slug: string } })
     </article>
   );
 }
+
 

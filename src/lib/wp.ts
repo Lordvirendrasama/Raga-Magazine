@@ -24,9 +24,9 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
         return null;
     }
     return JSON.parse(text);
-  } catch (error) {
+  } catch (error: any) {
     // This will catch network errors (e.g., "fetch failed")
-    console.error(`Network error fetching ${url}:`, error);
+    console.error(`Network error fetching ${url}:`, error.message);
     return null;
   }
 }
