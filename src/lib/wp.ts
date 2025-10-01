@@ -1,3 +1,4 @@
+
 // @/lib/wp.ts
 import { decode } from 'html-entities';
 import type { Post } from '@/components/article-card';
@@ -59,10 +60,12 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
   return postsData.map(transformPost).filter(p => p !== null) as Post[];
 }
 
-
 export async function getPostBySlug(slug: string) {
-  const posts = await getPosts({ slug, per_page: 1 });
-  return posts.length > 0 ? posts[0] : null;
+    const data = await fetchAPI(`/wp/v2/posts?slug=${slug}&_embed=1`);
+    if (data && data.length > 0) {
+        return transformPost(data[0]);
+    }
+    return null;
 }
 
 export async function getEventBySlug(slug: string) {

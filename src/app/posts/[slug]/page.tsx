@@ -1,4 +1,7 @@
 
+'use client';
+
+import { useState, useEffect } from 'react';
 import { getPostBySlug } from '@/lib/wp';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
@@ -7,52 +10,56 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { decode } from 'html-entities';
 import { getFeaturedImage } from '@/lib/wp';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  let post;
-  try {
-    post = await getPostBySlug(params.slug);
-  } catch (error) {
-    console.error(`Failed to generate metadata for post ${params.slug}:`, error);
-    return {
-      title: 'Error',
-      description: 'Could not load post details.',
-    };
+export default function PostPage({ params }: { params: { slug: string } }) {
+  const [postData, setPostData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const post = await getPostBySlug(params.slug);
+        if (!post) {
+          notFound();
+          return;
+        }
+        // The getPostBySlug in client-side context returns the raw post object
+        // we need to process it to get embedded data
+        const res = await fetch(`https://ragamagazine.com/wp-json/wp/v2/posts?slug=${params.slug}&_embed=1`);
+        const fullPostData = await res.json();
+        setPostData(fullPostData[0]);
+
+      } catch (error) {
+        console.error(`Failed to fetch post ${params.slug}:`, error);
+        notFound();
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [params.slug]);
+
+  if (loading) {
+    return (
+       <>
+        <Skeleton className="h-[50vh] min-h-[300px] w-full" />
+        <div className="container mx-auto max-w-4xl px-4 py-8 lg:py-16">
+            <div className="space-y-6">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-2/3" />
+                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-32 w-full" />
+            </div>
+        </div>
+       </>
+    );
   }
-
-  if (!post) {
-    return {
-      title: 'Post Not Found',
-    };
-  }
-
-  const title = decode(post.title.rendered);
-  const excerpt = post.excerpt.rendered.replace(/<[^>]+>/g, '');
-  const { url: imageUrl } = getFeaturedImage(post);
-
-  return {
-    title: `${title} | RagaMagazine`,
-    description: excerpt,
-    openGraph: {
-      title: title,
-      description: excerpt,
-      images: [
-        {
-          url: imageUrl,
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
-    },
-  };
-}
-
-export default async function PostPage({ params }: { params: { slug: string } }) {
-  const postData = await getPostBySlug(params.slug);
-
+  
   if (!postData) {
-    notFound();
+    return null; // Will be handled by notFound() in useEffect
   }
   
   const title = postData.title.rendered;
@@ -63,7 +70,6 @@ export default async function PostPage({ params }: { params: { slug: string } })
   const tags = postData._embedded?.['wp:term']?.[1]?.map((tag: any) => tag.name) || [];
   const dateGmt = postData.date_gmt;
   const content = postData.content.rendered;
-
 
   return (
     <article>

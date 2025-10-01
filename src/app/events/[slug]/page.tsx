@@ -1,4 +1,7 @@
 
+'use client';
+
+import { useState, useEffect } from 'react';
 import { getEventBySlug } from '@/lib/wp';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
@@ -6,50 +9,52 @@ import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { CalendarIcon, ClockIcon, MapPinIcon } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  try {
-    const event = await getEventBySlug(params.slug);
+export default function EventPage({ params }: { params: { slug: string } }) {
+  const [event, setEvent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-    if (!event) {
-      return {
-        title: 'Event Not Found',
-      };
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const eventData = await getEventBySlug(params.slug);
+        if (!eventData) {
+          notFound();
+          return;
+        }
+        setEvent(eventData);
+      } catch (error) {
+        console.error('Failed to fetch event:', error);
+        notFound();
+      } finally {
+        setLoading(false);
+      }
     }
 
-    const title = event.title;
-    const excerpt = event.description.replace(/<[^>]+>/g, '');
+    fetchData();
+  }, [params.slug]);
 
-    return {
-      title: `${title} | RagaMagazine`,
-      description: excerpt,
-      openGraph: {
-        title: title,
-        description: excerpt,
-        images: [
-          {
-            url: event.image?.url || 'https://placehold.co/1200x630',
-            width: 1200,
-            height: 630,
-            alt: title,
-          },
-        ],
-      },
-    };
-  } catch (error) {
-    console.error('Failed to generate metadata for event:', error);
-    return {
-      title: 'Event Not Found',
-      description: 'Could not load event details.',
-    };
+  if (loading) {
+    return (
+      <div className="container mx-auto max-w-4xl px-4 py-8 lg:py-16">
+        <Skeleton className="h-8 w-1/4 mb-4" />
+        <Skeleton className="h-12 w-3/4 mb-6" />
+        <div className="flex items-center gap-4 mb-8">
+          <Skeleton className="h-12 w-12 rounded-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+        </div>
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
   }
-}
-
-export default async function EventPage({ params }: { params: { slug: string } }) {
-  const event = await getEventBySlug(params.slug);
 
   if (!event) {
-    notFound();
+    return null;
   }
 
   const category = event.categories?.[0]?.name || 'Event';
