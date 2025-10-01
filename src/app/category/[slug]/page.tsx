@@ -1,4 +1,4 @@
-import { getPosts, getCategoryBySlug, transformPost } from '@/lib/wp';
+import { getPosts, getCategoryBySlug } from '@/lib/wp';
 import { notFound } from 'next/navigation';
 import { ArticleCard, type Post } from '@/components/article-card';
 
@@ -34,23 +34,19 @@ export default async function CategoryPage({ params }: { params: { slug: string 
 
   const posts = await getPosts({ categories: category.id, per_page: 12 });
   
-  const transformedPosts: Post[] = Array.isArray(posts) ? posts.map(transformPost) : [];
-
   return (
     <div className="container mx-auto px-4 py-8 lg:py-12">
       <h1 className="mb-8 font-headline text-4xl font-bold tracking-tight text-foreground md:text-5xl">
         Category: {category.name}
       </h1>
       {posts.length === 0 ? (
-         <p className="text-center text-destructive">Could not load posts. Please try again later.</p>
-      ) : transformedPosts.length > 0 ? (
+         <p className="text-center text-destructive">Could not load posts for this category. Please try again later.</p>
+      ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {transformedPosts.map((post) => (
+          {posts.map((post) => (
             <ArticleCard key={post.id} post={post} variant="default" />
           ))}
         </div>
-      ) : (
-        <p className="text-center text-muted-foreground">No posts found in this category yet.</p>
       )}
     </div>
   );

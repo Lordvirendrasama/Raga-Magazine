@@ -26,7 +26,7 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   }
 }
 
-export async function getPosts(params: Record<string, any> = {}, postType: string = 'posts'): Promise<any[]> {
+export async function getPosts(params: Record<string, any> = {}, postType: string = 'posts'): Promise<Post[]> {
   const isEventsCalendar = postType === 'event';
   const apiPath = isEventsCalendar ? '/tribe/events/v1/events' : '/wp/v2/posts';
   
@@ -48,13 +48,17 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
   const result = await fetchAPI(`${apiPath}?${query.toString()}`);
   
   if (!result) {
-    console.warn(`API fetch failed. Returning empty array.`);
     return [];
   }
 
-  const posts = isEventsCalendar ? result.events : result;
-  return Array.isArray(posts) ? posts : [];
+  const postsData = isEventsCalendar ? result.events : result;
+  if (!Array.isArray(postsData)) {
+    return [];
+  }
+
+  return postsData.map(transformPost).filter(p => p !== null) as Post[];
 }
+
 
 export async function getPostBySlug(slug: string) {
   const posts = await getPosts({ slug, per_page: 1 });
@@ -108,13 +112,9 @@ export function getFeaturedImage(post: any): { url: string; hint?: string } {
     return defaultImage;
 }
 
-export function transformPost(wpPost: any): Post {
-  if (!wpPost) {
-    throw new Error('Attempted to transform a null or undefined post.');
-  }
-
-  if (wpPost.author && typeof wpPost.author === 'object') {
-    return wpPost as Post;
+export function transformPost(wpPost: any): Post | null {
+  if (!wpPost || !wpPost.id) {
+    return null;
   }
 
   const isEvent = wpPost?.type === 'tribe_events' || wpPost?.hasOwnProperty('start_date');
@@ -123,14 +123,16 @@ export function transformPost(wpPost: any): Post {
   const excerpt = decode((wpPost?.excerpt?.rendered || wpPost?.description || '').replace(/<[^>]+>/g, ''));
   
   let category = 'Uncategorized';
-  const terms = wpPost?._embedded?.['wp:term']?.[0];
-  if (terms && Array.isArray(terms) && terms.length > 0) {
-      const categoryTerm = terms.find((term: any) => term.taxonomy === 'category');
-      if (categoryTerm) {
-        category = categoryTerm.name;
-      }
-  } else if (isEvent && wpPost?.categories?.[0]?.name) {
-      category = wpPost.categories[0].name;
+  if (isEvent && wpPost?.categories?.[0]?.name) {
+    category = wpPost.categories[0].name;
+  } else {
+    const terms = wpPost?._embedded?.['wp:term']?.[0];
+    if (terms && Array.isArray(terms) && terms.length > 0) {
+        const categoryTerm = terms.find((term: any) => term.taxonomy === 'category');
+        if (categoryTerm) {
+          category = categoryTerm.name;
+        }
+    }
   }
 
   const slug = wpPost.slug || '';

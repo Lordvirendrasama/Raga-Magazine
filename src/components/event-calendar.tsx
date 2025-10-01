@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { format, isSameDay, startOfDay } from 'date-fns';
-import { getPosts, transformPost } from '@/lib/wp';
+import { getPosts } from '@/lib/wp';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArticleCard, type Post } from '@/components/article-card';
@@ -35,13 +35,14 @@ export function EventCalendar() {
         setLoading(true);
         setError(null);
         const fetchedEvents = await getPosts({ per_page: 100 }, 'event');
-        if (fetchedEvents && fetchedEvents.length > 0) {
-            setEvents(fetchedEvents.map(transformPost));
-        } else {
-            // Don't set an error if it's just empty, but do if fetch failed
-            if (!fetchedEvents) {
+        if (Array.isArray(fetchedEvents)) {
+            setEvents(fetchedEvents);
+            if (fetchedEvents.length === 0) {
+              // This can happen on a network error or if there are truly no events
               setError('Could not load events. Please try again later.');
             }
+        } else {
+            setError('Could not load events. Please try again later.');
             setEvents([]);
         }
       } catch (err) {
@@ -74,7 +75,7 @@ export function EventCalendar() {
             <Skeleton className="h-24 w-full" />
             <Skeleton className="h-24 w-full" />
         </div>
-    ) : error ? (
+    ) : error && selectedDayEvents.length === 0 ? ( // Show general error if no events for day either
         <p className="py-8 text-center text-destructive">{error}</p>
     ) : selectedDayEvents.length > 0 ? (
       <div className="space-y-6">
