@@ -54,6 +54,13 @@ import {
   Edit,
   Send,
   Plus,
+  RefreshCw,
+  Sparkles,
+  Wand2,
+  ChevronsRight,
+  Clipboard,
+  Link,
+  Loader2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -69,6 +76,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { generateArticle } from "@/ai/flows/generate-article-flow";
+import { Skeleton } from "./ui/skeleton";
 
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -561,15 +570,269 @@ const RealtimeLogs = () => {
   );
 };
 
-export function DevTools() {
+// AI Console
+const AiConsole = () => {
+  const [topic, setTopic] = useState("A new indie artist from Mumbai");
+  const [response, setResponse] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleGenerate = async () => {
+    setLoading(true);
+    setResponse(null);
+    try {
+      const result = await generateArticle({ topic });
+      setResponse(result);
+      toast({
+        title: "Article Generated",
+        description: "AI-powered article has been created.",
+      });
+    } catch (e: any) {
+      toast({
+        title: "Generation Failed",
+        description: e.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <Tabs defaultValue="firestore" className="w-full">
-      <TabsList className="grid w-full grid-cols-4">
-        <TabsTrigger value="firestore">Firestore Explorer</TabsTrigger>
-        <TabsTrigger value="storage">Storage Manager</TabsTrigger>
-        <TabsTrigger value="api">API Tester</TabsTrigger>
-        <TabsTrigger value="logs">Realtime Logs</TabsTrigger>
-      </TabsList>
+    <Card>
+      <CardHeader>
+        <CardTitle>AI Prompt Console</CardTitle>
+        <CardDescription>
+          Generate draft articles using AI. Enter a topic to get started.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <Label htmlFor="ai-prompt">Article Topic</Label>
+          <Textarea
+            id="ai-prompt"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder="e.g., The rise of folk-fusion in South India"
+            className="h-24"
+          />
+        </div>
+        <Button onClick={handleGenerate} disabled={loading}>
+          {loading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Sparkles className="mr-2 h-4 w-4" />
+          )}
+          Generate Article
+        </Button>
+        {loading && (
+           <div className="space-y-2">
+             <Skeleton className="h-4 w-1/4" />
+             <Skeleton className="h-20 w-full" />
+           </div>
+        )}
+        {response && (
+          <div>
+            <Label>Generated Content</Label>
+            <div className="mt-2 space-y-4 rounded-md border bg-muted p-4">
+              <h3 className="font-bold text-lg">{response.title}</h3>
+              <ScrollArea className="h-60">
+                <p className="text-sm whitespace-pre-wrap">{response.body}</p>
+              </ScrollArea>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+// Cache Manager
+const CacheManager = () => {
+  const [path, setPath] = useState("/posts/some-article-slug");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleRevalidate = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/revalidate?path=${path}`);
+      if (!res.ok) throw new Error("Failed to revalidate.");
+      const result = await res.json();
+      if (result.revalidated) {
+        toast({
+          title: "Success",
+          description: `Path ${path} has been revalidated.`,
+        });
+      } else {
+        throw new Error(`Revalidation failed for ${path}.`);
+      }
+    } catch (e: any) {
+      toast({
+        title: "Error",
+        description: e.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Cache & CDN Panel</CardTitle>
+        <CardDescription>
+          Manually revalidate pages to show the latest content.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <Label htmlFor="revalidate-path">Path to Revalidate</Label>
+          <div className="flex gap-2">
+            <Input
+              id="revalidate-path"
+              value={path}
+              onChange={(e) => setPath(e.target.value)}
+              placeholder="/posts/your-article-slug"
+            />
+            <Button onClick={handleRevalidate} disabled={loading}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              {loading ? "Revalidating..." : "Revalidate"}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Use this to force-update a page after making changes in your CMS.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Utility Belt
+const UtilityBelt = () => {
+  const [base64Input, setBase64Input] = useState("hello world");
+  const [base64Output, setBase64Output] = useState("");
+  const [slugInput, setSlugInput] = useState("This is a Test Title!");
+  const [slugOutput, setSlugOutput] = useState("");
+  const { toast } = useToast();
+
+  const handleEncode = () => setBase64Output(btoa(base64Input));
+  const handleDecode = () => {
+    try {
+      setBase64Output(atob(base64Input));
+    } catch (e) {
+      toast({
+        title: "Invalid Base64",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSlugify = () => {
+    const slug = slugInput
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+    setSlugOutput(slug);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: "Copied to clipboard!" });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Utility Belt</CardTitle>
+        <CardDescription>A collection of handy dev tools.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Base64 Converter */}
+        <div>
+          <Label className="font-semibold">Base64 Converter</Label>
+          <div className="flex gap-2 mt-2">
+            <Input
+              value={base64Input}
+              onChange={(e) => setBase64Input(e.target.value)}
+              placeholder="Text to convert"
+            />
+            <Button onClick={handleEncode}>Encode</Button>
+            <Button onClick={handleDecode} variant="secondary">
+              Decode
+            </Button>
+          </div>
+          {base64Output && (
+            <div className="mt-2 flex items-center gap-2 rounded-md border bg-muted p-2">
+              <p className="truncate text-sm flex-1">{base64Output}</p>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => copyToClipboard(base64Output)}
+              >
+                <Clipboard className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
+        {/* Slugify Tool */}
+        <div>
+          <Label className="font-semibold">Slugify Tool</Label>
+          <div className="flex gap-2 mt-2">
+            <Input
+              value={slugInput}
+              onChange={(e) => setSlugInput(e.target.value)}
+              placeholder="Enter a title"
+            />
+            <Button onClick={handleSlugify}>
+              <Link className="h-4 w-4 mr-2" /> Slugify
+            </Button>
+          </div>
+          {slugOutput && (
+            <div className="mt-2 flex items-center gap-2 rounded-md border bg-muted p-2">
+              <p className="truncate text-sm flex-1">{slugOutput}</p>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => copyToClipboard(slugOutput)}
+              >
+                <Clipboard className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+
+export function DevTools() {
+  const [activeTab, setActiveTab] = useState("firestore");
+  
+  return (
+    <Tabs defaultValue="firestore" className="w-full" onValueChange={setActiveTab}>
+      <ScrollArea className="w-full whitespace-nowrap">
+        <TabsList className="grid w-full grid-cols-1 sm:w-auto sm:grid-cols-7">
+            <TabsTrigger value="firestore">Firestore</TabsTrigger>
+            <TabsTrigger value="storage">Storage</TabsTrigger>
+            <TabsTrigger value="api">API Tester</TabsTrigger>
+            <TabsTrigger value="logs">Logs</TabsTrigger>
+            <TabsTrigger value="ai-console">
+              <Sparkles className="mr-2 h-4 w-4" />
+              AI Console
+            </TabsTrigger>
+            <TabsTrigger value="cache">Cache</TabsTrigger>
+            <TabsTrigger value="utils">
+              <Wand2 className="mr-2 h-4 w-4" />
+              Utilities
+            </TabsTrigger>
+        </TabsList>
+      </ScrollArea>
       <TabsContent value="firestore">
         <FirestoreExplorer />
       </TabsContent>
@@ -581,6 +844,15 @@ export function DevTools() {
       </TabsContent>
       <TabsContent value="logs">
         <RealtimeLogs />
+      </TabsContent>
+      <TabsContent value="ai-console">
+        <AiConsole />
+      </TabsContent>
+      <TabsContent value="cache">
+        <CacheManager />
+      </TabsContent>
+       <TabsContent value="utils">
+        <UtilityBelt />
       </TabsContent>
     </Tabs>
   );
