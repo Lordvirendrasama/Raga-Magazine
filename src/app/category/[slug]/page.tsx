@@ -26,38 +26,22 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function CategoryPage({ params }: { params: { slug: string } }) {
-  let category;
-  try {
-    category = await getCategoryBySlug(params.slug);
-  } catch (error) {
-    console.error(`Failed to fetch category ${params.slug}:`, error);
-    // Let the check below handle it
-  }
+  const category = await getCategoryBySlug(params.slug);
 
   if (!category) {
     notFound();
   }
 
-  let transformedPosts: Post[] = [];
-  let fetchError = false;
-  try {
-    const posts = await getPosts({ categories: category.id, per_page: 12 });
-    if (posts) {
-        transformedPosts = posts.map(transformPost);
-    } else {
-        fetchError = true;
-    }
-  } catch (error) {
-    console.error(`Failed to fetch posts for category ${category.name}:`, error);
-    fetchError = true;
-  }
+  const posts = await getPosts({ categories: category.id, per_page: 12 });
+  
+  const transformedPosts: Post[] = Array.isArray(posts) ? posts.map(transformPost) : [];
 
   return (
     <div className="container mx-auto px-4 py-8 lg:py-12">
       <h1 className="mb-8 font-headline text-4xl font-bold tracking-tight text-foreground md:text-5xl">
         Category: {category.name}
       </h1>
-      {fetchError ? (
+      {posts.length === 0 ? (
          <p className="text-center text-destructive">Could not load posts. Please try again later.</p>
       ) : transformedPosts.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">

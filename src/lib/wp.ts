@@ -54,10 +54,11 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
   const result = await fetchAPI(`${BASE_URL}${apiPath}?${query.toString()}`);
   
   if (!result) {
-    return null; // Propagate null on fetch failure
+    return []; // Return an empty array on fetch failure
   }
 
-  return isEventsCalendar ? result.events : result;
+  const posts = isEventsCalendar ? result.events : result;
+  return Array.isArray(posts) ? posts : [];
 }
 
 
@@ -66,7 +67,7 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
  * @param slug - The slug of the post.
  */
 export async function getPostBySlug(slug: string) {
-  const posts = await getPosts({ slug, _embed: '1' }, 'posts');
+  const posts = await getPosts({ slug, per_page: 1, _embed: '1' }, 'posts');
   if (!posts || posts.length === 0) {
     return null;
   }
@@ -87,7 +88,7 @@ export async function getEventBySlug(slug: string) {
  * Fetches all categories.
  */
 export async function getCategories() {
-  return fetchAPI('/wp/v2/categories');
+  return await fetchAPI('/wp/v2/categories') || [];
 }
 
 /**
@@ -95,7 +96,7 @@ export async function getCategories() {
  */
 export async function getCategoryBySlug(slug: string) {
     const categories = await fetchAPI(`${BASE_URL}/wp/v2/categories?slug=${slug}`);
-    if (!categories || categories.length === 0) {
+    if (!categories || !Array.isArray(categories) || categories.length === 0) {
         return null;
     }
     return categories[0];
@@ -105,7 +106,7 @@ export async function getCategoryBySlug(slug: string) {
  * Fetches all tags.
  */
 export async function getTags() {
-  return fetchAPI('/wp/v2/tags');
+  return await fetchAPI('/wp/v2/tags') || [];
 }
 
 /**

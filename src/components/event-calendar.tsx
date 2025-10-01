@@ -34,7 +34,7 @@ export function EventCalendar() {
         setLoading(true);
         setError(null);
         const fetchedEvents = await getPosts({ per_page: 100 }, 'event');
-        if (fetchedEvents) {
+        if (fetchedEvents && fetchedEvents.length > 0) {
             setEvents(fetchedEvents.map(transformPost));
         } else {
             setError('Could not load events. Please try again later.');

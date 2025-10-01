@@ -5,30 +5,19 @@ import { getPosts, transformPost } from "@/lib/wp";
 import type { Post } from "@/components/article-card";
 
 export default async function Home() {
-  let transformedPosts: Post[] = [];
-  let fetchError = false;
+  const allPosts = await getPosts({ per_page: 20, _embed: true });
 
-  try {
-    const allPosts = await getPosts({ per_page: 20, _embed: true });
-    if (allPosts) {
-      transformedPosts = allPosts.map(transformPost);
-    } else {
-      fetchError = true;
-    }
-  } catch (error) {
-    console.error("Failed to fetch posts for Home page:", error);
-    fetchError = true;
-  }
-
-  if (fetchError) {
+  if (!allPosts || allPosts.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8 lg:py-12 text-center">
         <h2 className="font-headline text-2xl font-bold text-destructive">Could Not Load Posts</h2>
-        <p className="mt-2 text-muted-foreground">There was a problem connecting to the server. Please try again later.</p>
+        <p className="mt-2 text-muted-foreground">There was a problem connecting to the content server. Please try again later.</p>
       </div>
     );
   }
 
+  const transformedPosts: Post[] = allPosts.map(transformPost);
+  
   const featuredPosts = transformedPosts.filter(p => p.tags.includes('featured')).slice(0, 5);
   const magazinePosts = transformedPosts.slice(0, 9);
   const trendingPosts = [...transformedPosts].sort((a, b) => {

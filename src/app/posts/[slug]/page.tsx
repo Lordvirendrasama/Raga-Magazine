@@ -49,14 +49,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function PostPage({ params }: { params: { slug: string } }) {
-  let postData;
-
-  try {
-    postData = await getPostBySlug(params.slug);
-  } catch (error) {
-    console.error(`Failed to fetch post ${params.slug}:`, error);
-    // This will be caught by the check below and trigger notFound()
-  }
+  const postData = await getPostBySlug(params.slug);
 
   if (!postData) {
     notFound();
@@ -124,5 +117,3 @@ export default async function PostPage({ params }: { params: { slug: string } })
     </article>
   );
 }
-
-

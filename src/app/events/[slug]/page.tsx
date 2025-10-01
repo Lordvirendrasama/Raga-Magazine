@@ -46,13 +46,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function EventPage({ params }: { params: { slug: string } }) {
-  let event;
-  try {
-     event = await getEventBySlug(params.slug);
-  } catch (error) {
-    console.error(`Failed to fetch event ${params.slug}:`, error);
-    // Let the check below handle it
-  }
+  const event = await getEventBySlug(params.slug);
 
   if (!event) {
     notFound();
