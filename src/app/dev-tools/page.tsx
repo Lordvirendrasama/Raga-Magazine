@@ -1,6 +1,3 @@
-import { DevTools } from "@/components/dev-tools";
-import { Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DevToolsPage() {
   return (
@@ -10,12 +7,9 @@ export default function DevToolsPage() {
           Developer Dashboard
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-          Tools for managing and testing your Firebase backend.
+          This area is under construction.
         </p>
       </div>
-      <Suspense fallback={<Skeleton className="h-[600px] w-full" />}>
-        <DevTools />
-      </Suspense>
     </div>
   );
 }
