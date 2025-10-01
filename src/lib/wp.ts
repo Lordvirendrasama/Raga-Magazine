@@ -1,8 +1,8 @@
-
 // @/lib/wp.ts
 import { decode } from 'html-entities';
 import type { Post } from '@/components/article-card';
 import placeholderImages from '@/app/lib/placeholder-images.json';
+import { fallbackPosts } from '@/data/posts';
 
 
 const BASE_URL = 'https://ragamagazine.com/wp-json';
@@ -36,7 +36,7 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
  * @param params - Optional query parameters.
  * @param postType - The type of post to fetch (e.g., 'posts', 'event').
  */
-export async function getPosts(params: Record<string, any> = {}, postType: string = 'posts') {
+export async function getPosts(params: Record<string, any> = {}, postType: string = 'posts'): Promise<any[]> {
   const isEventsCalendar = postType === 'event';
   const apiPath = isEventsCalendar ? '/tribe/events/v1/events' : '/wp/v2/posts';
   
@@ -58,7 +58,10 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
   const result = await fetchAPI(`${apiPath}?${query.toString()}`);
   
   if (!result) {
-    return []; // Return an empty array on fetch failure
+    console.warn(`API fetch failed. Falling back to local data.`);
+    // If the fetch fails, use the local fallback data.
+    // This is a temporary measure to ensure the app runs without network.
+    return fallbackPosts;
   }
 
   const posts = isEventsCalendar ? result.events : result;
@@ -72,7 +75,11 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
  */
 export async function getPostBySlug(slug: string) {
   const posts = await getPosts({ slug, per_page: 1 });
-  return posts[0] || null;
+  if (posts.length > 0) {
+    return posts[0];
+  }
+  // If not found via API, check fallback data
+  return fallbackPosts.find(p => p.slug === slug) || null;
 }
 
 
@@ -81,7 +88,11 @@ export async function getPostBySlug(slug: string) {
  * @param slug - The slug of the event.
  */
 export async function getEventBySlug(slug: string) {
-  return await fetchAPI(`/tribe/events/v1/events/by-slug/${slug}`);
+  const result = await fetchAPI(`/tribe/events/v1/events/by-slug/${slug}`);
+  if (result) {
+    return result;
+  }
+  return fallbackPosts.find(p => p.isEvent && p.slug === slug) || null;
 }
 
 /**
@@ -89,18 +100,23 @@ export async function getEventBySlug(slug: string) {
  */
 export async function getCategories() {
   const result = await fetchAPI('/wp/v2/categories?per_page=50');
-  return Array.isArray(result) ? result : [];
+  if (Array.isArray(result)) {
+    return result;
+  }
+  // Fallback for categories if API fails
+  return [
+      { name: 'News', slug: 'news', count: 5 },
+      { name: 'Featured', slug: 'featured', count: 2 },
+      { name: 'Culture', slug: 'culture', count: 3 }
+  ];
 }
 
 /**
  * Fetches a category by its slug.
  */
-export async function getCategoryBySlug(slug: string) {
-    const categories = await fetchAPI(`/wp/v2/categories?slug=${slug}`);
-    if (!categories || !Array.isArray(categories) || categories.length === 0) {
-        return null;
-    }
-    return categories[0];
+export async function getCategoryBySlug(slug:string) {
+    const categories = await getCategories();
+    return categories.find((cat: any) => cat.slug === slug) || null;
 }
 
 /**
@@ -135,6 +151,12 @@ export function getFeaturedImage(post: any): { url: string; hint?: string } {
         return { url: post.image.url, hint: post.slug };
     }
     
+    // Check if a placeholder is assigned in the fallback data
+    if (post?.placeholderImageId) {
+        const image = placeholderImages.images.find(img => img.url.includes(`seed/${post.placeholderImageId}/`));
+        return image || defaultImage;
+    }
+
     // Fallback to a random placeholder from our list if no image is found
     if (post?.id) {
         const index = post.id % placeholderImages.images.length;
@@ -152,6 +174,11 @@ export function getFeaturedImage(post: any): { url: string; hint?: string } {
  * @returns A Post object.
  */
 export function transformPost(wpPost: any): Post {
+  // If the post is already in the correct format (from fallback data), return it.
+  if (wpPost && wpPost.author && typeof wpPost.author === 'object') {
+    return wpPost as Post;
+  }
+
   const isEvent = wpPost?.type === 'tribe_events' || wpPost?.hasOwnProperty('start_date');
 
   const title = decode(wpPost?.title?.rendered || wpPost?.title || 'Untitled');

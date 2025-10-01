@@ -6,9 +6,9 @@ import { getPosts, transformPost } from "@/lib/wp";
 import type { Post } from "@/components/article-card";
 
 export default async function Home() {
-  const allPosts = await getPosts({ per_page: 20 });
-
-  if (!allPosts || allPosts.length === 0) {
+  const rawPosts = await getPosts({ per_page: 20 });
+  
+  if (!rawPosts || rawPosts.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8 lg:py-12 text-center">
         <h2 className="font-headline text-2xl font-bold text-destructive">Could Not Load Posts</h2>
@@ -16,8 +16,8 @@ export default async function Home() {
       </div>
     );
   }
-
-  const transformedPosts: Post[] = allPosts.map(transformPost);
+  
+  const transformedPosts: Post[] = rawPosts.map(transformPost);
   
   const featuredPosts = transformedPosts.filter(p => p.tags.includes('featured')).slice(0, 5);
   const magazinePosts = transformedPosts.slice(0, 9);
