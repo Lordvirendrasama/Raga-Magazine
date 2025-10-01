@@ -51,7 +51,7 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
     query.set('status', 'publish');
   }
 
-  const result = await fetchAPI(`${apiPath}?${query.toString()}`);
+  const result = await fetchAPI(`${BASE_URL}${apiPath}?${query.toString()}`);
   
   if (!result) {
     return null; // Propagate null on fetch failure
@@ -79,7 +79,7 @@ export async function getPostBySlug(slug: string) {
  * @param slug - The slug of the event.
  */
 export async function getEventBySlug(slug: string) {
-  const result = await fetchAPI(`/tribe/events/v1/events/by-slug/${slug}`);
+  const result = await fetchAPI(`${BASE_URL}/tribe/events/v1/events/by-slug/${slug}`);
   return result; // Will be null if fetch fails
 }
 
@@ -94,7 +94,7 @@ export async function getCategories() {
  * Fetches a category by its slug.
  */
 export async function getCategoryBySlug(slug: string) {
-    const categories = await fetchAPI(`/wp/v2/categories?slug=${slug}`);
+    const categories = await fetchAPI(`${BASE_URL}/wp/v2/categories?slug=${slug}`);
     if (!categories || categories.length === 0) {
         return null;
     }
