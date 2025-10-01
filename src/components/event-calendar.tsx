@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -37,12 +38,15 @@ export function EventCalendar() {
         if (fetchedEvents && fetchedEvents.length > 0) {
             setEvents(fetchedEvents.map(transformPost));
         } else {
-            setError('Could not load events. Please try again later.');
+            // Don't set an error if it's just empty, but do if fetch failed
+            if (!fetchedEvents) {
+              setError('Could not load events. Please try again later.');
+            }
             setEvents([]);
         }
       } catch (err) {
         console.error("Failed to fetch events:", err);
-        setError('Could not load events. Please try again later.');
+        setError('An unexpected error occurred while fetching events.');
         setEvents([]); 
       } finally {
         setLoading(false);
@@ -68,9 +72,10 @@ export function EventCalendar() {
         <div className="space-y-4">
             <Skeleton className="h-24 w-full" />
             <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
         </div>
     ) : error ? (
-        <p className="text-destructive text-center py-8">{error}</p>
+        <p className="py-8 text-center text-destructive">{error}</p>
     ) : selectedDayEvents.length > 0 ? (
       <div className="space-y-6">
         {selectedDayEvents.map(event => (
@@ -78,7 +83,7 @@ export function EventCalendar() {
         ))}
       </div>
     ) : (
-      <p className="text-center text-muted-foreground py-8">No events for this day.</p>
+      <p className="py-8 text-center text-muted-foreground">No events for this day.</p>
     )
   );
 

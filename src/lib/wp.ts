@@ -1,3 +1,4 @@
+
 // @/lib/wp.ts
 import { decode } from 'html-entities';
 import type { Post } from '@/components/article-card';
@@ -14,8 +15,7 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     const res = await fetch(url, { cache: 'no-store', ...options });
 
     if (!res.ok) {
-      console.error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
-      // Don't return the body content for failed requests
+      // Don't log the error here, let the caller handle it.
       return null;
     }
     // Check for empty response body before parsing JSON
@@ -38,20 +38,24 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
  */
 export async function getPosts(params: Record<string, any> = {}, postType: string = 'posts') {
   const isEventsCalendar = postType === 'event';
-  const apiPath = isEventsCalendar ? '/tribe/events/v1/events' : `/wp/v2/${postType}`;
+  const apiPath = isEventsCalendar ? '/tribe/events/v1/events' : '/wp/v2/posts';
   
-  const query = new URLSearchParams({
+  const defaultParams: Record<string, string> = {
     per_page: '12',
+  };
+
+  if (!isEventsCalendar) {
+    defaultParams['_embed'] = '1';
+  } else {
+    defaultParams['status'] = 'publish';
+  }
+
+  const query = new URLSearchParams({
+    ...defaultParams,
     ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
   });
 
-  if (!isEventsCalendar) {
-    query.set('_embed', '1');
-  } else {
-    query.set('status', 'publish');
-  }
-
-  const result = await fetchAPI(`${BASE_URL}${apiPath}?${query.toString()}`);
+  const result = await fetchAPI(`${apiPath}?${query.toString()}`);
   
   if (!result) {
     return []; // Return an empty array on fetch failure
@@ -67,11 +71,8 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
  * @param slug - The slug of the post.
  */
 export async function getPostBySlug(slug: string) {
-  const posts = await getPosts({ slug, per_page: 1, _embed: '1' }, 'posts');
-  if (!posts || posts.length === 0) {
-    return null;
-  }
-  return posts[0];
+  const posts = await getPosts({ slug, per_page: 1 });
+  return posts[0] || null;
 }
 
 
@@ -80,22 +81,22 @@ export async function getPostBySlug(slug: string) {
  * @param slug - The slug of the event.
  */
 export async function getEventBySlug(slug: string) {
-  const result = await fetchAPI(`${BASE_URL}/tribe/events/v1/events/by-slug/${slug}`);
-  return result; // Will be null if fetch fails
+  return await fetchAPI(`/tribe/events/v1/events/by-slug/${slug}`);
 }
 
 /**
  * Fetches all categories.
  */
 export async function getCategories() {
-  return await fetchAPI('/wp/v2/categories') || [];
+  const result = await fetchAPI('/wp/v2/categories?per_page=50');
+  return Array.isArray(result) ? result : [];
 }
 
 /**
  * Fetches a category by its slug.
  */
 export async function getCategoryBySlug(slug: string) {
-    const categories = await fetchAPI(`${BASE_URL}/wp/v2/categories?slug=${slug}`);
+    const categories = await fetchAPI(`/wp/v2/categories?slug=${slug}`);
     if (!categories || !Array.isArray(categories) || categories.length === 0) {
         return null;
     }
@@ -106,7 +107,8 @@ export async function getCategoryBySlug(slug: string) {
  * Fetches all tags.
  */
 export async function getTags() {
-  return await fetchAPI('/wp/v2/tags') || [];
+  const result = await fetchAPI('/wp/v2/tags');
+  return Array.isArray(result) ? result : [];
 }
 
 /**
@@ -136,9 +138,7 @@ export function getFeaturedImage(post: any): { url: string; hint?: string } {
     // Fallback to a random placeholder from our list if no image is found
     if (post?.id) {
         const index = post.id % placeholderImages.images.length;
-        if (placeholderImages.images[index]) {
-            return placeholderImages.images[index];
-        }
+        return placeholderImages.images[index] || defaultImage;
     }
 
     return defaultImage;
@@ -158,9 +158,8 @@ export function transformPost(wpPost: any): Post {
   const excerpt = decode((wpPost?.excerpt?.rendered || wpPost?.description || '').replace(/<[^>]+>/g, ''));
   
   let category = 'Uncategorized';
-  const terms = wpPost?._embedded?.['wp:term']?.[0]; // This is an array of term objects
+  const terms = wpPost?._embedded?.['wp:term']?.[0];
   if (terms && Array.isArray(terms) && terms.length > 0) {
-      // Find the term with taxonomy 'category'
       const categoryTerm = terms.find((term: any) => term.taxonomy === 'category');
       if (categoryTerm) {
         category = categoryTerm.name;
@@ -169,12 +168,11 @@ export function transformPost(wpPost: any): Post {
       category = wpPost.categories[0].name;
   }
 
-  const slug = wpPost.slug;
+  const slug = wpPost.slug || '';
   
   const authorName = wpPost?._embedded?.author?.[0]?.name || wpPost?.author?.display_name || 'RagaMagazine Staff';
   const authorAvatar = wpPost?._embedded?.author?.[0]?.avatar_urls?.['96'] || 'https://secure.gravatar.com/avatar/?s=96&d=mm&r=g';
 
-  // Safely access tags
   const wpTags = wpPost?._embedded?.['wp:term']?.[1] || wpPost?.tags || [];
   const tags = Array.isArray(wpTags) ? wpTags.map((tag: any) => tag.name) : [];
 

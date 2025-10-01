@@ -1,3 +1,4 @@
+
 import { HeroCarousel } from "@/components/hero-carousel";
 import { MagazineGrid } from "@/components/magazine-grid";
 import { SidebarTopStories } from "@/components/sidebar-top-stories";
@@ -5,7 +6,7 @@ import { getPosts, transformPost } from "@/lib/wp";
 import type { Post } from "@/components/article-card";
 
 export default async function Home() {
-  const allPosts = await getPosts({ per_page: 20, _embed: true });
+  const allPosts = await getPosts({ per_page: 20 });
 
   if (!allPosts || allPosts.length === 0) {
     return (
@@ -27,7 +28,7 @@ export default async function Home() {
 
   return (
     <>
-      <HeroCarousel posts={featuredPosts.length ? featuredPosts : transformedPosts.slice(0,3)} />
+      <HeroCarousel posts={featuredPosts.length > 0 ? featuredPosts : transformedPosts.slice(0,3)} />
       <div className="container mx-auto px-4 py-8 lg:py-12">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
           <div className="lg:col-span-2">

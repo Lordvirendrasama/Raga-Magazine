@@ -51,7 +51,7 @@ export function HeroCarousel({ posts }: HeroCarouselProps) {
 
   if (!posts || posts.length === 0) {
     return (
-        <div className="relative h-[50vh] min-h-[350px] w-full md:h-[65vh] bg-muted flex items-center justify-center">
+        <div className="relative flex h-[50vh] min-h-[350px] w-full items-center justify-center bg-muted md:h-[65vh]">
             <p className="text-muted-foreground">Could not load featured posts.</p>
         </div>
     );
@@ -69,7 +69,7 @@ export function HeroCarousel({ posts }: HeroCarouselProps) {
         <CarouselContent>
           {posts.map((post, index) => (
             <CarouselItem key={post.id} onMouseEnter={() => playNote(index)}>
-              <div className="relative h-[50vh] min-h-[350px] w-full md:h-[65vh] overflow-hidden">
+              <div className="relative h-[50vh] min-h-[350px] w-full overflow-hidden md:h-[65vh]">
                 <Image
                   src={post.imageUrl}
                   alt={post.title}
@@ -82,7 +82,7 @@ export function HeroCarousel({ posts }: HeroCarouselProps) {
                 <div className="absolute inset-0 z-10 flex flex-col justify-end p-4 md:p-12">
                   <div className="container mx-auto">
                     <Badge>{post.category}</Badge>
-                    <h2 className="mt-4 font-headline text-2xl font-bold text-white shadow-2xl sm:text-3xl md:text-5xl lg:text-6xl max-w-4xl">
+                    <h2 className="mt-4 max-w-4xl font-headline text-2xl font-bold text-white shadow-2xl sm:text-3xl md:text-5xl lg:text-6xl">
                       <Link href={`/posts/${post.slug}`} className="hover:underline">
                         {post.title}
                       </Link>
