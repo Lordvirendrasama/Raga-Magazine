@@ -15,24 +15,29 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function PostPage({ params }: { params: { slug: string } }) {
   const [postData, setPostData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const slug = params.slug;
 
   useEffect(() => {
     async function fetchData() {
+      if (!slug) return;
       try {
         setLoading(true);
-        const post = await getPostBySlug(params.slug);
-        if (!post) {
+        // The getPostBySlug in client-side context returns the raw post object
+        // we need to process it to get embedded data
+        const res = await fetch(`https://ragamagazine.com/wp-json/wp/v2/posts?slug=${slug}&_embed=1`);
+        if (!res.ok) {
           notFound();
           return;
         }
-        // The getPostBySlug in client-side context returns the raw post object
-        // we need to process it to get embedded data
-        const res = await fetch(`https://ragamagazine.com/wp-json/wp/v2/posts?slug=${params.slug}&_embed=1`);
         const fullPostData = await res.json();
+        if (fullPostData.length === 0) {
+          notFound();
+          return;
+        }
         setPostData(fullPostData[0]);
 
       } catch (error) {
-        console.error(`Failed to fetch post ${params.slug}:`, error);
+        console.error(`Failed to fetch post ${slug}:`, error);
         notFound();
       } finally {
         setLoading(false);
@@ -40,7 +45,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
     }
 
     fetchData();
-  }, [params.slug]);
+  }, [slug]);
 
   if (loading) {
     return (

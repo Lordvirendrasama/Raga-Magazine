@@ -14,12 +14,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function EventPage({ params }: { params: { slug: string } }) {
   const [event, setEvent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const slug = params.slug;
 
   useEffect(() => {
     async function fetchData() {
+      if (!slug) return;
       try {
         setLoading(true);
-        const eventData = await getEventBySlug(params.slug);
+        const eventData = await getEventBySlug(slug);
         if (!eventData) {
           notFound();
           return;
@@ -34,7 +36,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
     }
 
     fetchData();
-  }, [params.slug]);
+  }, [slug]);
 
   if (loading) {
     return (

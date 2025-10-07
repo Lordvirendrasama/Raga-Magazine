@@ -11,12 +11,14 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
   const [category, setCategory] = useState<any>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const slug = params.slug;
 
   useEffect(() => {
     async function fetchData() {
+      if (!slug) return;
       try {
         setLoading(true);
-        const cat = await getCategoryBySlug(params.slug);
+        const cat = await getCategoryBySlug(slug);
         if (!cat) {
           notFound();
           return;
@@ -26,13 +28,13 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
         const fetchedPosts = await getPosts({ categories: cat.id, per_page: 12 });
         setPosts(fetchedPosts);
       } catch (error) {
-        console.error(`Failed to fetch data for category ${params.slug}:`, error);
+        console.error(`Failed to fetch data for category ${slug}:`, error);
       } finally {
         setLoading(false);
       }
     }
     fetchData();
-  }, [params.slug]);
+  }, [slug]);
   
   if (loading) {
     return (
