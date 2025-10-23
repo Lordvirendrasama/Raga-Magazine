@@ -3,23 +3,48 @@
 
 import { Newspaper } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const headlines = [
-  "Global markets react to new tech regulations",
-  "Artist Spotlight: A new voice in contemporary music emerges",
-  "The science behind the perfect sound: an interview with a top audio engineer",
-  "Live event coverage: Music festival brings thousands together",
-  "Breaking: New album drops from a legendary band",
-  "Tech trends: AI's impact on music production",
-  "Cultural deep dive: The history of the sitar",
-  "Independent artists to watch this year",
-];
+import { useEffect, useState } from 'react';
+import { getPosts, getTags } from '@/lib/wp';
+import type { Post } from './article-card';
 
 export const Marquee = ({ className }: { className?: string }) => {
-  const allHeadlines = [...headlines, ...headlines];
+  const [headlines, setHeadlines] = useState<string[]>(["Loading headlines..."]);
+
+  useEffect(() => {
+    async function fetchHeadlines() {
+      try {
+        const tags = await getTags();
+        const featuredTag = tags.find((tag: any) => tag.slug === 'featured');
+        
+        if (featuredTag) {
+          const featuredPosts = await getPosts({ tags: featuredTag.id, per_page: 10 });
+          if (featuredPosts.length > 0) {
+            setHeadlines(featuredPosts.map((post: Post) => post.title));
+          } else {
+            setHeadlines(["No featured articles found."]);
+          }
+        } else {
+            // Fallback if 'featured' tag doesn't exist. Fetch latest posts.
+            const latestPosts = await getPosts({per_page: 10});
+            if (latestPosts.length > 0) {
+                 setHeadlines(latestPosts.map((post: Post) => post.title));
+            } else {
+                setHeadlines(["Welcome to RagaMagazine."]);
+            }
+        }
+      } catch (error) {
+        console.error("Failed to fetch headlines for marquee:", error);
+        setHeadlines(["Could not load headlines."]);
+      }
+    }
+    fetchHeadlines();
+  }, []);
+  
+  const allHeadlines = headlines.length > 1 ? [...headlines, ...headlines] : headlines;
+
   return (
     <div className={cn("fixed bottom-0 left-0 z-50 flex w-full overflow-x-hidden border-t bg-background py-2 text-sm text-muted-foreground", className)}>
-      <div className="flex animate-marquee whitespace-nowrap">
+      <div className={cn("flex whitespace-nowrap", allHeadlines.length > 1 && "animate-marquee")}>
         {allHeadlines.map((headline, index) => (
           <div key={index} className="mx-4 flex flex-shrink-0 items-center gap-2">
             <Newspaper className="h-4 w-4 flex-shrink-0 text-primary" />
