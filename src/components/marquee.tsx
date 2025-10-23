@@ -18,7 +18,7 @@ const headlines = [
 export const Marquee = ({ className }: { className?: string }) => {
   const allHeadlines = [...headlines, ...headlines];
   return (
-    <div className={cn("relative flex w-full overflow-x-hidden border-y bg-muted/40 py-2 text-sm text-muted-foreground", className)}>
+    <div className={cn("fixed bottom-0 left-0 z-50 flex w-full overflow-x-hidden border-t bg-muted/40 py-2 text-sm text-muted-foreground", className)}>
       <div className="flex animate-marquee whitespace-nowrap">
         {allHeadlines.map((headline, index) => (
           <div key={index} className="mx-4 flex flex-shrink-0 items-center gap-2">

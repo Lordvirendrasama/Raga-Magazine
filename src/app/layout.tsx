@@ -16,6 +16,7 @@ import StreakPopup from '@/components/streak-popup';
 import { useState, useEffect } from 'react';
 import LoadingScreen from '@/components/loading-screen';
 import { GlobalLinkSound } from '@/components/global-link-sound';
+import { Marquee } from '@/components/marquee';
 
 export default function RootLayout({
   children,
@@ -60,6 +61,7 @@ export default function RootLayout({
                 </main>
                 <StreakPopup />
                 <Footer />
+                <Marquee />
                 <Toaster />
                 <GlobalLinkSound />
               </ThemeProvider>

@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { Button } from './ui/button';
 import React, { useState, useEffect } from 'react';
 import { getCategories } from '@/lib/wp';
-import { Marquee } from './marquee';
 
 interface CategoryLink {
   name: string;
@@ -50,8 +49,7 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className="border-t bg-card">
-      <Marquee />
+    <footer className="border-t bg-card pb-10">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div>
