@@ -4,25 +4,23 @@
 import { useRef, useCallback } from 'react';
 import { useMute } from './use-mute';
 
-// Frequencies for "Jana Gana Mana" in C Major scale (approximate)
-// Sa Re Ga Ga Ga Ga Ga Re Ga Ma
+// Frequencies for "Jana Gana Mana"
 const scaleFrequencies = [
-  261.63, // C4 (Jana)
-  293.66, // D4 (Gana)
-  329.63, // E4 (Mana)
-  329.63, // E4 (Adhi)
-  329.63, // E4 (nayaka)
-  293.66, // D4 (Jaya)
-  329.63, // E4 (He)
-  349.23, // F4 (Bharata)
-  329.63, // E4 (Bhagya)
-  329.63, // E4 (Vidhata)
-  293.66, // D4 (...)
-  277.18, // C#4 (...) - Adding a little variation
-  392.00, // G4 (...)
-  440.00, // A4 (...)
-  493.88, // B4 (...)
-  523.25, // C5 (...)
+  // Jana Gana Mana Adhinayaka Jaya He
+  261.63, // C4 - Ja na
+  293.66, // D4 - Ga na
+  329.63, // E4 - Ma na
+  329.63, // E4 - A dhi
+  329.63, // E4 - na ya
+  329.63, // E4 - ka
+  349.23, // F4 - Ja ya
+  329.63, // E4 - He
+  // Bharata Bhagya Vidhata
+  293.66, // D4 - Bha ra
+  293.66, // D4 - ta
+  329.63, // E4 - Bha gya
+  261.63, // C4 - Vi dha
+  246.94, // B3 - ta
 ];
 
 export function useScalePlayer() {
