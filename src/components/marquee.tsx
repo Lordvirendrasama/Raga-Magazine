@@ -9,6 +9,7 @@ import type { Post } from './article-card';
 
 export const Marquee = ({ className }: { className?: string }) => {
   const [headlines, setHeadlines] = useState<string[]>(["Loading headlines..."]);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     async function fetchHeadlines() {
@@ -20,6 +21,7 @@ export const Marquee = ({ className }: { className?: string }) => {
           const featuredPosts = await getPosts({ tags: featuredTag.id, per_page: 10 });
           if (featuredPosts.length > 0) {
             setHeadlines(featuredPosts.map((post: Post) => post.title));
+            setIsLoaded(true);
           } else {
             setHeadlines(["No featured articles found."]);
           }
@@ -28,6 +30,7 @@ export const Marquee = ({ className }: { className?: string }) => {
             const latestPosts = await getPosts({per_page: 10});
             if (latestPosts.length > 0) {
                  setHeadlines(latestPosts.map((post: Post) => post.title));
+                 setIsLoaded(true);
             } else {
                 setHeadlines(["Welcome to RagaMagazine."]);
             }
@@ -40,11 +43,11 @@ export const Marquee = ({ className }: { className?: string }) => {
     fetchHeadlines();
   }, []);
   
-  const allHeadlines = headlines.length > 1 ? [...headlines, ...headlines] : headlines;
+  const allHeadlines = isLoaded && headlines.length > 1 ? [...headlines, ...headlines] : headlines;
 
   return (
     <div className={cn("fixed bottom-0 left-0 z-50 flex w-full overflow-x-hidden border-t bg-background py-2 text-sm text-muted-foreground", className)}>
-      <div className={cn("flex whitespace-nowrap", allHeadlines.length > 1 && "animate-marquee")}>
+      <div className={cn("flex whitespace-nowrap", isLoaded && allHeadlines.length > 1 && "animate-marquee")}>
         {allHeadlines.map((headline, index) => (
           <div key={index} className="mx-4 flex flex-shrink-0 items-center gap-2">
             <Newspaper className="h-4 w-4 flex-shrink-0 text-primary" />
