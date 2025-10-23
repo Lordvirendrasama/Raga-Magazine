@@ -6,21 +6,32 @@ import { useMute } from './use-mute';
 
 // Frequencies for "Jana Gana Mana"
 const scaleFrequencies = [
-  // Jana Gana Mana Adhinayaka Jaya He
-  261.63, // C4 - Ja na
-  293.66, // D4 - Ga na
-  329.63, // E4 - Ma na
-  329.63, // E4 - A dhi
-  329.63, // E4 - na ya
-  329.63, // E4 - ka
-  349.23, // F4 - Ja ya
-  329.63, // E4 - He
-  // Bharata Bhagya Vidhata
-  293.66, // D4 - Bha ra
-  293.66, // D4 - ta
-  329.63, // E4 - Bha gya
-  261.63, // C4 - Vi dha
-  246.94, // B3 - ta
+    // Jana Gana Mana Adhinayaka Jaya He
+    261.63, 293.66, 329.63, 329.63, 329.63, 329.63, 349.23, 329.63, 293.66, 293.66, 329.63, 261.63, 246.94,
+    // Bharata Bhagya Vidhata
+    246.94, 261.63, 293.66, 293.66, 293.66, 293.66, 329.63, 293.66, 261.63,
+    // Punjab Sindhu Gujarata Maratha
+    392.00, 392.00, 392.00, 392.00, 392.00, 440.00, 392.00, 349.23, 329.63,
+    // Dravida Utkala Banga
+    329.63, 329.63, 349.23, 392.00, 329.63, 293.66, 261.63,
+    // Vindhya Himachala Yamuna Ganga
+    261.63, 293.66, 329.63, 329.63, 329.63, 329.63, 329.63, 349.23, 329.63,
+    // Uchchala Jaladhi Taranga
+    293.66, 293.66, 329.63, 261.63, 246.94,
+    // Tava Shubha Name Jage
+    246.94, 261.63, 293.66, 293.66, 293.66,
+    // Tava Shubha Ashisa Mage
+    293.66, 329.63, 293.66, 261.63,
+    // Gahe Tava Jaya Gatha
+    392.00, 392.00, 349.23, 329.63,
+    // Jana Gana Mangala Dayaka Jaya He
+    329.63, 329.63, 329.63, 349.23, 392.00, 329.63, 293.66, 261.63,
+    // Bharata Bhagya Vidhata
+    246.94, 261.63, 293.66, 293.66, 293.66,
+    // Jaya He, Jaya He, Jaya He
+    493.88, 493.88, 493.88, 440.00, 440.00, 440.00, 392.00, 392.00, 392.00,
+    // Jaya Jaya Jaya, Jaya He
+    261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25
 ];
 
 export function useScalePlayer() {
@@ -52,43 +63,45 @@ export function useScalePlayer() {
     }
 
     const now = audioContext.currentTime;
-    // Use the provided index, wrapping around if it's out of bounds
     const frequency = scaleFrequencies[noteIndex % scaleFrequencies.length];
 
-    // Main oscillator for the fundamental tone
-    const oscillator = audioContext.createOscillator();
-    oscillator.type = 'sine'; // Changed to sine for a softer tone
-    oscillator.frequency.setValueAtTime(frequency, now);
+    // --- Main Sitar Oscillator (Fundamental Tone) ---
+    const mainOscillator = audioContext.createOscillator();
+    mainOscillator.type = 'triangle'; // Triangle wave for a strong but rounded fundamental
+    mainOscillator.frequency.setValueAtTime(frequency, now);
 
-    // Second oscillator for harmonic complexity (sitar-like shimmer)
-    const subOscillator = audioContext.createOscillator();
-    subOscillator.type = 'triangle';
-    subOscillator.frequency.setValueAtTime(frequency, now);
-    subOscillator.detune.setValueAtTime(5, now); // Reduced detune for subtlety
+    const mainGain = audioContext.createGain();
+    mainGain.gain.setValueAtTime(0, now);
+    // Quick attack, then decay to a sustain level
+    mainGain.gain.linearRampToValueAtTime(0.3, now + 0.01); // Quick pluck
+    mainGain.gain.exponentialRampToValueAtTime(0.1, now + 0.5); // Decay
+    mainGain.gain.linearRampToValueAtTime(0.0001, now + 2.5); // Long release/sustain
 
-    // Gain node for the main oscillator
-    const gainNode = audioContext.createGain();
-    gainNode.gain.setValueAtTime(0, now);
-    gainNode.gain.linearRampToValueAtTime(0.2, now + 0.02); // Reduced gain
-    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+    mainOscillator.connect(mainGain);
+    mainGain.connect(audioContext.destination);
 
-    // Gain node for the sub-oscillator (less volume)
-    const subGainNode = audioContext.createGain();
-    subGainNode.gain.setValueAtTime(0, now);
-    subGainNode.gain.linearRampToValueAtTime(0.1, now + 0.02); // Reduced gain
-    subGainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.7); 
+    // --- Harmonic Oscillator (Sitar's Brightness & Jivari) ---
+    const harmonicOscillator = audioContext.createOscillator();
+    harmonicOscillator.type = 'sawtooth'; // Sawtooth for rich, bright harmonics
+    harmonicOscillator.frequency.setValueAtTime(frequency, now);
+    harmonicOscillator.detune.setValueAtTime(3, now); // Slight detune for the "jivari" shimmer effect
 
-    // Connect nodes
-    oscillator.connect(gainNode);
-    subOscillator.connect(subGainNode);
-    gainNode.connect(audioContext.destination);
-    subGainNode.connect(audioContext.destination);
+    const harmonicGain = audioContext.createGain();
+    harmonicGain.gain.setValueAtTime(0, now);
+    // Envelope mimics the main oscillator but at a lower volume
+    harmonicGain.gain.linearRampToValueAtTime(0.15, now + 0.02);
+    harmonicGain.gain.exponentialRampToValueAtTime(0.05, now + 0.7);
+    harmonicGain.gain.linearRampToValueAtTime(0.0001, now + 2.5);
 
+    harmonicOscillator.connect(harmonicGain);
+    harmonicGain.connect(audioContext.destination);
+    
     // Start and stop the sound
-    oscillator.start(now);
-    subOscillator.start(now);
-    oscillator.stop(now + 1.8);
-    subOscillator.stop(now + 1.8);
+    mainOscillator.start(now);
+    harmonicOscillator.start(now);
+    mainOscillator.stop(now + 2.6);
+    harmonicOscillator.stop(now + 2.6);
+
   }, [initializeAudioContext, isMuted]);
 
   return playNote;
