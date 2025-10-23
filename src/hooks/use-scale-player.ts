@@ -4,34 +4,49 @@
 import { useRef, useCallback } from 'react';
 import { useMute } from './use-mute';
 
-// Frequencies for "Jana Gana Mana"
+// Frequencies for "Jana Gana Mana" based on Sargam notes
+const C4 = 261.63; // Sa
+const D4 = 293.66; // Re
+const E4 = 329.63; // Ga
+const F4 = 349.23; // Ma
+const G4 = 392.00; // Pa
+const A4 = 440.00; // Dha
+const Bb4 = 466.16; // Komal Ni
+const B4 = 493.88; // Shuddha Ni
+const C5 = 523.25; // Sa (Higher Octave)
+
+const Ni_low = 246.94; // Komal Ni (Lower Octave) - B3
+
 const scaleFrequencies = [
-    // Jana Gana Mana Adhinayaka Jaya He
-    261.63, 293.66, 329.63, 329.63, 329.63, 329.63, 349.23, 329.63, 293.66, 293.66, 329.63, 261.63, 246.94,
-    // Bharata Bhagya Vidhata
-    246.94, 261.63, 293.66, 293.66, 293.66, 293.66, 329.63, 293.66, 261.63,
-    // Punjab Sindhu Gujarata Maratha
-    392.00, 392.00, 392.00, 392.00, 392.00, 440.00, 392.00, 349.23, 329.63,
-    // Dravida Utkala Banga
-    329.63, 329.63, 349.23, 392.00, 329.63, 293.66, 261.63,
-    // Vindhya Himachala Yamuna Ganga
-    261.63, 293.66, 329.63, 329.63, 329.63, 329.63, 329.63, 349.23, 329.63,
-    // Uchchala Jaladhi Taranga
-    293.66, 293.66, 329.63, 261.63, 246.94,
-    // Tava Shubha Name Jage
-    246.94, 261.63, 293.66, 293.66, 293.66,
-    // Tava Shubha Ashisa Mage
-    293.66, 329.63, 293.66, 261.63,
-    // Gahe Tava Jaya Gatha
-    392.00, 392.00, 349.23, 329.63,
-    // Jana Gana Mangala Dayaka Jaya He
-    329.63, 329.63, 329.63, 349.23, 392.00, 329.63, 293.66, 261.63,
-    // Bharata Bhagya Vidhata
-    246.94, 261.63, 293.66, 293.66, 293.66,
-    // Jaya He, Jaya He, Jaya He
-    493.88, 493.88, 493.88, 440.00, 440.00, 440.00, 392.00, 392.00, 392.00,
-    // Jaya Jaya Jaya, Jaya He
-    261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25
+    // Jana Gana Mana Adhinayaka Jaya He: Sa Re Ga Ga Ga Ga Ga Re Ga Ma
+    C4, D4, E4, E4, E4, E4, E4, D4, E4, F4,
+    // Bharatha Bhagya Vidhatha: Ga Ga Ga Re Re Re Ni(low) Re Sa
+    E4, E4, E4, D4, D4, D4, Ni_low, D4, C4,
+    // Punjaba Sindhu Gujaratha Maratha: Sa Pa Pa Pa Pa Pa Ma Dha Pa
+    C4, G4, G4, G4, G4, G4, F4, A4, G4,
+    // Dravida Utkala Vanga: Ma Ma Ma Ga Ga Ga Re Ma Ga
+    F4, F4, F4, E4, E4, E4, D4, F4, E4,
+    // Vindhya Himaachala Yamuna Ganga: Ga Ga Ga Ga Ga Pa Pa Pa Ma Ma
+    E4, E4, E4, E4, E4, G4, G4, G4, F4, F4,
+    // Uchchala Jaladhi Taranga: Ga Ga Ga Re Re Re Ni(low) Re Sa
+    E4, E4, E4, D4, D4, D4, Ni_low, D4, C4,
+    // Tava Shubha Name Jage: Sa Re Ga Ga Ga Ga Re Ga Ma
+    C4, D4, E4, E4, E4, E4, D4, E4, F4,
+    // Tava Shubha Ashisha Mage: Ga Ma Pa Pa Pa Ma Ga Re Ma Ga
+    E4, F4, G4, G4, G4, F4, E4, D4, F4, E4,
+
+    // Gahe Tava Jaya Gatha: Ga Ga Re Re Re Re Ni(low) Re Sa -- (This seems to repeat a previous line, let's use the line from the prompt)
+    // Actually the prompt says Gahe Tava Jaya Gatha: Ga Ga Re Re Re Re Ni Re Sa
+    E4, E4, D4, D4, D4, D4, Ni_low, D4, C4,
+
+    // Jana Gana Mangala Daayaka Jaya He: Pa Pa Pa Pa Pa Pa Ma Dha Pa
+    G4, G4, G4, G4, G4, G4, F4, A4, G4,
+    // Bharatha Bhagya Vidhatha: Ma Ma Ma Ga Ga Ga Re Ma Ga
+    F4, F4, F4, E4, E4, E4, D4, F4, E4,
+    // Jaya He, Jaya He, Jaya He: NiNi Sa', NiDha Ni, DhaPa Dha
+    B4, B4, C5, B4, A4, B4, A4, G4, A4,
+    // Jaya Jaya Jaya Jaya He: SaSa ReRe GaGa ReGa Ma
+    C4, C4, D4, D4, E4, E4, D4, E4, F4
 ];
 
 export function useScalePlayer() {
