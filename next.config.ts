@@ -39,6 +39,12 @@ const nextConfig: NextConfig = {
         hostname: 'picsum.photos',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'darkgrey-gazelle-504232.hostingersite.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },

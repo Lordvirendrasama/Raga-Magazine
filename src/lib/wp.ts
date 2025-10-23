@@ -1,10 +1,9 @@
-
 // @/lib/wp.ts
 import { decode } from 'html-entities';
 import type { Post } from '@/components/article-card';
 import placeholderImages from '@/app/lib/placeholder-images.json';
 
-const BASE_URL = 'https://ragamagazine.com/wp-json';
+const BASE_URL = 'https://darkgrey-gazelle-504232.hostingersite.com/wp-json';
 
 async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
