@@ -10,7 +10,6 @@ import { ScrollArea } from './ui/scroll-area';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getPosts, transformPost } from '@/lib/wp';
-import { useScalePlayer } from '@/hooks/use-scale-player';
 import GlitchLoader from './glitch-loader';
 
 interface SearchOverlayProps {
@@ -22,7 +21,6 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const playNote = useScalePlayer();
 
   const handleSearch = useCallback(async (term: string) => {
     if (term.length > 2) {
@@ -103,7 +101,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 {filteredPosts.map((post, index) => {
                   const href = post.isEvent ? `/events/${post.slug}` : `/posts/${post.slug}`;
                   return (
-                    <Link href={href} key={post.id} onClick={handleClose} className="group flex items-center gap-4 rounded-lg p-2 transition-colors hover:bg-accent/50" onMouseEnter={() => playNote(index)}>
+                    <Link href={href} key={post.id} onClick={handleClose} className="group flex items-center gap-4 rounded-lg p-2 transition-colors hover:bg-accent/50">
                       <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md">
                         <Image
                           src={post.imageUrl}

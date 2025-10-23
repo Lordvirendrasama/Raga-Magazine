@@ -16,7 +16,6 @@ import {
 import { Badge } from '@/components/ui/badge';
 import type { Post } from './article-card';
 import { cn } from '@/lib/utils';
-import { useScalePlayer } from '@/hooks/use-scale-player';
 
 interface HeroCarouselProps {
   posts: Post[];
@@ -25,7 +24,6 @@ interface HeroCarouselProps {
 export function HeroCarousel({ posts }: HeroCarouselProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
-  const playNote = useScalePlayer();
 
   useEffect(() => {
     if (!api) {
@@ -68,7 +66,7 @@ export function HeroCarousel({ posts }: HeroCarouselProps) {
       >
         <CarouselContent>
           {posts.map((post, index) => (
-            <CarouselItem key={post.id} onMouseEnter={() => playNote(index)}>
+            <CarouselItem key={post.id}>
               <div className="relative h-[50vh] min-h-[350px] w-full overflow-hidden md:h-[65vh]">
                 <Image
                   src={post.imageUrl}

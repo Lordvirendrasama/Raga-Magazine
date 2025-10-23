@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -35,7 +36,6 @@ export function MagazineGrid({ initialPosts }: MagazineGridProps) {
             post={post}
             variant={index === 0 ? 'featured' : 'default'}
             className={index === 0 ? "md:col-span-2" : ""}
-            noteIndex={index}
           />
         ))}
       </div>

@@ -6,14 +6,12 @@ import Image from 'next/image';
 import { type Post } from './article-card';
 import { Badge } from './ui/badge';
 import { ArrowUpRight } from 'lucide-react';
-import { useScalePlayer } from '@/hooks/use-scale-player';
 
 interface SidebarTopStoriesProps {
   posts: Post[];
 }
 
 export function SidebarTopStories({ posts }: SidebarTopStoriesProps) {
-  const playNote = useScalePlayer();
   return (
     <aside className="sticky top-20">
       <h2 className="mb-6 font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
@@ -21,7 +19,7 @@ export function SidebarTopStories({ posts }: SidebarTopStoriesProps) {
       </h2>
       <div className="space-y-6">
         {posts.map((post, index) => (
-          <Link href={post.isEvent ? `/events/${post.slug}` : `/posts/${post.slug}`} key={post.id} className="group flex items-start gap-4" onMouseEnter={() => playNote(index)}>
+          <Link href={post.isEvent ? `/events/${post.slug}` : `/posts/${post.slug}`} key={post.id} className="group flex items-start gap-4">
             <span className="font-headline text-3xl font-bold text-muted-foreground">
               {String(index + 1).padStart(2, '0')}
             </span>

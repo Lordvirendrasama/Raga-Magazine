@@ -15,6 +15,7 @@ import { AuthProvider } from '@/hooks/use-auth';
 import StreakPopup from '@/components/streak-popup';
 import { useState, useEffect } from 'react';
 import LoadingScreen from '@/components/loading-screen';
+import { GlobalLinkSound } from '@/components/global-link-sound';
 
 export default function RootLayout({
   children,
@@ -60,6 +61,7 @@ export default function RootLayout({
                 <StreakPopup />
                 <Footer />
                 <Toaster />
+                <GlobalLinkSound />
               </ThemeProvider>
             </AuthProvider>
           </MuteProvider>

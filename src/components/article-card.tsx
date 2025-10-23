@@ -80,15 +80,13 @@ export interface Post {
 interface ArticleCardProps extends VariantProps<typeof cardVariants> {
   post: Post;
   className?: string;
-  noteIndex?: number;
 }
 
-export function ArticleCard({ post, variant, className, noteIndex = 0 }: ArticleCardProps) {
+export function ArticleCard({ post, variant, className }: ArticleCardProps) {
   const href = post.isEvent ? `/events/${post.slug}` : `/posts/${post.slug}`;
-  const playNote = useScalePlayer();
   
   return (
-    <article className={cn(cardVariants({ variant }), className)} onMouseEnter={() => playNote(noteIndex)}>
+    <article className={cn(cardVariants({ variant }), className)}>
       <Link href={href} className="absolute inset-0 z-10" aria-label={post.title} />
       <div className={cn(imageContainerVariants({ variant }))}>
         <Image

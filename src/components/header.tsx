@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { SearchOverlay } from './search-overlay';
 import { getCategories } from '@/lib/wp';
 import { ThemeToggle } from './theme-toggle';
-import { useScalePlayer } from '@/hooks/use-scale-player';
 import { MuteToggle } from './mute-toggle';
 import { StreakCounter } from './streak-counter';
 import { UserAuth } from './user-auth';
@@ -33,7 +32,6 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [navLinks, setNavLinks] = useState<NavLink[]>([...fallbackLinks, ...allStaticLinks]);
-  const playNote = useScalePlayer();
   
   useEffect(() => {
     async function fetchMenu() {
@@ -70,14 +68,14 @@ export function Header() {
       <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-2 md:px-4">
           <div className="flex items-center gap-2 md:gap-4">
-            <Link href="/" className="flex items-center gap-2" onMouseEnter={() => playNote(0)}>
+            <Link href="/" className="flex items-center gap-2">
               <h1 className="font-headline text-xl font-bold tracking-tighter md:text-2xl">RagaMagazine</h1>
             </Link>
             <StreakCounter />
           </div>
           <nav className="hidden md:flex md:items-center md:gap-4 lg:gap-6">
             {navLinks.map((link, index) => (
-              <Link key={link.name} href={link.href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary" onMouseEnter={() => playNote(index + 1)}>
+              <Link key={link.name} href={link.href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
                 {link.name}
               </Link>
             ))}
@@ -98,7 +96,7 @@ export function Header() {
           <div className="absolute top-16 left-0 w-full h-[calc(100vh-4rem)] bg-background z-50 md:hidden">
             <nav className="flex flex-col items-center gap-2 p-4">
               {navLinks.map((link, index) => (
-                <Link key={link.name} href={link.href} className="w-full rounded-md py-3 text-center text-lg font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground" onClick={() => setIsMenuOpen(false)} onMouseEnter={() => playNote(index + 1)}>
+                <Link key={link.name} href={link.href} className="w-full rounded-md py-3 text-center text-lg font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground" onClick={() => setIsMenuOpen(false)}>
                   {link.name}
                 </Link>
               ))}

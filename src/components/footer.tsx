@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { Button } from './ui/button';
 import React, { useState, useEffect } from 'react';
 import { getCategories } from '@/lib/wp';
-import { useScalePlayer } from '@/hooks/use-scale-player';
 
 interface CategoryLink {
   name: string;
@@ -27,7 +26,6 @@ const allStaticLinks: CategoryLink[] = [
 export function Footer() {
   const [currentYear, setCurrentYear] = useState<number | null>(null);
   const [navLinks, setNavLinks] = useState<CategoryLink[]>([...fallbackLinks, ...allStaticLinks]);
-  const playNote = useScalePlayer();
 
   useEffect(() => {
     setCurrentYear(new Date().getFullYear());
@@ -67,7 +65,6 @@ export function Footer() {
                         <Link 
                           href={link.href} 
                           className={`text-sm text-muted-foreground hover:text-${index % 2 === 0 ? 'primary' : 'accent'}`}
-                          onMouseEnter={() => playNote(index)}
                         >
                             {link.name}
                         </Link>
