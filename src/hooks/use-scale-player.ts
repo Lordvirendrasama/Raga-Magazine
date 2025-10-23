@@ -11,15 +11,14 @@ const E4 = 329.63; // Ga
 const F4 = 349.23; // Ma
 const G4 = 392.00; // Pa
 const A4 = 440.00; // Dha
-const Bb4 = 466.16; // Komal Ni
 const B4 = 493.88; // Shuddha Ni
-const C5 = 523.25; // Sa (Higher Octave)
 
-const Ni_low = 246.94; // Komal Ni (Lower Octave) - B3
+const Ni_low = 246.94; // Komal Ni (Lower Octave) -> B3 in Western terms, but let's call it Ni_low
+const C5 = 523.25; // Sa' (Higher Octave)
 
-const scaleFrequencies = [
-    // Jana Gana Mana Adhinayaka Jaya He: Sa Re Ga Ga Ga Ga Ga Re Ga Ma
-    C4, D4, E4, E4, E4, E4, E4, D4, E4, F4,
+export const scaleFrequencies = [
+    // Jana Gana Mana Adhinayaka Jaya He: Sa Re Ga Ga Ga Ga Ga Ga Ga Re Ga Ma
+    C4, D4, E4, E4, E4, E4, E4, E4, E4, D4, E4, F4,
     // Bharatha Bhagya Vidhatha: Ga Ga Ga Re Re Re Ni(low) Re Sa
     E4, E4, E4, D4, D4, D4, Ni_low, D4, C4,
     // Punjaba Sindhu Gujaratha Maratha: Sa Pa Pa Pa Pa Pa Ma Dha Pa
@@ -34,11 +33,8 @@ const scaleFrequencies = [
     C4, D4, E4, E4, E4, E4, D4, E4, F4,
     // Tava Shubha Ashisha Mage: Ga Ma Pa Pa Pa Ma Ga Re Ma Ga
     E4, F4, G4, G4, G4, F4, E4, D4, F4, E4,
-
-    // Gahe Tava Jaya Gatha: Ga Ga Re Re Re Re Ni(low) Re Sa -- (This seems to repeat a previous line, let's use the line from the prompt)
-    // Actually the prompt says Gahe Tava Jaya Gatha: Ga Ga Re Re Re Re Ni Re Sa
+    // Gahe Tava Jaya Gatha: Ga Ga Re Re Re Re Ni(low) Re Sa
     E4, E4, D4, D4, D4, D4, Ni_low, D4, C4,
-
     // Jana Gana Mangala Daayaka Jaya He: Pa Pa Pa Pa Pa Pa Ma Dha Pa
     G4, G4, G4, G4, G4, G4, F4, A4, G4,
     // Bharatha Bhagya Vidhatha: Ma Ma Ma Ga Ga Ga Re Ma Ga

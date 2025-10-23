@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useScalePlayer } from '@/hooks/use-scale-player';
+import { useScalePlayer, scaleFrequencies } from '@/hooks/use-scale-player';
 import { throttle } from 'lodash';
 
 export function GlobalLinkSound() {
@@ -13,7 +13,7 @@ export function GlobalLinkSound() {
   useEffect(() => {
     const playNextNote = () => {
       playNote(noteCounterRef.current);
-      noteCounterRef.current = (noteCounterRef.current + 1) % 16; // 16 notes in the scale
+      noteCounterRef.current = (noteCounterRef.current + 1) % scaleFrequencies.length;
     };
 
     const throttledPlay = throttle(playNextNote, 200, { trailing: false });
