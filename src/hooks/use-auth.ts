@@ -7,6 +7,7 @@ const USER_STORAGE_KEY = 'raga-users';
 
 interface User {
   name: string;
+  isAdmin?: boolean;
 }
 
 interface AuthContextType {
@@ -26,14 +27,24 @@ export const useAuth = () => {
   return context;
 };
 
+const getUserFromStorage = (name: string): User | null => {
+    const users = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || '{}');
+    const userData = users[name];
+    if (userData) {
+      return { name, isAdmin: userData.isAdmin || false };
+    }
+    return null;
+}
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     // Check if a user is logged in from a previous session
-    const loggedInUser = sessionStorage.getItem('raga-loggedInUser');
-    if (loggedInUser) {
-      setUser({ name: loggedInUser });
+    const loggedInUserName = sessionStorage.getItem('raga-loggedInUser');
+    if (loggedInUserName) {
+      const loggedInUser = getUserFromStorage(loggedInUserName);
+      setUser(loggedInUser);
     }
   }, []);
 
@@ -45,7 +56,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = (name: string, pass: string) => {
     const users = getUsers();
     if (users[name] && users[name].password === pass) {
-      setUser({ name });
+      const loggedInUser = { name, isAdmin: users[name].isAdmin || false };
+      setUser(loggedInUser);
       sessionStorage.setItem('raga-loggedInUser', name);
     } else {
       throw new Error('Invalid name or password.');
@@ -57,9 +69,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (users[name]) {
       throw new Error('User already exists. Please log in.');
     }
-    users[name] = { password: pass, streakData: { streak: 0, lastVisit: '' } };
+    // The first user to sign up is the admin
+    const isFirstUser = Object.keys(users).length === 0;
+    users[name] = { 
+        password: pass, 
+        streakData: { streak: 0, lastVisit: '' },
+        isAdmin: isFirstUser 
+    };
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
-    setUser({ name });
+    
+    const newUser = { name, isAdmin: isFirstUser };
+    setUser(newUser);
     sessionStorage.setItem('raga-loggedInUser', name);
   };
 

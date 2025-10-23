@@ -11,6 +11,7 @@ import { ThemeToggle } from './theme-toggle';
 import { MuteToggle } from './mute-toggle';
 import { StreakCounter } from './streak-counter';
 import { UserAuth } from './user-auth';
+import { useAuth } from '@/hooks/use-auth';
 
 interface NavLink {
   name: string;
@@ -29,6 +30,7 @@ const allStaticLinks: NavLink[] = [
 ];
 
 export function Header() {
+  const { user } = useAuth();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [navLinks, setNavLinks] = useState<NavLink[]>([...fallbackLinks, ...allStaticLinks]);
@@ -37,20 +39,31 @@ export function Header() {
     async function fetchMenu() {
       try {
         const categories = await getCategories();
+        let baseLinks = allStaticLinks;
+        if (user?.isAdmin) {
+          baseLinks = [...baseLinks, { name: 'Admin', href: '/admin' }];
+        }
         if (categories && categories.length > 0) {
             const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0);
             const links = filteredCategories.slice(0,3).map((cat: any) => ({
               name: cat.name,
               href: `/category/${cat.slug}`,
             }));
-            setNavLinks([...links, ...allStaticLinks]);
+            setNavLinks([...links, ...baseLinks]);
+        } else {
+             setNavLinks([...fallbackLinks, ...baseLinks]);
         }
       } catch (error) {
         console.error('Failed to fetch categories for header, using fallback:', error);
+        let baseLinks = allStaticLinks;
+        if (user?.isAdmin) {
+          baseLinks = [...baseLinks, { name: 'Admin', href: '/admin' }];
+        }
+        setNavLinks([...fallbackLinks, ...baseLinks]);
       }
     }
     fetchMenu();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (isMenuOpen) {
