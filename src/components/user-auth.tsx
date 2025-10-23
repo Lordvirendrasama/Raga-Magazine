@@ -94,10 +94,10 @@ export function UserAuth() {
                   <Input id="login-name" value={name} onChange={(e) => setName(e.target.value)} className="col-span-3" />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="login-password" value={password} onChange={(e) => setPassword(e.target.value)} className="text-right">
+                  <Label htmlFor="login-password" className="text-right">
                     Password
                   </Label>
-                  <Input id="login-password" type="password" className="col-span-3" />
+                  <Input id="login-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="col-span-3" />
                 </div>
                 {error && <p className="text-destructive text-sm text-center col-span-4">{error}</p>}
               </div>
@@ -118,10 +118,10 @@ export function UserAuth() {
                   <Input id="signup-name" value={name} onChange={(e) => setName(e.target.value)} className="col-span-3" />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="signup-password" value={password} onChange={(e) => setPassword(e.target.value)} className="text-right">
+                  <Label htmlFor="signup-password" className="text-right">
                     Password
                   </Label>
-                  <Input id="signup-password" type="password" className="col-span-3" />
+                  <Input id="signup-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="col-span-3" />
                 </div>
                  {error && <p className="text-destructive text-sm text-center col-span-4">{error}</p>}
               </div>
