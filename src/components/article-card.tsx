@@ -5,10 +5,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { format } from 'date-fns';
+import { useState } from 'react';
 
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { useScalePlayer } from '@/hooks/use-scale-player';
+import { MusicNoteAnimation } from './music-note-animation';
 
 const cardVariants = cva(
   'group relative flex flex-col overflow-hidden rounded-lg bg-card text-card-foreground shadow-md transition-shadow hover:shadow-xl',
@@ -84,9 +86,15 @@ interface ArticleCardProps extends VariantProps<typeof cardVariants> {
 
 export function ArticleCard({ post, variant, className }: ArticleCardProps) {
   const href = post.isEvent ? `/events/${post.slug}` : `/posts/${post.slug}`;
-  
+  const [isHovering, setIsHovering] = useState(false);
+
   return (
-    <article className={cn(cardVariants({ variant }), className)}>
+    <article
+      className={cn(cardVariants({ variant }), className)}
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
+      <MusicNoteAnimation isPlaying={isHovering} />
       <Link href={href} className="absolute inset-0 z-10" aria-label={post.title} />
       <div className={cn(imageContainerVariants({ variant }))}>
         <Image
