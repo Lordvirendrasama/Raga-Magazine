@@ -38,11 +38,12 @@ export function Header() {
   useEffect(() => {
     async function fetchMenu() {
       try {
-        const categories = await getCategories();
-        let baseLinks = allStaticLinks;
+        let baseLinks = [...allStaticLinks];
         if (user?.isAdmin) {
-          baseLinks = [...baseLinks, { name: 'Admin', href: '/admin' }];
+          baseLinks.push({ name: 'Admin', href: '/admin' });
         }
+        
+        const categories = await getCategories();
         if (categories && categories.length > 0) {
             const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0);
             const links = filteredCategories.slice(0,3).map((cat: any) => ({
@@ -55,9 +56,9 @@ export function Header() {
         }
       } catch (error) {
         console.error('Failed to fetch categories for header, using fallback:', error);
-        let baseLinks = allStaticLinks;
+        let baseLinks = [...allStaticLinks];
         if (user?.isAdmin) {
-          baseLinks = [...baseLinks, { name: 'Admin', href: '/admin' }];
+          baseLinks.push({ name: 'Admin', href: '/admin' });
         }
         setNavLinks([...fallbackLinks, ...baseLinks]);
       }

@@ -14,7 +14,7 @@ export default function AdminPage() {
         // Redirect if user is not an admin.
         // A short delay before checking to allow auth state to settle.
         const timer = setTimeout(() => {
-            if (!user?.isAdmin) {
+            if (user && !user.isAdmin) {
                 router.push('/');
             }
         }, 500);
@@ -23,10 +23,18 @@ export default function AdminPage() {
     }, [user, router]);
 
 
-    if (!user?.isAdmin) {
+    if (!user) {
         return (
              <div className="container mx-auto px-4 py-8 lg:py-12 text-center">
                 <p>Verifying access...</p>
+            </div>
+        );
+    }
+    
+    if (!user.isAdmin) {
+        return (
+             <div className="container mx-auto px-4 py-8 lg:py-12 text-center">
+                <p>Access Denied. Redirecting...</p>
             </div>
         );
     }
