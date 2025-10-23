@@ -27,6 +27,7 @@ const fallbackLinks: NavLink[] = [
 const allStaticLinks: NavLink[] = [
   { name: 'Timeline', href: '/timeline' },
   { name: 'Events', href: '/events' },
+  { name: 'Admin', href: '/admin' },
 ];
 
 export function Header() {
@@ -38,10 +39,7 @@ export function Header() {
   useEffect(() => {
     async function fetchMenu() {
       try {
-        let baseLinks = [...allStaticLinks];
-        if (user?.isAdmin) {
-          baseLinks.push({ name: 'Admin', href: '/admin' });
-        }
+        const baseLinks = [...allStaticLinks];
         
         const categories = await getCategories();
         if (categories && categories.length > 0) {
@@ -56,10 +54,7 @@ export function Header() {
         }
       } catch (error) {
         console.error('Failed to fetch categories for header, using fallback:', error);
-        let baseLinks = [...allStaticLinks];
-        if (user?.isAdmin) {
-          baseLinks.push({ name: 'Admin', href: '/admin' });
-        }
+        const baseLinks = [...allStaticLinks];
         setNavLinks([...fallbackLinks, ...baseLinks]);
       }
     }
