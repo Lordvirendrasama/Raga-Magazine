@@ -45,6 +45,16 @@ const Wall = ({ wallData, rotation, position }: { wallData: MuseumWall; rotation
     );
 };
 
+const SkeletonWall = ({ rotation, position }: { rotation: string; position: string; }) => {
+    return (
+        <a-entity position={position} rotation={rotation}>
+            <a-plane width="10" height="4" color="#F0F0F0" material="side: double"></a-plane>
+            <a-box color="#DDD" width="3" height="2.25" position="-3 0.5 0.1"></a-box>
+            <a-box color="#E5E5E5" width="2" height="0.3" position="1.5 1 0.1"></a-box>
+            <a-box color="#E5E5E5" width="3" height="1" position="1.5 -0.5 0.1"></a-box>
+        </a-entity>
+    );
+}
 
 export default function MuseumPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -70,11 +80,22 @@ export default function MuseumPage() {
     return null;
   }
   
-  if (loading) {
+  if (!walls && loading) {
       return (
-          <div className="h-[80vh] w-full flex items-center justify-center">
-              <p>Loading Museum...</p>
-          </div>
+        <div className="h-[80vh] w-full">
+            <a-scene embedded background="color: #ECECEC">
+                <a-camera position="0 1.6 0"></a-camera>
+                <a-light type="ambient" color="#888"></a-light>
+                <a-light type="point" intensity="0.5" position="0 3 0"></a-light>
+                <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#C0C0C0"></a-plane>
+                <a-plane position="0 4 0" rotation="90 0 0" width="20" height="20" color="#C0C0C0"></a-plane>
+
+                <SkeletonWall position="0 2 -5" rotation="0 0 0" />
+                <SkeletonWall position="5 2 0" rotation="0 -90 0" />
+                <SkeletonWall position="0 2 5" rotation="0 180 0" />
+                <SkeletonWall position="-5 2 0" rotation="0 90 0" />
+            </a-scene>
+        </div>
       );
   }
   
@@ -88,7 +109,7 @@ export default function MuseumPage() {
 
   return (
     <div className="h-[80vh] w-full">
-      <a-scene background="color: #ECECEC">
+      <a-scene embedded background="color: #ECECEC">
         <a-camera position="0 1.6 0"></a-camera>
         
         <a-light type="ambient" color="#888"></a-light>
