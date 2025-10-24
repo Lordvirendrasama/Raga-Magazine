@@ -19,7 +19,6 @@ const fallbackLinks: CategoryLink[] = [
 ];
 
 const allStaticLinks: CategoryLink[] = [
-  { name: 'Museum', href: '/museum' },
   { name: 'Events', href: '/events' },
 ];
 
