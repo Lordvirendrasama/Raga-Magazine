@@ -22,11 +22,14 @@ const MouseFollower = () => {
   const [points, setPoints] = useState<{ x: number; y: number }[]>([]);
 
   useEffect(() => {
-    const newPoints = [...points, { x, y }];
-    if (newPoints.length > 10) {
-      newPoints.shift();
-    }
-    setPoints(newPoints);
+    // Use a functional update to avoid depending on `points` in the dependency array
+    setPoints(prevPoints => {
+        const newPoints = [...prevPoints, { x, y }];
+        if (newPoints.length > 10) {
+            newPoints.shift();
+        }
+        return newPoints;
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [x, y]);
 
