@@ -5,7 +5,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-export function TimelineScene() {
+export function MuseumScene() {
   return (
     <Canvas camera={{ position: [0, 0, 5] }}>
       {/* 

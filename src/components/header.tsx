@@ -25,7 +25,7 @@ const fallbackLinks: NavLink[] = [
 ];
 
 const allStaticLinks: NavLink[] = [
-  { name: 'Timeline', href: '/timeline' },
+  { name: 'Museum', href: '/museum' },
   { name: 'Events', href: '/events' },
   { name: 'Admin', href: '/admin' },
 ];
