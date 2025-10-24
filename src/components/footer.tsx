@@ -20,6 +20,7 @@ const fallbackLinks: CategoryLink[] = [
 
 const allStaticLinks: CategoryLink[] = [
   { name: 'Events', href: '/events' },
+  { name: 'Museum', href: '/museum' },
 ];
 
 export function Footer() {

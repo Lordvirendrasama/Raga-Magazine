@@ -1,12 +1,17 @@
 
 'use client';
 
-import { MuseumScene } from '@/components/museum-scene';
-
 export default function MuseumPage() {
   return (
-    <div className="h-full w-full absolute inset-0">
-      <MuseumScene />
+    <div className="container mx-auto px-4 py-8 lg:py-12">
+      <div className="mb-8 text-center md:mb-12">
+        <h1 className="mb-4 font-headline text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+          The Museum
+        </h1>
+        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+          This experience is currently under construction.
+        </p>
+      </div>
     </div>
   );
 }
