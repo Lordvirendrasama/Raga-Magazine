@@ -9,6 +9,7 @@ export interface MuseumWall {
     artistDescription: string;
     imageUrl: string;
     imageHint: string;
+    youtubeUrl: string;
 }
 
 const COLLECTION_NAME = 'museum_walls';
@@ -19,24 +20,28 @@ const defaultContent: Omit<MuseumWall, 'id'>[] = [
         artistDescription: "Known for blending traditional sounds with modern electronic beats, Artist One redefined the genre in the early 2000s.",
         imageUrl: placeholderImages.images[10].url,
         imageHint: placeholderImages.images[10].hint,
+        youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     },
     {
         artistName: "Artist Two - The Purist",
         artistDescription: "A master of the sitar, Artist Two is celebrated for their flawless technique and deep understanding of classical ragas.",
         imageUrl: placeholderImages.images[2].url,
         imageHint: placeholderImages.images[2].hint,
+        youtubeUrl: "",
     },
     {
         artistName: "Artist Three - The Innovator",
         artistDescription: "Pioneering the use of microtonal keyboards, Artist Three opened new harmonic possibilities in contemporary music.",
         imageUrl: placeholderImages.images[13].url,
         imageHint: placeholderImages.images[13].hint,
+        youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     },
     {
         artistName: "Artist Four - The Performer",
         artistDescription: "With an electrifying stage presence, Artist Four's live shows are legendary, captivating audiences worldwide.",
         imageUrl: placeholderImages.images[14].url,
         imageHint: placeholderImages.images[14].hint,
+        youtubeUrl: "",
     }
 ];
 
@@ -56,7 +61,13 @@ export async function getMuseumContent(): Promise<MuseumWall[]> {
 
     const walls: MuseumWall[] = [];
     querySnapshot.forEach((doc) => {
-        walls.push({ id: doc.id, ...doc.data() } as MuseumWall);
+        const data = doc.data();
+        walls.push({ 
+            id: doc.id, 
+            ...data,
+            // Ensure youtubeUrl is present, default to empty string if not
+            youtubeUrl: data.youtubeUrl || "",
+        } as MuseumWall);
     });
     
     // Simple sort to ensure order

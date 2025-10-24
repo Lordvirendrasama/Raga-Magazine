@@ -110,6 +110,8 @@ export default function AdminPage() {
                                 <Skeleton className="h-20 w-full" />
                                 <Skeleton className="h-4 w-1/6" />
                                 <Skeleton className="h-10 w-full" />
+                                <Skeleton className="h-4 w-1/6" />
+                                <Skeleton className="h-20 w-full" />
                              </div>
                         ))}
                     </CardContent>
@@ -150,6 +152,9 @@ export default function AdminPage() {
 
                         <Label htmlFor={`walls[${index}].imageUrl`}>Image URL</Label>
                         <Input {...register(`walls.${index}.imageUrl`)} id={`walls[${index}].imageUrl`} />
+
+                        <Label htmlFor={`walls[${index}].youtubeUrl`}>YouTube Embed URL</Label>
+                        <Textarea {...register(`walls.${index}.youtubeUrl`)} id={`walls[${index}].youtubeUrl`} rows={2} placeholder="e.g., https://www.youtube.com/embed/VIDEO_ID" />
                     </div>
                 ))}
                 <Button type="submit" disabled={isSubmitting}>
