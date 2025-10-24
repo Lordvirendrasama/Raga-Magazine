@@ -42,6 +42,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet" />
         <title>RagaMagazine</title>
         <meta name="description" content="The future of reading is here." />
+        <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased')} suppressHydrationWarning>
         {isLoading && <LoadingScreen />}
