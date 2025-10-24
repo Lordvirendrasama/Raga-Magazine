@@ -1,6 +1,6 @@
 
 import { db } from './firebase';
-import { collection, doc, getDocs, writeBatch, query } from 'firebase/firestore';
+import { collection, doc, getDocs, writeBatch, query, orderBy } from 'firebase/firestore';
 import placeholderImages from '@/app/lib/placeholder-images.json';
 
 export interface MuseumWall {
@@ -47,7 +47,7 @@ const defaultContent: Omit<MuseumWall, 'id'>[] = [
 
 export async function getMuseumContent(): Promise<MuseumWall[]> {
     const wallsCollection = collection(db, COLLECTION_NAME);
-    const q = query(wallsCollection);
+    const q = query(wallsCollection, orderBy('id'));
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
@@ -70,7 +70,7 @@ export async function getMuseumContent(): Promise<MuseumWall[]> {
         } as MuseumWall);
     });
     
-    // Simple sort to ensure order
+    // Firestore query with orderBy should handle sorting, but as a fallback:
     walls.sort((a, b) => a.id.localeCompare(b.id));
 
     return walls;
@@ -94,7 +94,7 @@ async function initializeDefaultContent(): Promise<void> {
     const batch = writeBatch(db);
     defaultContent.forEach((content, index) => {
         const docRef = doc(db, COLLECTION_NAME, `wall-${index + 1}`);
-        batch.set(docRef, content);
+        batch.set(docRef, { ...content, id: `wall-${index + 1}` });
     });
     await batch.commit();
 }

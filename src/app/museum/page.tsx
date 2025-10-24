@@ -162,7 +162,7 @@ export default function MuseumPage() {
   return (
     <>
     <div className="h-[80vh] w-full">
-      <a-scene embedded background={`color: ${resolvedTheme === 'dark' ? '#333' : '#ECECEC'}`} key={resolvedTheme}>
+      <a-scene embedded background={`color: ${resolvedTheme === 'dark' ? '#333' : '#ECECEC'}`}>
         {sceneElements}
         {renderContent()}
       </a-scene>
