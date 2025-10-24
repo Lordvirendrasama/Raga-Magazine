@@ -205,10 +205,10 @@ export default function MuseumPage() {
             {/* Content will be injected here by useEffect */}
             {loading && (
                  <>
-                    <a-entity position="0 3 -5" rotation="0 0 0"><a-plane width="10" height="6" color="var(--museum-wall)" material="shader: flat;"></a-plane></a-entity>
-                    <a-entity position="5 3 0" rotation="0 -90 0"><a-plane width="10" height="6" color="var(--museum-wall)" material="shader: flat;"></a-plane></a-entity>
-                    <a-entity position="0 3 5" rotation="0 180 0"><a-plane width="10" height="6" color="var(--museum-wall)" material="shader: flat;"></a-plane></a-entity>
-                    <a-entity position="-5 3 0" rotation="0 90 0"><a-plane width="10" height="6" color="var(--museum-wall)" material="shader: flat;"></a-plane></a-entity>
+                    <a-entity position="0 3 -5" rotation="0 0 0"><a-plane width="10" height="6" color={resolvedTheme === 'dark' ? '#111111' : '#F0F0F0'} material="shader: flat;"></a-plane></a-entity>
+                    <a-entity position="5 3 0" rotation="0 -90 0"><a-plane width="10" height="6" color={resolvedTheme === 'dark' ? '#111111' : '#F0F0F0'} material="shader: flat;"></a-plane></a-entity>
+                    <a-entity position="0 3 5" rotation="0 180 0"><a-plane width="10" height="6" color={resolvedTheme === 'dark' ? '#111111' : '#F0F0F0'} material="shader: flat;"></a-plane></a-entity>
+                    <a-entity position="-5 3 0" rotation="0 90 0"><a-plane width="10" height="6" color={resolvedTheme === 'dark' ? '#111111' : '#F0F0F0'} material="shader: flat;"></a-plane></a-entity>
                  </>
             )}
           </a-entity>

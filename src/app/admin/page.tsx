@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useForm, useFieldArray, SubmitHandler, FieldValues } from "react-hook-form";
+import { useForm, useFieldArray, SubmitHandler } from "react-hook-form";
 import { getMuseumContent, updateMuseumContent, type MuseumWall } from '@/lib/museum-content';
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from '@/components/ui/skeleton';
@@ -117,6 +117,7 @@ export default function AdminPage() {
                                         <Skeleton className="h-4 w-1/6" />
                                         <Skeleton className="h-20 w-full" />
                                     </div>
+
                                     <div className="space-y-2">
                                         <Skeleton className="h-4 w-1/6" />
                                         <Skeleton className="h-10 w-full" />
@@ -141,7 +142,7 @@ export default function AdminPage() {
           Admin Dashboard
         </h1>
         <p className="text-lg text-muted-foreground">
-          Manage your website content and settings.
+          Manage the content for the 3D museum experience.
         </p>
       </div>
 
@@ -150,7 +151,7 @@ export default function AdminPage() {
             <CardHeader>
             <CardTitle>Museum Content</CardTitle>
             <CardDescription>
-                Edit the text and images for the four walls of the 3D museum.
+                Edit the text, images, and videos for the four walls of the 3D museum.
             </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

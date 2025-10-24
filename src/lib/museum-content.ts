@@ -53,10 +53,18 @@ export async function getMuseumContent(): Promise<MuseumWall[]> {
     if (querySnapshot.empty) {
         console.log('No museum content found, initializing with default data.');
         await initializeDefaultContent();
-        return defaultContent.map((wall, index) => ({
-            ...wall,
-            id: `wall-${index + 1}`
-        }));
+        // After initializing, fetch again to get the sorted data
+        const newSnapshot = await getDocs(q);
+         const walls: MuseumWall[] = [];
+        newSnapshot.forEach((doc) => {
+            const data = doc.data();
+            walls.push({
+                id: doc.id,
+                ...data,
+                youtubeUrl: data.youtubeUrl || "",
+            } as MuseumWall);
+        });
+        return walls;
     }
 
     const walls: MuseumWall[] = [];
@@ -65,7 +73,6 @@ export async function getMuseumContent(): Promise<MuseumWall[]> {
         walls.push({ 
             id: doc.id, 
             ...data,
-            // Ensure youtubeUrl is present, default to empty string if not
             youtubeUrl: data.youtubeUrl || "",
         } as MuseumWall);
     });
@@ -81,7 +88,6 @@ export async function updateMuseumContent(walls: MuseumWall[]): Promise<void> {
     
     walls.forEach(wall => {
         const wallRef = doc(db, COLLECTION_NAME, wall.id);
-        // We exclude the ID from the data we write to Firestore
         const { id, ...wallData } = wall;
         batch.set(wallRef, wallData);
     });
