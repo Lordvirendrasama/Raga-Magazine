@@ -300,18 +300,19 @@
     width: 60vw;
     height: 50vh;
     max-width: 800px;
+    backface-visibility: hidden;
   }
 
   .cube__face--front {
     transform: rotateY(0deg) translateZ(30vw);
   }
   .cube__face--right {
-    transform: rotateY(90deg) translateZ(30vw);
+    transform: rotateY(-90deg) translateZ(30vw);
   }
   .cube__face--back {
-    transform: rotateY(180deg) translateZ(30vw);
+    transform: rotateY(-180deg) translateZ(30vw);
   }
   .cube__face--left {
-    transform: rotateY(-90deg) translateZ(30vw);
+    transform: rotateY(-270deg) translateZ(30vw);
   }
 }
