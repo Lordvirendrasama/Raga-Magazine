@@ -18,11 +18,13 @@ type FormValues = {
   walls: MuseumWall[];
 };
 
+type PageStatus = 'loading' | 'success' | 'denied';
+
 export default function AdminPage() {
     const { user } = useAuth();
     const router = useRouter();
     const { toast } = useToast();
-    const [loading, setLoading] = useState(true);
+    const [status, setStatus] = useState<PageStatus>('loading');
 
     const { register, control, handleSubmit, reset, formState: { isSubmitting } } = useForm<FormValues>({
         defaultValues: {
@@ -35,75 +37,42 @@ export default function AdminPage() {
     });
 
     useEffect(() => {
-        if (user === null) { // still checking auth
-            return;
-        }
-        if (!user || !user.isAdmin) {
-            toast({
-                title: "Access Denied",
-                description: "You do not have permission to view this page.",
-                variant: "destructive"
-            });
-            router.push('/');
-        } else {
-             const fetchContent = async () => {
-                setLoading(true);
-                try {
-                    const content = await getMuseumContent();
-                    reset({ walls: content });
-                } catch (e) {
-                     toast({
-                        title: "Error",
-                        description: "Could not load museum content.",
-                        variant: "destructive"
-                    });
-                }
-                setLoading(false);
-            };
-            fetchContent();
-        }
+        const checkAuthAndFetchData = async () => {
+            if (user === null) {
+                // Auth state is still being determined, wait.
+                setStatus('loading');
+                return;
+            }
+
+            if (!user || !user.isAdmin) {
+                toast({
+                    title: "Access Denied",
+                    description: "You do not have permission to view this page.",
+                    variant: "destructive"
+                });
+                setStatus('denied');
+                router.push('/');
+                return;
+            }
+            
+            // User is admin, fetch content.
+            try {
+                const content = await getMuseumContent();
+                reset({ walls: content });
+                setStatus('success');
+            } catch (e) {
+                 toast({
+                    title: "Error",
+                    description: "Could not load museum content.",
+                    variant: "destructive"
+                });
+                setStatus('denied'); // Or a new 'error' state
+            }
+        };
+
+        checkAuthAndFetchData();
     }, [user, router, reset, toast]);
 
-    if (!user || loading) {
-        return (
-             <div className="container mx-auto px-4 py-8 lg:py-12">
-                <div className="mb-8">
-                    <Skeleton className="h-12 w-1/3 mb-4" />
-                    <Skeleton className="h-6 w-2/3" />
-                </div>
-                <Card>
-                    <CardHeader>
-                        <Skeleton className="h-8 w-1/4 mb-2" />
-                        <Skeleton className="h-5 w-1/2" />
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        {[...Array(4)].map((_, i) => (
-                             <div key={i} className="space-y-4 p-4 border rounded-lg">
-                                <Skeleton className="h-6 w-1/5 mb-4" />
-                                <div className="space-y-2">
-                                    <Skeleton className="h-4 w-1/6" />
-                                    <Skeleton className="h-10 w-full" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Skeleton className="h-4 w-1/6" />
-                                    <Skeleton className="h-20 w-full" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Skeleton className="h-4 w-1/6" />
-                                    <Skeleton className="h-10 w-full" />
-                                </div>
-                                 <div className="space-y-2">
-                                    <Skeleton className="h-4 w-1/6" />
-                                    <Skeleton className="h-10 w-full" />
-                                </div>
-                             </div>
-                        ))}
-                    </CardContent>
-                </Card>
-            </div>
-        );
-    }
-    
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         try {
             await updateMuseumContent(data.walls);
@@ -120,6 +89,50 @@ export default function AdminPage() {
             });
         }
     };
+    
+    if (status !== 'success') {
+        return (
+             <div className="container mx-auto px-4 py-8 lg:py-12">
+                <div className="mb-8">
+                    <Skeleton className="h-12 w-1/3 mb-4" />
+                    <Skeleton className="h-6 w-2/3" />
+                </div>
+                <Card>
+                    <CardHeader>
+                        <Skeleton className="h-8 w-1/4 mb-2" />
+                        <Skeleton className="h-5 w-1/2" />
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        {status === 'denied' ? (
+                            <p className="text-center text-destructive">Access Denied. You do not have permission to view this page.</p>
+                        ) : (
+                            [...Array(4)].map((_, i) => (
+                                 <div key={i} className="space-y-4 p-4 border rounded-lg">
+                                    <Skeleton className="h-6 w-1/5 mb-4" />
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-4 w-1/6" />
+                                        <Skeleton className="h-10 w-full" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-4 w-1/6" />
+                                        <Skeleton className="h-20 w-full" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-4 w-1/6" />
+                                        <Skeleton className="h-10 w-full" />
+                                    </div>
+                                     <div className="space-y-2">
+                                        <Skeleton className="h-4 w-1/6" />
+                                        <Skeleton className="h-10 w-full" />
+                                    </div>
+                                 </div>
+                            ))
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
     
   return (
     <div className="container mx-auto px-4 py-8 lg:py-12">
@@ -142,20 +155,28 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent className="space-y-6">
                  {fields.map((field, index) => (
-                    <div key={field.id} className="space-y-2 p-4 border rounded-lg">
+                    <div key={field.id} className="space-y-4 p-4 border rounded-lg">
                          <h3 className="font-headline text-xl font-semibold">Wall {index + 1}</h3>
                         
-                        <Label htmlFor={`walls[${index}].artistName`}>Artist Name</Label>
-                        <Input {...register(`walls.${index}.artistName`)} id={`walls[${index}].artistName`} />
+                        <div className="space-y-2">
+                          <Label htmlFor={`walls[${index}].artistName`}>Artist Name</Label>
+                          <Input {...register(`walls.${index}.artistName`)} id={`walls[${index}].artistName`} />
+                        </div>
                         
-                        <Label htmlFor={`walls[${index}].artistDescription`}>Artist Description</Label>
-                        <Textarea {...register(`walls.${index}.artistDescription`)} id={`walls[${index}].artistDescription`} rows={3} />
+                        <div className="space-y-2">
+                          <Label htmlFor={`walls[${index}].artistDescription`}>Artist Description</Label>
+                          <Textarea {...register(`walls.${index}.artistDescription`)} id={`walls[${index}].artistDescription`} rows={3} />
+                        </div>
 
-                        <Label htmlFor={`walls[${index}].imageUrl`}>Image URL</Label>
-                        <Input {...register(`walls.${index}.imageUrl`)} id={`walls[${index}].imageUrl`} />
-
-                        <Label htmlFor={`walls[${index}].youtubeUrl`}>YouTube Embed URL</Label>
-                        <Input {...register(`walls.${index}.youtubeUrl`)} id={`walls[${index}].youtubeUrl`} placeholder="e.g., https://www.youtube.com/embed/VIDEO_ID" />
+                        <div className="space-y-2">
+                            <Label htmlFor={`walls[${index}].imageUrl`}>Image URL</Label>
+                            <Input {...register(`walls.${index}.imageUrl`)} id={`walls[${index}].imageUrl`} />
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <Label htmlFor={`walls[${index}].youtubeUrl`}>YouTube Embed URL</Label>
+                            <Input {...register(`walls.${index}.youtubeUrl`)} id={`walls[${index}].youtubeUrl`} placeholder="e.g., https://www.youtube.com/embed/VIDEO_ID" />
+                        </div>
                     </div>
                 ))}
                 <Button type="submit" disabled={isSubmitting}>
