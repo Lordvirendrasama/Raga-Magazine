@@ -93,8 +93,9 @@ export async function updateMuseumContent(walls: MuseumWall[]): Promise<void> {
 async function initializeDefaultContent(): Promise<void> {
     const batch = writeBatch(db);
     defaultContent.forEach((content, index) => {
-        const docRef = doc(db, COLLECTION_NAME, `wall-${index + 1}`);
-        batch.set(docRef, { ...content, id: `wall-${index + 1}` });
+        const docId = `wall-${index + 1}`;
+        const docRef = doc(db, COLLECTION_NAME, docId);
+        batch.set(docRef, { ...content, id: docId });
     });
     await batch.commit();
 }
