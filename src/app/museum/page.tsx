@@ -63,10 +63,10 @@ export default function MuseumPage() {
         setLoading(false);
         if (walls.length === 4) {
             const wallConfigs = [
-                { position: '0 2.5 -4', rotation: '0 0 0' },   // Front
-                { position: '4 2.5 0', rotation: '0 -90 0' },  // Right
-                { position: '0 2.5 4', rotation: '0 180 0' }, // Back
-                { position: '-4 2.5 0', rotation: '0 90 0' },  // Left
+                { position: '0 3 -5', rotation: '0 0 0' },   // Front
+                { position: '5 3 0', rotation: '0 -90 0' },  // Right
+                { position: '0 3 5', rotation: '0 180 0' }, // Back
+                { position: '-5 3 0', rotation: '0 90 0' },  // Left
             ];
 
             walls.forEach((wallData, index) => {
@@ -77,8 +77,8 @@ export default function MuseumPage() {
 
                 // Wall Plane (acts as a backboard)
                 const plane = document.createElement('a-plane');
-                plane.setAttribute('width', '8');
-                plane.setAttribute('height', '5');
+                plane.setAttribute('width', '10');
+                plane.setAttribute('height', '6');
                 plane.setAttribute('color', wallColor);
                 plane.setAttribute('material', 'shader: flat;');
                 wallEntity.appendChild(plane);
@@ -86,9 +86,9 @@ export default function MuseumPage() {
                 // Image
                 const image = document.createElement('a-image');
                 image.setAttribute('src', wallData.imageUrl);
-                image.setAttribute('width', '3');
-                image.setAttribute('height', '2.25');
-                image.setAttribute('position', '-2.25 1 0.01');
+                image.setAttribute('width', '4');
+                image.setAttribute('height', '3');
+                image.setAttribute('position', '-2.5 1 0.01');
                 image.setAttribute('data-ai-hint', wallData.imageHint || 'music artist');
                 wallEntity.appendChild(image);
 
@@ -96,8 +96,8 @@ export default function MuseumPage() {
                 const artistName = document.createElement('a-text');
                 artistName.setAttribute('value', wallData.artistName);
                 artistName.setAttribute('color', textColor);
-                artistName.setAttribute('position', '1.5 2 0.01');
-                artistName.setAttribute('align', 'left');
+                artistName.setAttribute('position', '2.5 2 0.01');
+                artistName.setAttribute('align', 'center');
                 artistName.setAttribute('width', '4');
                 artistName.setAttribute('font', 'https://cdn.aframe.io/fonts/Exo2Bold.fnt');
                 wallEntity.appendChild(artistName);
@@ -106,22 +106,22 @@ export default function MuseumPage() {
                 const artistDesc = document.createElement('a-text');
                 artistDesc.setAttribute('value', wallData.artistDescription);
                 artistDesc.setAttribute('color', textColor);
-                artistDesc.setAttribute('position', '1.5 1.2 0.01');
-                artistDesc.setAttribute('align', 'left');
+                artistDesc.setAttribute('position', '2.5 1.2 0.01');
+                artistDesc.setAttribute('align', 'center');
                 artistDesc.setAttribute('baseline', 'top');
-                artistDesc.setAttribute('width', '3.5');
-                artistDesc.setAttribute('wrap-count', '40');
+                artistDesc.setAttribute('width', '4.5');
+                artistDesc.setAttribute('wrap-count', '45');
                 artistDesc.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
                 wallEntity.appendChild(artistDesc);
                 
                 // YouTube Video Placeholder
                 if (wallData.youtubeUrl && wallData.youtubeUrl.includes('embed')) {
                     const videoEntity = document.createElement('a-entity');
-                    videoEntity.setAttribute('position', '1.5 -1.25 0.01');
+                    videoEntity.setAttribute('position', '2.5 -1.25 0.01');
                     
                     const videoBg = document.createElement('a-plane');
-                    videoBg.setAttribute('width', '2.5');
-                    videoBg.setAttribute('height', '1.4');
+                    videoBg.setAttribute('width', '3');
+                    videoBg.setAttribute('height', '1.7');
                     videoBg.setAttribute('color', '#000000');
                     videoEntity.appendChild(videoBg);
                     
@@ -136,15 +136,15 @@ export default function MuseumPage() {
 
                     const videoThumb = document.createElement('a-image');
                     videoThumb.setAttribute('src', `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`);
-                    videoThumb.setAttribute('width', '2.4');
-                    videoThumb.setAttribute('height', '1.3');
+                    videoThumb.setAttribute('width', '2.9');
+                    videoThumb.setAttribute('height', '1.6');
                     videoThumb.setAttribute('position', '0 0 0.01');
                     videoEntity.appendChild(videoThumb);
-                    
+
                     const playButton = document.createElement('a-image');
                     playButton.setAttribute('src', 'https://cdn.glitch.com/a5214015-23d5-4a25-9694-84c4711b712c%2Fyt-play-button.png?v=1614023245084');
-                    playButton.setAttribute('width', '0.6');
-                    playButton.setAttribute('height', '0.42');
+                    playButton.setAttribute('width', '0.7');
+                    playButton.setAttribute('height', '0.5');
                     playButton.setAttribute('position', '0 0 0.02');
                     playButton.setAttribute('transparent', 'true');
                     videoEntity.appendChild(playButton);
@@ -194,21 +194,21 @@ export default function MuseumPage() {
     <>
       <div className="h-[80vh] w-full">
         <a-scene ref={sceneRef} embedded background={`color: ${bgColor}`} vr-mode-ui="enabled: false">
-          <a-camera position="0 1.6 0" wasd-controls="enabled: true; acceleration: 65;" look-controls="pointerLockEnabled: true"></a-camera>
+          <a-camera position="0 1.6 0" wasd-controls="enabled: true; acceleration: 100;" look-controls="pointerLockEnabled: true"></a-camera>
           <a-light type="ambient" color="#888"></a-light>
           <a-light type="point" intensity="0.5" position="0 4 0"></a-light>
           
           <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color={floorColor} material="shader: flat;"></a-plane>
-          <a-plane position="0 5 0" rotation="90 0 0" width="20" height="20" color={ceilingColor} material="shader: flat;"></a-plane>
+          <a-plane position="0 6 0" rotation="90 0 0" width="20" height="20" color={ceilingColor} material="shader: flat;"></a-plane>
           
           <a-entity id="content-container">
             {/* Content will be injected here by useEffect */}
             {loading && (
                  <>
-                    <a-entity position="0 2.5 -4" rotation="0 0 0"><a-plane width="8" height="5" color="var(--museum-wall)" material="shader: flat;"></a-plane></a-entity>
-                    <a-entity position="4 2.5 0" rotation="0 -90 0"><a-plane width="8" height="5" color="var(--museum-wall)" material="shader: flat;"></a-plane></a-entity>
-                    <a-entity position="0 2.5 4" rotation="0 180 0"><a-plane width="8" height="5" color="var(--museum-wall)" material="shader: flat;"></a-plane></a-entity>
-                    <a-entity position="-4 2.5 0" rotation="0 90 0"><a-plane width="8" height="5" color="var(--museum-wall)" material="shader: flat;"></a-plane></a-entity>
+                    <a-entity position="0 3 -5" rotation="0 0 0"><a-plane width="10" height="6" color="var(--museum-wall)" material="shader: flat;"></a-plane></a-entity>
+                    <a-entity position="5 3 0" rotation="0 -90 0"><a-plane width="10" height="6" color="var(--museum-wall)" material="shader: flat;"></a-plane></a-entity>
+                    <a-entity position="0 3 5" rotation="0 180 0"><a-plane width="10" height="6" color="var(--museum-wall)" material="shader: flat;"></a-plane></a-entity>
+                    <a-entity position="-5 3 0" rotation="0 90 0"><a-plane width="10" height="6" color="var(--museum-wall)" material="shader: flat;"></a-plane></a-entity>
                  </>
             )}
           </a-entity>
