@@ -30,6 +30,8 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --museum-wall: #F0F0F0;
+    --museum-text: #000000;
   }
   .dark {
     --background: 0 0% 0%;
@@ -56,6 +58,8 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --museum-wall: #111111;
+    --museum-text: #FFFFFF;
   }
 }
 
@@ -206,7 +210,7 @@
     75% { clip-path: inset(80% 0 5% 0); }
   }
 
-  @keyframes glitch-flicker-3 {
+  @keyframes glitch-flipper-3 {
     0%, 100% { clip-path: inset(0 0 0 0); }
     25% { clip-path: inset(10% 0 85% 0); }
     50% { clip-path: inset(70% 0 10% 0); }
