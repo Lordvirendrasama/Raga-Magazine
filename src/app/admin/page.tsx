@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useForm, useFieldArray, SubmitHandler } from "react-hook-form";
+import { useForm, useFieldArray, SubmitHandler, type FieldValues } from "react-hook-form";
 import { getMuseumContent, updateMuseumContent, type MuseumWall } from '@/lib/museum-content';
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from '@/components/ui/skeleton';

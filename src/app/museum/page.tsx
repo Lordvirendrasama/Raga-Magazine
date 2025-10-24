@@ -89,18 +89,14 @@ export default function MuseumPage() {
   return (
     <div className="h-[80vh] w-full">
       <a-scene background="color: #ECECEC">
-        {/* Camera and controls */}
         <a-camera position="0 1.6 0"></a-camera>
         
-        {/* Lighting */}
         <a-light type="ambient" color="#888"></a-light>
         <a-light type="point" intensity="0.5" position="0 3 0"></a-light>
 
-        {/* Floor and Ceiling */}
         <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color="#C0C0C0"></a-plane>
         <a-plane position="0 4 0" rotation="90 0 0" width="20" height="20" color="#C0C0C0"></a-plane>
 
-        {/* --- Walls --- */}
         <Wall wallData={walls[0]} position="0 2 -5" rotation="0 0 0" />
         <Wall wallData={walls[1]} position="5 2 0" rotation="0 -90 0" />
         <Wall wallData={walls[2]} position="0 2 5" rotation="0 180 0" />
