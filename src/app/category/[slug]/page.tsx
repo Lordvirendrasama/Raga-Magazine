@@ -11,9 +11,9 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
   const [category, setCategory] = useState<any>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const slug = params.slug;
 
   useEffect(() => {
+    const slug = params.slug;
     async function fetchData() {
       if (!slug) return;
       try {
@@ -34,7 +34,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       }
     }
     fetchData();
-  }, [slug]);
+  }, [params.slug]);
   
   if (loading) {
     return (
