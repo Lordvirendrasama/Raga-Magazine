@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useForm, useFieldArray, SubmitHandler, type FieldValues } from "react-hook-form";
+import { useForm, useFieldArray, SubmitHandler } from "react-hook-form";
 import { getMuseumContent, updateMuseumContent, type MuseumWall } from '@/lib/museum-content';
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from '@/components/ui/skeleton';
@@ -35,43 +35,75 @@ export default function AdminPage() {
     });
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            if (user && !user.isAdmin) {
-                router.push('/');
-            }
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [user, router]);
-
-    useEffect(() => {
-        if (user?.isAdmin) {
-            const fetchContent = async () => {
+        if (user === null) { // still checking auth
+            return;
+        }
+        if (!user || !user.isAdmin) {
+            toast({
+                title: "Access Denied",
+                description: "You do not have permission to view this page.",
+                variant: "destructive"
+            });
+            router.push('/');
+        } else {
+             const fetchContent = async () => {
                 setLoading(true);
-                const content = await getMuseumContent();
-                reset({ walls: content });
+                try {
+                    const content = await getMuseumContent();
+                    reset({ walls: content });
+                } catch (e) {
+                     toast({
+                        title: "Error",
+                        description: "Could not load museum content.",
+                        variant: "destructive"
+                    });
+                }
                 setLoading(false);
             };
             fetchContent();
         }
-    }, [user, reset]);
+    }, [user, router, reset, toast]);
 
-
-    if (!user) {
+    if (!user || loading) {
         return (
-             <div className="container mx-auto px-4 py-8 lg:py-12 text-center">
-                <p>Verifying access...</p>
+             <div className="container mx-auto px-4 py-8 lg:py-12">
+                <div className="mb-8">
+                    <Skeleton className="h-12 w-1/3 mb-4" />
+                    <Skeleton className="h-6 w-2/3" />
+                </div>
+                <Card>
+                    <CardHeader>
+                        <Skeleton className="h-8 w-1/4 mb-2" />
+                        <Skeleton className="h-5 w-1/2" />
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        {[...Array(4)].map((_, i) => (
+                             <div key={i} className="space-y-4 p-4 border rounded-lg">
+                                <Skeleton className="h-6 w-1/5 mb-4" />
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-1/6" />
+                                    <Skeleton className="h-10 w-full" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-1/6" />
+                                    <Skeleton className="h-20 w-full" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-1/6" />
+                                    <Skeleton className="h-10 w-full" />
+                                </div>
+                                 <div className="space-y-2">
+                                    <Skeleton className="h-4 w-1/6" />
+                                    <Skeleton className="h-10 w-full" />
+                                </div>
+                             </div>
+                        ))}
+                    </CardContent>
+                </Card>
             </div>
         );
     }
     
-    if (!user.isAdmin) {
-        return (
-             <div className="container mx-auto px-4 py-8 lg:py-12 text-center">
-                <p>Access Denied. Redirecting...</p>
-            </div>
-        );
-    }
-
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         try {
             await updateMuseumContent(data.walls);
@@ -89,37 +121,6 @@ export default function AdminPage() {
         }
     };
     
-    if (loading) {
-        return (
-             <div className="container mx-auto px-4 py-8 lg:py-12">
-                <div className="mb-8">
-                    <Skeleton className="h-12 w-1/3 mb-4" />
-                    <Skeleton className="h-6 w-2/3" />
-                </div>
-                <Card>
-                    <CardHeader>
-                        <Skeleton className="h-8 w-1/4" />
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        {[...Array(4)].map((_, i) => (
-                             <div key={i} className="space-y-2 p-4 border rounded-lg">
-                                <Skeleton className="h-6 w-1/5 mb-4" />
-                                <Skeleton className="h-4 w-1/6" />
-                                <Skeleton className="h-10 w-full" />
-                                <Skeleton className="h-4 w-1/6" />
-                                <Skeleton className="h-20 w-full" />
-                                <Skeleton className="h-4 w-1/6" />
-                                <Skeleton className="h-10 w-full" />
-                                <Skeleton className="h-4 w-1/6" />
-                                <Skeleton className="h-20 w-full" />
-                             </div>
-                        ))}
-                    </CardContent>
-                </Card>
-            </div>
-        )
-    }
-
   return (
     <div className="container mx-auto px-4 py-8 lg:py-12">
       <div className="mb-8">
@@ -154,7 +155,7 @@ export default function AdminPage() {
                         <Input {...register(`walls.${index}.imageUrl`)} id={`walls[${index}].imageUrl`} />
 
                         <Label htmlFor={`walls[${index}].youtubeUrl`}>YouTube Embed URL</Label>
-                        <Textarea {...register(`walls.${index}.youtubeUrl`)} id={`walls[${index}].youtubeUrl`} rows={2} placeholder="e.g., https://www.youtube.com/embed/VIDEO_ID" />
+                        <Input {...register(`walls.${index}.youtubeUrl`)} id={`walls[${index}].youtubeUrl`} placeholder="e.g., https://www.youtube.com/embed/VIDEO_ID" />
                     </div>
                 ))}
                 <Button type="submit" disabled={isSubmitting}>
