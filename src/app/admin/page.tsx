@@ -38,8 +38,8 @@ export default function AdminPage() {
 
     useEffect(() => {
         const checkAuthAndFetchData = async () => {
-            if (user === null) {
-                // Auth state is still being determined, wait.
+            // This pattern ensures we don't proceed until auth state is resolved.
+            if (user === undefined) {
                 setStatus('loading');
                 return;
             }
@@ -59,14 +59,14 @@ export default function AdminPage() {
             try {
                 const content = await getMuseumContent();
                 reset({ walls: content });
-                setStatus('success');
+                setStatus('success'); // This was the missing key part
             } catch (e) {
                  toast({
                     title: "Error",
                     description: "Could not load museum content.",
                     variant: "destructive"
                 });
-                setStatus('denied'); // Or a new 'error' state
+                setStatus('denied');
             }
         };
 
@@ -104,7 +104,7 @@ export default function AdminPage() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                         {status === 'denied' ? (
-                            <p className="text-center text-destructive">Access Denied. You do not have permission to view this page.</p>
+                            <p className="text-center text-destructive">Access Denied. You will be redirected.</p>
                         ) : (
                             [...Array(4)].map((_, i) => (
                                  <div key={i} className="space-y-4 p-4 border rounded-lg">

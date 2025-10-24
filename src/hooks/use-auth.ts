@@ -11,7 +11,7 @@ interface User {
 }
 
 interface AuthContextType {
-  user: User | null;
+  user: User | null | undefined; // undefined means initial loading state
   login: (name: string, pass: string) => void;
   signup: (name: string, pass: string) => void;
   logout: () => void;
@@ -28,6 +28,7 @@ export const useAuth = () => {
 };
 
 const getUserFromStorage = (name: string): User | null => {
+    if (typeof window === 'undefined') return null;
     const users = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || '{}');
     const userData = users[name];
     if (userData) {
@@ -37,18 +38,23 @@ const getUserFromStorage = (name: string): User | null => {
 }
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null | undefined>(undefined);
 
   useEffect(() => {
     // Check if a user is logged in from a previous session
-    const loggedInUserName = sessionStorage.getItem('raga-loggedInUser');
-    if (loggedInUserName) {
-      const loggedInUser = getUserFromStorage(loggedInUserName);
-      setUser(loggedInUser);
+    if (typeof window !== 'undefined') {
+        const loggedInUserName = sessionStorage.getItem('raga-loggedInUser');
+        if (loggedInUserName) {
+          const loggedInUser = getUserFromStorage(loggedInUserName);
+          setUser(loggedInUser);
+        } else {
+          setUser(null); // Explicitly set to null if no user is logged in
+        }
     }
   }, []);
 
   const getUsers = () => {
+    if (typeof window === 'undefined') return {};
     const users = localStorage.getItem(USER_STORAGE_KEY);
     return users ? JSON.parse(users) : {};
   };
