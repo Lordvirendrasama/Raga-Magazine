@@ -159,7 +159,7 @@ export default function MuseumPage() {
     <>
       <div className="h-[80vh] w-full">
         <a-scene embedded background={`color: ${colors.bgColor}`} vr-mode-ui="enabled: false">
-          <a-camera position="0 1.6 0" wasd-controls="enabled: true; acceleration: 100;" look-controls="pointerLockEnabled: true"></a-camera>
+          <a-camera position="0 1.8 0" wasd-controls="enabled: true; acceleration: 100;" look-controls="pointerLockEnabled: true"></a-camera>
           <a-light type="ambient" color="#888"></a-light>
           <a-light type="point" intensity="0.5" position="0 4 0"></a-light>
           
