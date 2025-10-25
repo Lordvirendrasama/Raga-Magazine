@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from '@/components/ui/skeleton';
 
 type FormValues = {
-  walls: MuseumWall[];
+  walls: Omit<MuseumWall, 'id'>[];
 };
 
 type PageStatus = 'loading' | 'success' | 'denied';
@@ -38,7 +38,6 @@ export default function AdminPage() {
 
     useEffect(() => {
         const checkAuthAndFetchData = async () => {
-            // This pattern ensures we don't proceed until auth state is resolved.
             if (user === undefined) {
                 setStatus('loading');
                 return;
@@ -55,10 +54,9 @@ export default function AdminPage() {
                 return;
             }
             
-            // User is admin, fetch content.
             try {
                 const content = await getMuseumContent();
-                reset({ walls: content });
+                reset({ walls: content.map(({ id, ...rest }) => rest) });
                 setStatus('success');
             } catch (e) {
                  toast({
@@ -111,16 +109,7 @@ export default function AdminPage() {
                                     <Skeleton className="h-6 w-1/5 mb-4" />
                                     <div className="space-y-2">
                                         <Skeleton className="h-4 w-1/6" />
-                                        <Skeleton className="h-10 w-full" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Skeleton className="h-4 w-1/6" />
                                         <Skeleton className="h-20 w-full" />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Skeleton className="h-4 w-1/6" />
-                                        <Skeleton className="h-10 w-full" />
                                     </div>
                                      <div className="space-y-2">
                                         <Skeleton className="h-4 w-1/6" />
@@ -151,7 +140,7 @@ export default function AdminPage() {
             <CardHeader>
             <CardTitle>Museum Content</CardTitle>
             <CardDescription>
-                Edit the text, images, and videos for the four walls of the 3D museum.
+                Edit the text and YouTube video for the four walls of the 3D museum.
             </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -160,18 +149,8 @@ export default function AdminPage() {
                          <h3 className="font-headline text-xl font-semibold">Wall {index + 1}</h3>
                         
                         <div className="space-y-2">
-                          <Label htmlFor={`walls[${index}].artistName`}>Artist Name</Label>
-                          <Input {...register(`walls.${index}.artistName`)} id={`walls[${index}].artistName`} />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor={`walls[${index}].artistDescription`}>Artist Description</Label>
-                          <Textarea {...register(`walls.${index}.artistDescription`)} id={`walls[${index}].artistDescription`} rows={3} />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor={`walls[${index}].imageUrl`}>Image URL</Label>
-                            <Input {...register(`walls.${index}.imageUrl`)} id={`walls[${index}].imageUrl`} />
+                          <Label htmlFor={`walls[${index}].text`}>Text</Label>
+                          <Textarea {...register(`walls.${index}.text`)} id={`walls[${index}].text`} rows={4} />
                         </div>
                         
                         <div className="space-y-2">

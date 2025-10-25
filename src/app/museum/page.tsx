@@ -56,45 +56,31 @@ const MuseumWallComponent = ({ wall, wallConfig, colors, onPlayVideo }: { wall: 
         color={colors.wallColor}
         material="shader: flat;"
       ></a-plane>
-      <a-image
-        src={wall.imageUrl}
-        width="4"
-        height="3"
-        position="-2.5 1 0.01"
-        data-ai-hint={wall.imageHint || 'music artist'}
-      ></a-image>
+      
       <a-text
-        value={wall.artistName}
+        value={wall.text}
         color={colors.textColor}
-        position="2.5 2 0.01"
-        align="center"
-        width="4"
-        font="https://cdn.aframe.io/fonts/Exo2Bold.fnt"
-      ></a-text>
-      <a-text
-        value={wall.artistDescription}
-        color={colors.textColor}
-        position="2.5 1.2 0.01"
+        position="0 1.5 0.01"
         align="center"
         baseline="top"
-        width="4.5"
-        wrap-count="45"
-        font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+        width="8"
+        wrap-count="60"
+        font="https://cdn.aframe.io/fonts/Exo2Bold.fnt"
       ></a-text>
 
       {youtubeId && (
-        <a-entity ref={videoEntityRef} position="2.5 -1.25 0.01">
-          <a-plane width="3" height="1.7" color="#000000"></a-plane>
+        <a-entity ref={videoEntityRef} position="0 -1.25 0.01">
+          <a-plane width="4" height="2.25" color="#000000"></a-plane>
           <a-image
             src={`https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`}
-            width="2.9"
-            height="1.6"
+            width="3.9"
+            height="2.15"
             position="0 0 0.01"
           ></a-image>
           <a-image
             src="https://cdn.glitch.com/a5214015-23d5-4a25-9694-84c4711b712c%2Fyt-play-button.png?v=1614023245084"
-            width="0.7"
-            height="0.5"
+            width="0.8"
+            height="0.56"
             position="0 0 0.02"
             transparent="true"
           ></a-image>
