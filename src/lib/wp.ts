@@ -63,7 +63,7 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
 export async function getPostBySlug(slug: string) {
     const data = await fetchAPI(`/wp/v2/posts?slug=${slug}&_embed=1`);
     if (data && data.length > 0) {
-        return transformPost(data[0]);
+        return data[0];
     }
     return null;
 }

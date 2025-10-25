@@ -23,17 +23,12 @@ export default function PostPage({ params }: { params: { slug: string } }) {
       if (!slug) return;
       try {
         setLoading(true);
-        const res = await fetch(`https://darkgrey-gazelle-504232.hostingersite.com/wp-json/wp/v2/posts?slug=${slug}&_embed=1`);
-        if (!res.ok) {
+        const post = await getPostBySlug(slug);
+        if (!post) {
           notFound();
           return;
         }
-        const fullPostData = await res.json();
-        if (fullPostData.length === 0) {
-          notFound();
-          return;
-        }
-        setPostData(fullPostData[0]);
+        setPostData(post);
 
       } catch (error) {
         console.error(`Failed to fetch post ${slug}:`, error);
