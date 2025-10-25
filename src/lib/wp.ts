@@ -33,7 +33,7 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
   
   const defaultParams: Record<string, string> = {
     per_page: '12',
-    _embed: '1' // Ensure this is always included for standard posts
+    _embed: '1'
   };
 
   if (isEventsCalendar) {
