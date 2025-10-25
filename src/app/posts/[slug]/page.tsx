@@ -11,20 +11,20 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { decode } from 'html-entities';
 import { getFeaturedImage } from '@/lib/wp';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { Post } from '@/components/article-card';
 
 export default function PostPage({ params }: { params: { slug: string } }) {
-  const [postData, setPostData] = useState<any>(null);
+  const [postData, setPostData] = useState<any>(null); // Keep as any to handle raw WP object
   const [loading, setLoading] = useState(true);
-  const slug = params.slug;
 
   useEffect(() => {
+    const slug = params.slug;
     async function fetchData() {
       if (!slug) return;
       try {
         setLoading(true);
-        // The getPostBySlug in client-side context returns the raw post object
-        // we need to process it to get embedded data
-        const res = await fetch(`https://ragamagazine.com/wp-json/wp/v2/posts?slug=${slug}&_embed=1`);
+        // The raw fetch is no longer needed, we use our lib function
+        const res = await fetch(`https://darkgrey-gazelle-504232.hostingersite.com/wp-json/wp/v2/posts?slug=${slug}&_embed=1`);
         if (!res.ok) {
           notFound();
           return;
@@ -45,7 +45,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
     }
 
     fetchData();
-  }, [slug]);
+  }, [params.slug]);
 
   if (loading) {
     return (
@@ -67,6 +67,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
     return null; // Will be handled by notFound() in useEffect
   }
   
+  // Process the raw post data for rendering
   const title = postData.title.rendered;
   const category = postData._embedded?.['wp:term']?.[0]?.find((term: any) => term.taxonomy === 'category')?.name || 'Uncategorized';
   const authorName = postData._embedded?.author?.[0]?.name || 'RagaMagazine Staff';

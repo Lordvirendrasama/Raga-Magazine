@@ -70,7 +70,12 @@ export async function getPostBySlug(slug: string) {
 
 export async function getEventBySlug(slug: string) {
   const result = await fetchAPI(`/tribe/events/v1/events/by-slug/${slug}`);
-  return result || null;
+  if (result) {
+    // The events endpoint doesn't support _embed, so we need to process it.
+    // The result from by-slug is a single object, not an array.
+    return result;
+  }
+  return null;
 }
 
 export async function getCategories() {
@@ -98,22 +103,24 @@ export function getFeaturedImage(post: any): { url: string; hint?: string } {
       return defaultImage;
     }
     
-    // Check for event image first
-    if (post?.image?.url) {
+    // 1. Check for event image (from /tribe/events/v1/events)
+    if (post.image?.url) {
         return { url: post.image.url, hint: post.slug };
     }
 
-    const featuredMedia = post?._embedded?.['wp:featuredmedia']?.[0];
+    // 2. Check for standard embedded featured media (from /wp/v2/posts)
+    const featuredMedia = post._embedded?.['wp:featuredmedia']?.[0];
     if (featuredMedia?.source_url) {
         return { url: featuredMedia.source_url, hint: post.slug };
     }
     
-    // Fallback to placeholder if no image is found
-    if (post?.id) {
+    // 3. Fallback to placeholder if no image is found, using post ID for variety
+    if (post.id) {
         const index = post.id % placeholderImages.images.length;
         return placeholderImages.images[index] || defaultImage;
     }
 
+    // 4. Ultimate fallback
     return defaultImage;
 }
 
