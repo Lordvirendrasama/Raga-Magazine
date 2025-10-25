@@ -104,13 +104,13 @@ export function getFeaturedImage(post: any): { url: string; hint?: string } {
     }
     
     // 1. Check for event image (from /tribe/events/v1/events)
-    if (post.image?.url) {
+    if (post.image && post.image.url) {
         return { url: post.image.url, hint: post.slug };
     }
 
     // 2. Check for standard embedded featured media (from /wp/v2/posts)
     const featuredMedia = post._embedded?.['wp:featuredmedia']?.[0];
-    if (featuredMedia?.source_url) {
+    if (featuredMedia && featuredMedia.source_url) {
         return { url: featuredMedia.source_url, hint: post.slug };
     }
     
