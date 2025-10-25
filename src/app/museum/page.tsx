@@ -64,7 +64,6 @@ const MuseumWallComponent = ({ wall, wallConfig, colors, onPlayVideo }: { wall: 
         align="center"
         baseline="top"
         width="8"
-        wrap-count="60"
         font="https://cdn.aframe.io/fonts/Exo2Bold.fnt"
       ></a-text>
 
