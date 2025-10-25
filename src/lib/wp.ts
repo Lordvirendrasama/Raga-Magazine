@@ -33,11 +33,11 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
   
   const defaultParams: Record<string, string> = {
     per_page: '12',
+    _embed: '1' // Ensure this is always included for standard posts
   };
 
-  if (!isEventsCalendar) {
-    defaultParams['_embed'] = '1';
-  } else {
+  if (isEventsCalendar) {
+    delete defaultParams['_embed']; // Events API doesn't use _embed
     defaultParams['status'] = 'publish';
   }
 

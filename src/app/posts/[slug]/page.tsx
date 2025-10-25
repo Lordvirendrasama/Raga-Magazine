@@ -18,12 +18,11 @@ export default function PostPage({ params }: { params: { slug: string } }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const slug = params.slug;
     async function fetchData() {
+      const slug = params.slug;
       if (!slug) return;
       try {
         setLoading(true);
-        // The raw fetch is no longer needed, we use our lib function
         const res = await fetch(`https://darkgrey-gazelle-504232.hostingersite.com/wp-json/wp/v2/posts?slug=${slug}&_embed=1`);
         if (!res.ok) {
           notFound();
@@ -45,7 +44,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
     }
 
     fetchData();
-  }, [params.slug]);
+  }, [params]);
 
   if (loading) {
     return (
