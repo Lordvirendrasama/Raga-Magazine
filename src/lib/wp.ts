@@ -108,6 +108,7 @@ export function getFeaturedImage(post: any): { url: string; hint?: string } {
         return { url: featuredMedia.source_url, hint: post.slug };
     }
     
+    // Fallback to placeholder if no image is found
     if (post?.id) {
         const index = post.id % placeholderImages.images.length;
         return placeholderImages.images[index] || defaultImage;
