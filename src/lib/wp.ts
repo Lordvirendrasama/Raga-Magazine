@@ -1,3 +1,4 @@
+
 // @/lib/wp.ts
 import { decode } from 'html-entities';
 import type { Post } from '@/components/article-card';
@@ -96,14 +97,15 @@ export function getFeaturedImage(post: any): { url: string; hint?: string } {
     if (!post) {
       return defaultImage;
     }
+    
+    // Check for event image first
+    if (post?.image?.url) {
+        return { url: post.image.url, hint: post.slug };
+    }
 
     const featuredMedia = post?._embedded?.['wp:featuredmedia']?.[0];
     if (featuredMedia?.source_url) {
         return { url: featuredMedia.source_url, hint: post.slug };
-    }
-
-    if (post?.image?.url) {
-        return { url: post.image.url, hint: post.slug };
     }
     
     if (post?.id) {
