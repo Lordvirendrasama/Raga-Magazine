@@ -21,174 +21,113 @@ declare global {
   }
 }
 
+// Component to render a single wall
+const MuseumWallComponent = ({ wall, wallConfig, colors, onPlayVideo }: { wall: MuseumWall, wallConfig: any, colors: any, onPlayVideo: (url: string) => void }) => {
+  let youtubeId = '';
+  if (wall.youtubeUrl && wall.youtubeUrl.includes('embed')) {
+    try {
+      const url = new URL(wall.youtubeUrl);
+      const pathParts = url.pathname.split('/');
+      const idFromUrl = pathParts[pathParts.length - 1];
+      if (idFromUrl) youtubeId = idFromUrl;
+    } catch (e) {
+      youtubeId = 'dQw4w9WgXcQ'; // Fallback
+    }
+  }
+
+  // Need to create entities dynamically for event handlers
+  const videoEntityRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (videoEntityRef.current && youtubeId) {
+      const handler = () => onPlayVideo(wall.youtubeUrl);
+      const el = videoEntityRef.current;
+      el.addEventListener('click', handler);
+      return () => {
+        el.removeEventListener('click', handler);
+      };
+    }
+  }, [wall.youtubeUrl, onPlayVideo, youtubeId]);
+
+  return (
+    <a-entity position={wallConfig.position} rotation={wallConfig.rotation}>
+      <a-plane
+        width="10"
+        height="6"
+        color={colors.wallColor}
+        material="shader: flat;"
+      ></a-plane>
+      <a-image
+        src={wall.imageUrl}
+        width="4"
+        height="3"
+        position="-2.5 1 0.01"
+        data-ai-hint={wall.imageHint || 'music artist'}
+      ></a-image>
+      <a-text
+        value={wall.artistName}
+        color={colors.textColor}
+        position="2.5 2 0.01"
+        align="center"
+        width="4"
+        font="https://cdn.aframe.io/fonts/Exo2Bold.fnt"
+      ></a-text>
+      <a-text
+        value={wall.artistDescription}
+        color={colors.textColor}
+        position="2.5 1.2 0.01"
+        align="center"
+        baseline="top"
+        width="4.5"
+        wrap-count="45"
+        font="https://cdn.aframe.io/fonts/Roboto-msdf.json"
+      ></a-text>
+
+      {youtubeId && (
+        <a-entity ref={videoEntityRef} position="2.5 -1.25 0.01" clickable>
+          <a-plane width="3" height="1.7" color="#000000"></a-plane>
+          <a-image
+            src={`https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`}
+            width="2.9"
+            height="1.6"
+            position="0 0 0.01"
+          ></a-image>
+          <a-image
+            src="https://cdn.glitch.com/a5214015-23d5-4a25-9694-84c4711b712c%2Fyt-play-button.png?v=1614023245084"
+            width="0.7"
+            height="0.5"
+            position="0 0 0.02"
+            transparent="true"
+          ></a-image>
+        </a-entity>
+      )}
+    </a-entity>
+  );
+};
+
+
 export default function MuseumPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [walls, setWalls] = useState<MuseumWall[]>([]);
   const { resolvedTheme } = useTheme();
-  const sceneRef = useRef<any>(null);
 
   useEffect(() => {
     setIsMounted(true);
+    getMuseumContent()
+      .then(fetchedWalls => {
+        setWalls(fetchedWalls);
+      })
+      .catch(err => {
+        console.error("Failed to load museum content", err);
+        setWalls([]); // Set to empty array on error
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
-
-  useEffect(() => {
-    if (!isMounted || !resolvedTheme) {
-        return;
-    }
-
-    const sceneEl = sceneRef.current;
-    if (!sceneEl) return;
-
-    // Use CSS variables defined in globals.css
-    const wallColor = getComputedStyle(document.documentElement).getPropertyValue('--museum-wall').trim();
-    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--museum-text').trim();
-    
-    const contentContainer = sceneEl.querySelector('#content-container');
-    if (contentContainer) {
-      // Clear previous content to prevent duplicates on theme change
-      while (contentContainer.firstChild) {
-        contentContainer.removeChild(contentContainer.firstChild);
-      }
-    } else {
-        return; // Container not ready
-    }
-
-    const handlePlayVideo = (url: string) => {
-        setVideoUrl(url);
-    };
-    
-    setLoading(true);
-    getMuseumContent().then(walls => {
-        setLoading(false);
-        const contentContainer = sceneEl.querySelector('#content-container');
-        if (!contentContainer) return; // Re-check container
-
-        // Clear any previous content to be safe
-        while (contentContainer.firstChild) {
-          contentContainer.removeChild(contentContainer.firstChild);
-        }
-
-        if (walls.length === 4) {
-            const wallConfigs = [
-                { position: '0 3 -5', rotation: '0 0 0' },   // Front
-                { position: '5 3 0', rotation: '0 -90 0' },  // Right
-                { position: '0 3 5', rotation: '0 180 0' }, // Back
-                { position: '-5 3 0', rotation: '0 90 0' },  // Left
-            ];
-
-            walls.forEach((wallData, index) => {
-                const config = wallConfigs[index];
-                const wallEntity = document.createElement('a-entity');
-                wallEntity.setAttribute('position', config.position);
-                wallEntity.setAttribute('rotation', config.rotation);
-
-                // Wall Plane (acts as a backboard)
-                const plane = document.createElement('a-plane');
-                plane.setAttribute('width', '10');
-                plane.setAttribute('height', '6');
-                plane.setAttribute('color', wallColor);
-                plane.setAttribute('material', 'shader: flat;');
-                wallEntity.appendChild(plane);
-
-                // Image
-                const image = document.createElement('a-image');
-                image.setAttribute('src', wallData.imageUrl);
-                image.setAttribute('width', '4');
-                image.setAttribute('height', '3');
-                image.setAttribute('position', '-2.5 1 0.01');
-                image.setAttribute('data-ai-hint', wallData.imageHint || 'music artist');
-                wallEntity.appendChild(image);
-
-                // Artist Name Text
-                const artistName = document.createElement('a-text');
-                artistName.setAttribute('value', wallData.artistName);
-                artistName.setAttribute('color', textColor);
-                artistName.setAttribute('position', '2.5 2 0.01');
-                artistName.setAttribute('align', 'center');
-                artistName.setAttribute('width', '4');
-                artistName.setAttribute('font', 'https://cdn.aframe.io/fonts/Exo2Bold.fnt');
-                wallEntity.appendChild(artistName);
-                
-                // Artist Description Text
-                const artistDesc = document.createElement('a-text');
-                artistDesc.setAttribute('value', wallData.artistDescription);
-                artistDesc.setAttribute('color', textColor);
-                artistDesc.setAttribute('position', '2.5 1.2 0.01');
-                artistDesc.setAttribute('align', 'center');
-                artistDesc.setAttribute('baseline', 'top');
-                artistDesc.setAttribute('width', '4.5');
-                artistDesc.setAttribute('wrap-count', '45');
-                artistDesc.setAttribute('font', 'https://cdn.aframe.io/fonts/Roboto-msdf.json');
-                wallEntity.appendChild(artistDesc);
-                
-                // YouTube Video Placeholder
-                if (wallData.youtubeUrl && wallData.youtubeUrl.includes('embed')) {
-                    const videoEntity = document.createElement('a-entity');
-                    videoEntity.setAttribute('position', '2.5 -1.25 0.01');
-                    
-                    const videoBg = document.createElement('a-plane');
-                    videoBg.setAttribute('width', '3');
-                    videoBg.setAttribute('height', '1.7');
-                    videoBg.setAttribute('color', '#000000');
-                    videoEntity.appendChild(videoBg);
-                    
-                    // Extract YouTube ID for thumbnail
-                    let youtubeId = 'dQw4w9WgXcQ'; // Default fallback
-                    try {
-                        const url = new URL(wallData.youtubeUrl);
-                        const pathParts = url.pathname.split('/');
-                        const idFromUrl = pathParts[pathParts.length - 1];
-                        if (idFromUrl) youtubeId = idFromUrl;
-                    } catch (e) { /* ignore invalid url */ }
-
-                    const videoThumb = document.createElement('a-image');
-                    videoThumb.setAttribute('src', `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`);
-                    videoThumb.setAttribute('width', '2.9');
-                    videoThumb.setAttribute('height', '1.6');
-                    videoThumb.setAttribute('position', '0 0 0.01');
-                    videoEntity.appendChild(videoThumb);
-
-                    const playButton = document.createElement('a-image');
-                    playButton.setAttribute('src', 'https://cdn.glitch.com/a5214015-23d5-4a25-9694-84c4711b712c%2Fyt-play-button.png?v=1614023245084');
-                    playButton.setAttribute('width', '0.7');
-                    playButton.setAttribute('height', '0.5');
-                    playButton.setAttribute('position', '0 0 0.02');
-                    playButton.setAttribute('transparent', 'true');
-                    videoEntity.appendChild(playButton);
-
-                    videoEntity.addEventListener('click', () => handlePlayVideo(wallData.youtubeUrl));
-                    wallEntity.appendChild(videoEntity);
-                }
-
-                contentContainer.appendChild(wallEntity);
-            });
-        } else {
-             // Handle error case
-            const errorText = document.createElement('a-text');
-            errorText.setAttribute('value', 'Could not load museum content.');
-            errorText.setAttribute('color', textColor);
-            errorText.setAttribute('position', '0 1.6 -3');
-            errorText.setAttribute('align', 'center');
-            errorText.setAttribute('width', '4');
-            contentContainer.appendChild(errorText);
-        }
-    }).catch(err => {
-        setLoading(false);
-        console.error("Failed to load and render museum content", err);
-        const contentContainer = sceneEl.querySelector('#content-container');
-        if (!contentContainer) return;
-        
-        const errorText = document.createElement('a-text');
-        errorText.setAttribute('value', 'Error: Could not load content.');
-        errorText.setAttribute('color', 'red');
-        errorText.setAttribute('position', '0 1.6 -3');
-        errorText.setAttribute('align', 'center');
-        contentContainer.appendChild(errorText);
-    });
-
-  }, [isMounted, resolvedTheme]);
-
+  
   if (!isMounted) {
     return (
         <div className="h-[80vh] w-full flex items-center justify-center bg-muted">
@@ -197,30 +136,57 @@ export default function MuseumPage() {
     );
   }
 
-  const floorColor = resolvedTheme === 'dark' ? '#444' : '#C0C0C0';
-  const ceilingColor = resolvedTheme === 'dark' ? '#222' : '#E0E0E0';
-  const bgColor = resolvedTheme === 'dark' ? '#333' : '#ECECEC';
+  const wallConfigs = [
+    { position: '0 3 -5', rotation: '0 0 0' },   // Front
+    { position: '5 3 0', rotation: '0 -90 0' },  // Right
+    { position: '0 3 5', rotation: '0 180 0' }, // Back
+    { position: '-5 3 0', rotation: '0 90 0' },  // Left
+  ];
+
+  const colors = {
+      floorColor: resolvedTheme === 'dark' ? '#444' : '#C0C0C0',
+      ceilingColor: resolvedTheme === 'dark' ? '#222' : '#E0E0E0',
+      bgColor: resolvedTheme === 'dark' ? '#333' : '#ECECEC',
+      wallColor: resolvedTheme === 'dark' ? '#111111' : '#F0F0F0',
+      textColor: resolvedTheme === 'dark' ? '#FFFFFF' : '#000000',
+  }
+
+  const handlePlayVideo = (url: string) => {
+    setVideoUrl(url);
+  };
 
   return (
     <>
       <div className="h-[80vh] w-full">
-        <a-scene ref={sceneRef} embedded background={`color: ${bgColor}`} vr-mode-ui="enabled: false">
+        <a-scene embedded background={`color: ${colors.bgColor}`} vr-mode-ui="enabled: false">
           <a-camera position="0 1.6 0" wasd-controls="enabled: true; acceleration: 100;" look-controls="pointerLockEnabled: true"></a-camera>
           <a-light type="ambient" color="#888"></a-light>
           <a-light type="point" intensity="0.5" position="0 4 0"></a-light>
           
-          <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color={floorColor} material="shader: flat;"></a-plane>
-          <a-plane position="0 6 0" rotation="90 0 0" width="20" height="20" color={ceilingColor} material="shader: flat;"></a-plane>
+          <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color={colors.floorColor} material="shader: flat;"></a-plane>
+          <a-plane position="0 6 0" rotation="90 0 0" width="20" height="20" color={colors.ceilingColor} material="shader: flat;"></a-plane>
           
           <a-entity id="content-container">
-            {/* Content will be injected here by useEffect */}
             {loading && (
                  <>
-                    <a-entity position="0 3 -5" rotation="0 0 0"><a-plane width="10" height="6" color={resolvedTheme === 'dark' ? '#111111' : '#F0F0F0'} material="shader: flat;"></a-plane></a-entity>
-                    <a-entity position="5 3 0" rotation="0 -90 0"><a-plane width="10" height="6" color={resolvedTheme === 'dark' ? '#111111' : '#F0F0F0'} material="shader: flat;"></a-plane></a-entity>
-                    <a-entity position="0 3 5" rotation="0 180 0"><a-plane width="10" height="6" color={resolvedTheme === 'dark' ? '#111111' : '#F0F0F0'} material="shader: flat;"></a-plane></a-entity>
-                    <a-entity position="-5 3 0" rotation="0 90 0"><a-plane width="10" height="6" color={resolvedTheme === 'dark' ? '#111111' : '#F0F0F0'} material="shader: flat;"></a-plane></a-entity>
+                    {wallConfigs.map((config, index) => (
+                        <a-entity key={index} position={config.position} rotation={config.rotation}>
+                            <a-plane width="10" height="6" color={colors.wallColor} material="shader: flat;"></a-plane>
+                        </a-entity>
+                    ))}
                  </>
+            )}
+            {!loading && walls.length > 0 && walls.map((wall, index) => (
+                <MuseumWallComponent
+                    key={wall.id}
+                    wall={wall}
+                    wallConfig={wallConfigs[index]}
+                    colors={colors}
+                    onPlayVideo={handlePlayVideo}
+                />
+            ))}
+            {!loading && walls.length === 0 && (
+                 <a-text value="Could not load museum content." color={colors.textColor} position="0 1.6 -3" align="center" width="4"></a-text>
             )}
           </a-entity>
         </a-scene>
