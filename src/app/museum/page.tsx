@@ -61,6 +61,14 @@ export default function MuseumPage() {
     setLoading(true);
     getMuseumContent().then(walls => {
         setLoading(false);
+        const contentContainer = sceneEl.querySelector('#content-container');
+        if (!contentContainer) return; // Re-check container
+
+        // Clear any previous content to be safe
+        while (contentContainer.firstChild) {
+          contentContainer.removeChild(contentContainer.firstChild);
+        }
+
         if (walls.length === 4) {
             const wallConfigs = [
                 { position: '0 3 -5', rotation: '0 0 0' },   // Front
@@ -168,6 +176,9 @@ export default function MuseumPage() {
     }).catch(err => {
         setLoading(false);
         console.error("Failed to load and render museum content", err);
+        const contentContainer = sceneEl.querySelector('#content-container');
+        if (!contentContainer) return;
+        
         const errorText = document.createElement('a-text');
         errorText.setAttribute('value', 'Error: Could not load content.');
         errorText.setAttribute('color', 'red');
