@@ -35,7 +35,6 @@ const MuseumWallComponent = ({ wall, wallConfig, colors, onPlayVideo }: { wall: 
     }
   }
 
-  // Need to create entities dynamically for event handlers
   const videoEntityRef = useRef<any>(null);
 
   useEffect(() => {
@@ -84,7 +83,7 @@ const MuseumWallComponent = ({ wall, wallConfig, colors, onPlayVideo }: { wall: 
       ></a-text>
 
       {youtubeId && (
-        <a-entity ref={videoEntityRef} position="2.5 -1.25 0.01" clickable>
+        <a-entity ref={videoEntityRef} position="2.5 -1.25 0.01">
           <a-plane width="3" height="1.7" color="#000000"></a-plane>
           <a-image
             src={`https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`}
