@@ -76,13 +76,6 @@ const MuseumWallComponent = ({ wall, wallConfig, colors, onPlayVideo }: { wall: 
             height="2.15"
             position="0 0 0.01"
           ></a-image>
-          <a-image
-            src="https://cdn.glitch.com/a5214015-23d5-4a25-9694-84c4711b712c%2Fyt-play-button.png?v=1614023245084"
-            width="0.8"
-            height="0.56"
-            position="0 0 0.02"
-            transparent="true"
-          ></a-image>
         </a-entity>
       )}
     </a-entity>
