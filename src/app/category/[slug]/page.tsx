@@ -34,7 +34,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       }
     }
     fetchData();
-  }, [params.slug]);
+  }, [params]);
   
   if (loading) {
     return (
