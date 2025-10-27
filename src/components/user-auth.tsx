@@ -48,7 +48,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export function UserAuth() {
-  const { user, login, signup, signInWithGoogle, isFirebaseReady } = useAuth();
+  const { user, login, signup, signInWithGoogle, isFirebaseReady, logout } = useAuth();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
@@ -99,15 +99,19 @@ export function UserAuth() {
     setIsDialogOpen(open);
   };
   
-  if (user || user === undefined) {
-    return null;
+  if (user) {
+    return (
+       <Button variant="outline" onClick={logout}>
+          Log Out
+        </Button>
+    );
   }
 
-  if (!isFirebaseReady) {
+  if (user === undefined || !isFirebaseReady) {
     return (
       <Button variant="outline" disabled>
         <LogIn className="mr-2 h-4 w-4" />
-        Auth Unavailable
+        Loading...
       </Button>
     )
   }
@@ -223,3 +227,5 @@ export function UserAuth() {
     </Dialog>
   );
 }
+
+    
