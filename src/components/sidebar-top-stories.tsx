@@ -2,7 +2,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { type Post } from './article-card';
 import { Badge } from './ui/badge';
 import { ArrowUpRight } from 'lucide-react';
@@ -14,6 +13,18 @@ interface SidebarTopStoriesProps {
 export function SidebarTopStories({ posts }: SidebarTopStoriesProps) {
   return (
     <aside className="sticky top-20">
+      <div className="mb-8">
+        <iframe
+          style={{ borderRadius: '12px' }}
+          src="https://open.spotify.com/embed/playlist/3uyM6sSqMepnevczhOfxUT?utm_source=generator&theme=0"
+          width="100%"
+          height="352"
+          frameBorder="0"
+          allowFullScreen
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+        ></iframe>
+      </div>
       <h2 className="mb-6 font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
         Top Stories
       </h2>
