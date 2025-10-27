@@ -14,7 +14,8 @@ const StreakPopup = () => {
 
   useEffect(() => {
     if (streak > 0 && typeof window !== 'undefined') {
-      const sessionKey = user ? `streak-popup-session-${user.name}` : 'streak-popup-session-guest';
+      const userIdentifier = user ? user.uid : 'guest';
+      const sessionKey = `streak-popup-session-${userIdentifier}`;
       const hasSeenPopup = sessionStorage.getItem(sessionKey);
       
       if (!hasSeenPopup) {

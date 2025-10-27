@@ -3,15 +3,13 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from './use-auth';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
-const USER_STORAGE_KEY = 'raga-users';
-const GUEST_STREAK_KEY = 'raga-guest-streak';
 
-// Helper to get date in YYYY-MM-DD format for IST
-const getISTDate = (date: Date): string => {
-  const utcOffset = 5.5 * 60; // IST is UTC+5:30
-  const istDate = new Date(date.getTime() + utcOffset * 60 * 1000);
-  return istDate.toISOString().split('T')[0];
+// Helper to get date in YYYY-MM-DD format
+const getLocalDate = (date: Date): string => {
+  return date.toISOString().split('T')[0];
 };
 
 interface StreakData {
@@ -24,60 +22,61 @@ export const useStreak = () => {
   const [streak, setStreak] = useState(0);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === 'undefined' || user === undefined) {
+      // Don't run on server or while auth is loading
       return;
     }
-
-    const todayStr = getISTDate(new Date());
-    let newStreak: number;
+    
+    const GUEST_STREAK_KEY = 'raga-guest-streak';
 
     const processStreak = (currentData: StreakData | undefined): StreakData => {
+        const todayStr = getLocalDate(new Date());
         const { streak: currentStreak = 0, lastVisit = '' } = currentData || { streak: 0, lastVisit: '' };
 
         if (lastVisit === todayStr) {
-            newStreak = currentStreak; // Visited today already
-            return { streak: newStreak, lastVisit };
+            return { streak: currentStreak, lastVisit };
         }
 
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = getISTDate(yesterday);
-
-        if (lastVisit === yesterdayStr) {
-            newStreak = currentStreak + 1; // Consecutive visit
-        } else {
-            newStreak = 1; // Missed a day or first visit
-        }
+        const yesterdayStr = getLocalDate(yesterday);
+        
+        const newStreak = (lastVisit === yesterdayStr) ? currentStreak + 1 : 1;
         
         return { streak: newStreak, lastVisit: todayStr };
     };
 
-    try {
-      if (user) {
-        // Logged-in user logic
-        const usersStr = localStorage.getItem(USER_STORAGE_KEY);
-        const users = usersStr ? JSON.parse(usersStr) : {};
-        const userData = users[user.name] || {};
-        
-        const newStreakData = processStreak(userData.streakData);
-        setStreak(newStreakData.streak);
+    const updateStreak = async () => {
+        try {
+            if (user) {
+                // Logged-in user logic (Firestore)
+                const streakRef = doc(db, 'streaks', user.uid);
+                const streakSnap = await getDoc(streakRef);
+                const currentData = streakSnap.data() as StreakData | undefined;
+                
+                const newStreakData = processStreak(currentData);
+                setStreak(newStreakData.streak);
 
-        users[user.name] = { ...userData, streakData: newStreakData };
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
-      } else {
-        // Guest user logic
-        const guestStreakStr = localStorage.getItem(GUEST_STREAK_KEY);
-        const guestStreakData = guestStreakStr ? JSON.parse(guestStreakStr) : undefined;
-        
-        const newGuestStreakData = processStreak(guestStreakData);
-        setStreak(newGuestStreakData.streak);
+                await setDoc(streakRef, newStreakData, { merge: true });
 
-        localStorage.setItem(GUEST_STREAK_KEY, JSON.stringify(newGuestStreakData));
-      }
-    } catch (error) {
-      console.error('Failed to process streak data:', error);
-      setStreak(0);
-    }
+            } else {
+                // Guest user logic (localStorage)
+                const guestStreakStr = localStorage.getItem(GUEST_STREAK_KEY);
+                const guestStreakData = guestStreakStr ? JSON.parse(guestStreakStr) : undefined;
+                
+                const newGuestStreakData = processStreak(guestStreakData);
+                setStreak(newGuestStreakData.streak);
+
+                localStorage.setItem(GUEST_STREAK_KEY, JSON.stringify(newGuestStreakData));
+            }
+        } catch (error) {
+            console.error('Failed to process streak data:', error);
+            setStreak(0); // Reset on error
+        }
+    };
+
+    updateStreak();
+
   }, [user]);
 
   const { title, message } = useMemo(() => {

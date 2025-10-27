@@ -2,19 +2,30 @@
 'use client';
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-
-const USER_STORAGE_KEY = 'raga-users';
+import { auth } from '@/lib/firebase';
+import { 
+  onAuthStateChanged, 
+  User as FirebaseUser,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  GoogleAuthProvider,
+  signInWithPopup
+} from 'firebase/auth';
 
 interface User {
-  name: string;
+  uid: string;
+  email: string | null;
+  name: string | null;
   isAdmin?: boolean;
 }
 
 interface AuthContextType {
-  user: User | null | undefined; // undefined means initial loading state
-  login: (name: string, pass: string) => void;
-  signup: (name: string, pass: string) => void;
-  logout: () => void;
+  user: User | null | undefined; // undefined: loading, null: logged out
+  login: (email: string, pass: string) => Promise<void>;
+  signup: (email: string, pass: string) => Promise<void>;
+  logout: () => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,74 +38,48 @@ export const useAuth = () => {
   return context;
 };
 
-const getUserFromStorage = (name: string): User | null => {
-    if (typeof window === 'undefined') return null;
-    const users = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || '{}');
-    const userData = users[name];
-    if (userData) {
-      return { name, isAdmin: userData.isAdmin || false };
-    }
-    return null;
-}
+const formatUser = (user: FirebaseUser): User => {
+  return {
+    uid: user.uid,
+    email: user.email,
+    name: user.displayName || user.email?.split('@')[0] || 'User',
+    isAdmin: false // TODO: Implement admin role management if needed
+  };
+};
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null | undefined>(undefined);
 
   useEffect(() => {
-    // Check if a user is logged in from a previous session
-    if (typeof window !== 'undefined') {
-        const loggedInUserName = sessionStorage.getItem('raga-loggedInUser');
-        if (loggedInUserName) {
-          const loggedInUser = getUserFromStorage(loggedInUserName);
-          setUser(loggedInUser);
-        } else {
-          setUser(null); // Explicitly set to null if no user is logged in
-        }
-    }
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setUser(formatUser(firebaseUser));
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const getUsers = () => {
-    if (typeof window === 'undefined') return {};
-    const users = localStorage.getItem(USER_STORAGE_KEY);
-    return users ? JSON.parse(users) : {};
+  const login = async (email: string, pass: string) => {
+    await signInWithEmailAndPassword(auth, email, pass);
   };
 
-  const login = (name: string, pass: string) => {
-    const users = getUsers();
-    if (users[name] && users[name].password === pass) {
-      const loggedInUser = { name, isAdmin: users[name].isAdmin || false };
-      setUser(loggedInUser);
-      sessionStorage.setItem('raga-loggedInUser', name);
-    } else {
-      throw new Error('Invalid name or password.');
-    }
+  const signup = async (email: string, pass: string) => {
+    await createUserWithEmailAndPassword(auth, email, pass);
+  };
+  
+  const signInWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
   };
 
-  const signup = (name: string, pass: string) => {
-    const users = getUsers();
-    if (users[name]) {
-      throw new Error('User already exists. Please log in.');
-    }
-    // The first user to sign up is the admin
-    const isFirstUser = Object.keys(users).length === 0;
-    users[name] = { 
-        password: pass, 
-        streakData: { streak: 0, lastVisit: '' },
-        isAdmin: isFirstUser 
-    };
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
-    
-    const newUser = { name, isAdmin: isFirstUser };
-    setUser(newUser);
-    sessionStorage.setItem('raga-loggedInUser', name);
+  const logout = async () => {
+    await signOut(auth);
   };
 
-  const logout = () => {
-    setUser(null);
-    sessionStorage.removeItem('raga-loggedInUser');
-  };
-
-  const value = { user, login, signup, logout };
+  const value = { user, login, signup, logout, signInWithGoogle };
 
   return React.createElement(AuthContext.Provider, { value }, children);
 };
