@@ -9,8 +9,8 @@ import { cn } from '@/lib/utils';
 
 const MuseumWallComponent = ({ wall }: { wall: MuseumWall }) => {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-8 rounded-lg border bg-card p-6 shadow-lg">
-      <p className="text-muted-foreground text-center">{wall.text}</p>
+    <div className="flex h-full w-full flex-col items-center justify-center gap-8 rounded-lg border bg-card p-6 shadow-lg" style={{ backgroundColor: 'var(--museum-wall)', color: 'var(--museum-text)' }}>
+      <p className="text-center">{wall.text}</p>
     </div>
   );
 };
