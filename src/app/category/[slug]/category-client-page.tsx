@@ -34,7 +34,7 @@ export default function CategoryClientPage({ slug }: { slug: string }) {
         setCategory(cat);
 
         const postType = isLiveCategory ? 'event' : 'posts';
-        // For 'live' (events), we don't filter by category ID.
+        // For 'live' (events), we don't filter by category ID as the API might not support it well.
         const params = isLiveCategory ? { per_page: 12 } : { categories: cat.id, per_page: 12 };
         
         const fetchedPosts = await getPosts(params, postType);
