@@ -12,19 +12,19 @@ const COLLECTION_NAME = 'museum_walls';
 
 const defaultContent: Omit<MuseumWall, 'id'>[] = [
     {
-        text: "Artist One - The Visionary\n\nKnown for blending traditional sounds with modern electronic beats, Artist One redefined the genre in the early 2000s.",
+        text: "Artist One is known for blending traditional sounds with modern electronic beats, redefining the genre in the early 2000s.",
         youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     },
     {
-        text: "Artist Two - The Purist\n\nA master of the sitar, Artist Two is celebrated for their flawless technique and deep understanding of classical ragas.",
+        text: "A master of the sitar, Artist Two is celebrated for their flawless technique and deep understanding of classical ragas.",
         youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     },
     {
-        text: "Artist Three - The Innovator\n\nPioneering the use of microtonal keyboards, Artist Three opened new harmonic possibilities in contemporary music.",
+        text: "Pioneering the use of microtonal keyboards, Artist Three opened new harmonic possibilities in contemporary music.",
         youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     },
     {
-        text: "Artist Four - The Performer\n\nWith an electrifying stage presence, Artist Four's live shows are legendary, captivating audiences worldwide.",
+        text: "With an electrifying stage presence, Artist Four's live shows are legendary, captivating audiences worldwide.",
         youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     }
 ];

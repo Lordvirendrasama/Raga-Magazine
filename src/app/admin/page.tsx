@@ -140,7 +140,7 @@ export default function AdminPage() {
             <CardHeader>
             <CardTitle>Museum Content</CardTitle>
             <CardDescription>
-                Edit the text and YouTube video for the four walls of the 3D museum.
+                Edit the text paragraph and YouTube video for the four walls of the 3D museum.
             </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -149,8 +149,8 @@ export default function AdminPage() {
                          <h3 className="font-headline text-xl font-semibold">Wall {index + 1}</h3>
                         
                         <div className="space-y-2">
-                          <Label htmlFor={`walls[${index}].text`}>Text</Label>
-                          <Textarea {...register(`walls.${index}.text`)} id={`walls[${index}].text`} rows={4} />
+                          <Label htmlFor={`walls[${index}].text`}>Text Paragraph</Label>
+                          <Textarea {...register(`walls.${index}.text`)} id={`walls[${index}].text`} rows={3} />
                         </div>
                         
                         <div className="space-y-2">

@@ -57,15 +57,11 @@ const MuseumWallComponent = ({ wall, wallConfig, colors, onPlayVideo }: { wall: 
         material="shader: flat;"
       ></a-plane>
       
-      <a-text
-        value={wall.text}
-        color={colors.textColor}
+      {/* Using a simpler text geometry for performance */}
+       <a-entity
+        text={`value: ${wall.text}; color: ${colors.textColor}; align: center; baseline: top; wrapCount: 40; width: 8;`}
         position="0 1.5 0.01"
-        align="center"
-        baseline="top"
-        width="8"
-        font="https://cdn.aframe.io/fonts/Exo2Bold.fnt"
-      ></a-text>
+      ></a-entity>
 
       {youtubeId && (
         <a-entity ref={videoEntityRef} position="0 -1.25 0.01">
