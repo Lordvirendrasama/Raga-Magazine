@@ -27,6 +27,7 @@ interface AuthContextType {
   signup: (email: string, pass: string) => Promise<void>;
   logout: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  isFirebaseReady: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -50,20 +51,24 @@ const formatUser = (user: FirebaseUser): User => {
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null | undefined>(undefined);
+  const isFirebaseReady = !!auth;
 
   useEffect(() => {
+    if (!isFirebaseReady) {
+      setUser(null); // Firebase is not configured, so no user.
+      console.warn("Firebase is not configured. Please check your environment variables.");
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         setUser(formatUser(firebaseUser));
       } else {
-        // Handle the redirect result when the page loads
         getRedirectResult(auth)
           .then((result) => {
             if (result) {
-              // This is the successfully signed-in user.
               setUser(formatUser(result.user));
             } else {
-              // No user signed in, either via redirect or session.
               setUser(null);
             }
           })
@@ -75,26 +80,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [isFirebaseReady]);
 
   const login = async (email: string, pass: string) => {
+    if (!auth) throw new Error('Firebase is not configured.');
     await signInWithEmailAndPassword(auth, email, pass);
   };
 
   const signup = async (email: string, pass: string) => {
+    if (!auth) throw new Error('Firebase is not configured.');
     await createUserWithEmailAndPassword(auth, email, pass);
   };
   
   const signInWithGoogle = async () => {
+    if (!auth) throw new Error('Firebase is not configured.');
     const provider = new GoogleAuthProvider();
     await signInWithRedirect(auth, provider);
   };
 
   const logout = async () => {
+    if (!auth) throw new Error('Firebase is not configured.');
     await signOut(auth);
   };
 
-  const value = { user, login, signup, logout, signInWithGoogle };
+  const value = { user, login, signup, logout, signInWithGoogle, isFirebaseReady };
 
   return React.createElement(AuthContext.Provider, { value }, children);
 };
