@@ -45,6 +45,12 @@ const nextConfig: NextConfig = {
         hostname: 'darkgrey-gazelle-504232.hostingersite.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ytimg.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
