@@ -34,13 +34,17 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
   const isEventsCalendar = postType === 'event';
   const apiPath = isEventsCalendar ? '/tribe/events/v1/events' : `/wp/v2/${postType}`;
   
-  const defaultParams: Record<string, string> = {
-    per_page: '12',
-  };
+  const defaultParams: Record<string, string> = {};
 
   if (isEventsCalendar) {
     defaultParams['status'] = 'publish';
+    // The events API might not use per_page in the same way, or we want all of them for the calendar.
+    // So we don't set a per_page limit for events unless it's explicitly passed in params.
+    if (!params.per_page) {
+        delete params.per_page; 
+    }
   } else {
+    defaultParams['per_page'] = params.per_page || '12';
     defaultParams['_embed'] = '1';
   }
 
@@ -137,17 +141,15 @@ export function transformPost(wpPost: any): Post | null {
   
   let category = 'Uncategorized';
   if (isEvent) {
-    // For events, category data is in a different structure
     if (wpPost.categories && wpPost.categories.length > 0) {
       category = wpPost.categories[0].name;
     } else {
-      category = 'Event'; // Default category for events if none assigned
+      category = 'Event';
     }
   } else {
-    // For regular posts, get category from _embedded field
     const terms = wpPost?._embedded?.['wp:term']?.[0];
     if (terms && Array.isArray(terms) && terms.length > 0) {
-        const categoryTerm = terms.find((term: any) => term.taxonomy === 'category');
+        const categoryTerm = terms.find((term: any) => term.taxonomy === 'category' && term.slug !== 'uncategorized');
         if (categoryTerm) {
           category = categoryTerm.name;
         }
@@ -159,7 +161,6 @@ export function transformPost(wpPost: any): Post | null {
   const authorName = wpPost?._embedded?.author?.[0]?.name || wpPost?.author?.display_name || 'RagaMagazine Staff';
   const authorAvatar = wpPost?._embedded?.author?.[0]?.avatar_urls?.['96'] || 'https://secure.gravatar.com/avatar/?s=96&d=mm&r=g';
 
-  // For events, tags are structured differently
   let tags: string[] = [];
   if (isEvent) {
     if (wpPost.tags && Array.isArray(wpPost.tags)) {
@@ -170,6 +171,10 @@ export function transformPost(wpPost: any): Post | null {
     if (Array.isArray(wpTags)) {
       tags = wpTags.map((tag: any) => tag.name);
     }
+  }
+  
+  if (wpPost.tags?.nodes) { // Handle GraphQL-like tag structure if present
+      tags = wpPost.tags.nodes.map((tag: any) => tag.name);
   }
 
   const { url: imageUrl, hint: imageHint } = getFeaturedImage(wpPost);
