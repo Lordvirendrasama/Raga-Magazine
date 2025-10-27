@@ -13,8 +13,8 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const slug = params.slug;
     async function fetchData() {
+      const slug = params.slug;
       if (!slug) return;
       try {
         setLoading(true);
@@ -34,7 +34,7 @@ export default function CategoryPage({ params }: { params: { slug: string } }) {
       }
     }
     fetchData();
-  }, [params]);
+  }, [params.slug]);
   
   if (loading) {
     return (

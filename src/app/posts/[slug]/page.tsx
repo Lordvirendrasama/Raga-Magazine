@@ -39,7 +39,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
     }
 
     fetchData();
-  }, [params]);
+  }, [params.slug]);
 
   if (loading) {
     return (

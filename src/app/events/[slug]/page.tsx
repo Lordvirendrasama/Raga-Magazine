@@ -37,7 +37,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
     }
 
     fetchData();
-  }, [params]);
+  }, [params.slug]);
 
   if (loading) {
     return (
