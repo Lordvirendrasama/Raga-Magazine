@@ -16,20 +16,15 @@ export default function CategoryClientPage({ slug }: { slug: string }) {
     async function fetchData() {
       setLoading(true);
       try {
-        if (slug === 'live') {
-          const fetchedPosts = await getPosts({ per_page: 12 }, 'event');
-          setCategory({ name: 'Live' });
-          setPosts(fetchedPosts);
-        } else {
-          const cat = await getCategoryBySlug(slug);
-          if (!cat) {
-            notFound();
-            return;
-          }
-          const fetchedPosts = await getPosts({ categories: cat.id, per_page: 12 }, 'posts');
-          setCategory(cat);
-          setPosts(fetchedPosts);
+        const cat = await getCategoryBySlug(slug);
+        if (!cat) {
+          notFound();
+          return;
         }
+        setCategory(cat);
+
+        const fetchedPosts = await getPosts({ categories: cat.id, per_page: 12 });
+        setPosts(fetchedPosts);
       } catch (error) {
         console.error(`Failed to fetch data for category ${slug}:`, error);
         setPosts([]);
