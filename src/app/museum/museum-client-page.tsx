@@ -17,6 +17,7 @@ declare global {
       'a-plane': any;
       'a-image': any;
       'a-text': any;
+      'a-sky': any;
     }
   }
 }
@@ -80,14 +81,25 @@ const MuseumWallComponent = ({ wall, wallConfig, colors, onPlayVideo }: { wall: 
 };
 
 
-export default function MuseumClientPage({ initialWalls }: { initialWalls: MuseumWall[] }) {
+export default function MuseumClientPage({ initialWalls, onLoaded }: { initialWalls: MuseumWall[], onLoaded: () => void }) {
   const [isMounted, setIsMounted] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const { resolvedTheme } = useTheme();
+  const sceneRef = useRef<any>(null);
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    const sceneEl = sceneRef.current;
+    if (sceneEl) {
+      const handleLoaded = () => {
+        onLoaded();
+      };
+      sceneEl.addEventListener('loaded', handleLoaded);
+      return () => {
+        sceneEl.removeEventListener('loaded', handleLoaded);
+      };
+    }
+  }, [onLoaded]);
   
   if (!isMounted) {
     return (
@@ -105,9 +117,7 @@ export default function MuseumClientPage({ initialWalls }: { initialWalls: Museu
   ];
 
   const colors = {
-      floorColor: resolvedTheme === 'dark' ? '#444' : '#C0C0C0',
-      ceilingColor: resolvedTheme === 'dark' ? '#222' : '#E0E0E0',
-      bgColor: resolvedTheme === 'dark' ? '#333' : '#ECECEC',
+      skyColor: resolvedTheme === 'dark' ? '#1A1A1A' : '#E0E0E0',
       wallColor: resolvedTheme === 'dark' ? '#111111' : '#F0F0F0',
       textColor: resolvedTheme === 'dark' ? '#FFFFFF' : '#000000',
   }
@@ -119,13 +129,11 @@ export default function MuseumClientPage({ initialWalls }: { initialWalls: Museu
   return (
     <>
       <div className="h-[80vh] w-full">
-        <a-scene embedded background={`color: ${colors.bgColor}`} vr-mode-ui="enabled: false">
-          <a-camera position="0 2.2 0" wasd-controls="enabled: true; acceleration: 100;" look-controls="pointerLockEnabled: true"></a-camera>
-          <a-light type="ambient" color="#888"></a-light>
-          <a-light type="point" intensity="0.5" position="0 4 0"></a-light>
+        <a-scene ref={sceneRef} embedded vr-mode-ui="enabled: false">
+          <a-camera position="0 2.2 0" wasd-controls="enabled: true; acceleration: 60;" look-controls="pointerLockEnabled: true"></a-camera>
           
-          <a-plane position="0 0 0" rotation="-90 0 0" width="20" height="20" color={colors.floorColor} material="shader: flat;"></a-plane>
-          <a-plane position="0 6 0" rotation="90 0 0" width="20" height="20" color={colors.ceilingColor} material="shader: flat;"></a-plane>
+          <a-sky color={colors.skyColor}></a-sky>
+          <a-light type="ambient" color="#FFF" intensity="0.7"></a-light>
           
           <a-entity id="content-container">
             {initialWalls.length > 0 ? (
