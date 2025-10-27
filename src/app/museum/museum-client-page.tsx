@@ -57,14 +57,15 @@ const MuseumWallComponent = ({ wall, wallConfig, colors, onPlayVideo }: { wall: 
         material="shader: flat;"
       ></a-plane>
       
-      {/* Using a simpler text geometry for performance */}
+      {/* Text on the right */}
        <a-entity
-        text={`value: ${wall.text}; color: ${colors.textColor}; align: center; baseline: top; wrapCount: 40; width: 8;`}
-        position="0 1.5 0.01"
+        text={`value: ${wall.text}; color: ${colors.textColor}; align: left; baseline: top; wrapCount: 35; width: 4.5;`}
+        position="0.25 1.5 0.01"
       ></a-entity>
 
+      {/* Video on the left */}
       {youtubeId && (
-        <a-entity ref={videoEntityRef} position="0 -1.25 0.01">
+        <a-entity ref={videoEntityRef} position="-2.5 0 0.01">
           <a-plane width="4" height="2.25" color="#000000"></a-plane>
           <a-image
             src={`https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`}

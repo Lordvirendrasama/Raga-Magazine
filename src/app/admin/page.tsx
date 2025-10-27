@@ -1,13 +1,11 @@
 
 'use client';
 
-import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm, useFieldArray, SubmitHandler } from "react-hook-form";
 import { getMuseumContent, updateMuseumContent, type MuseumWall } from '@/lib/museum-content';
@@ -18,11 +16,9 @@ type FormValues = {
   walls: Omit<MuseumWall, 'id'>[];
 };
 
-type PageStatus = 'loading' | 'success' | 'denied';
+type PageStatus = 'loading' | 'success' | 'error';
 
 export default function AdminPage() {
-    const { user } = useAuth();
-    const router = useRouter();
     const { toast } = useToast();
     const [status, setStatus] = useState<PageStatus>('loading');
 
@@ -37,23 +33,7 @@ export default function AdminPage() {
     });
 
     useEffect(() => {
-        const checkAuthAndFetchData = async () => {
-            if (user === undefined) {
-                setStatus('loading');
-                return;
-            }
-
-            if (!user || !user.isAdmin) {
-                toast({
-                    title: "Access Denied",
-                    description: "You do not have permission to view this page.",
-                    variant: "destructive"
-                });
-                setStatus('denied');
-                router.push('/');
-                return;
-            }
-            
+        const fetchData = async () => {
             try {
                 const content = await getMuseumContent();
                 reset({ walls: content.map(({ id, ...rest }) => rest) });
@@ -64,12 +44,12 @@ export default function AdminPage() {
                     description: "Could not load museum content.",
                     variant: "destructive"
                 });
-                setStatus('denied');
+                setStatus('error');
             }
         };
 
-        checkAuthAndFetchData();
-    }, [user, router, reset, toast]);
+        fetchData();
+    }, [reset, toast]);
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         try {
@@ -101,8 +81,8 @@ export default function AdminPage() {
                         <Skeleton className="h-5 w-1/2" />
                     </CardHeader>
                     <CardContent className="space-y-6">
-                        {status === 'denied' ? (
-                            <p className="text-center text-destructive">Access Denied. You will be redirected.</p>
+                        {status === 'error' ? (
+                            <p className="text-center text-destructive">Could not load admin data.</p>
                         ) : (
                             [...Array(4)].map((_, i) => (
                                  <div key={i} className="space-y-4 p-4 border rounded-lg">
