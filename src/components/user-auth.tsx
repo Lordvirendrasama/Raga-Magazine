@@ -66,8 +66,7 @@ export function UserAuth() {
     setError(null);
     try {
       await signInWithGoogle();
-      toast({ title: 'Signed in with Google!', description: 'Welcome!' });
-      setIsDialogOpen(false);
+      // No need to handle toast or dialog here, as the page will redirect.
     } catch (err: any) {
         setError(err.message);
     }

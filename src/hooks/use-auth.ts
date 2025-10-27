@@ -10,7 +10,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
   GoogleAuthProvider,
-  signInWithPopup
+  signInWithRedirect,
+  getRedirectResult
 } from 'firebase/auth';
 
 interface User {
@@ -55,7 +56,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (firebaseUser) {
         setUser(formatUser(firebaseUser));
       } else {
-        setUser(null);
+        // Handle the redirect result when the page loads
+        getRedirectResult(auth)
+          .then((result) => {
+            if (result) {
+              // This is the successfully signed-in user.
+              setUser(formatUser(result.user));
+            } else {
+              // No user signed in, either via redirect or session.
+              setUser(null);
+            }
+          })
+          .catch((error) => {
+            console.error("Error getting redirect result:", error);
+            setUser(null);
+          });
       }
     });
 
@@ -72,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    await signInWithRedirect(auth, provider);
   };
 
   const logout = async () => {
