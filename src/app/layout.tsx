@@ -26,11 +26,8 @@ export default function RootLayout({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2500); 
-
-    return () => clearTimeout(timer);
+    // Hide the loading screen as soon as the component mounts and is interactive.
+    setIsLoading(false);
   }, []);
 
   return (
@@ -45,7 +42,7 @@ export default function RootLayout({
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased')} suppressHydrationWarning>
         {isLoading && <LoadingScreen />}
-        <div className={cn('transition-opacity duration-700', isLoading ? 'opacity-0' : 'opacity-100')}>
+        <div className={cn('transition-opacity duration-500', isLoading ? 'opacity-0' : 'opacity-100')}>
           <MuteProvider>
             <AuthProvider>
               <ThemeProvider
