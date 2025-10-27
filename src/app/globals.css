@@ -30,8 +30,6 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --museum-wall: #F0F0F0;
-    --museum-text: #000000;
   }
   .dark {
     --background: 0 0% 0%;
@@ -58,8 +56,6 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --museum-wall: #111111;
-    --museum-text: #FFFFFF;
   }
 }
 
@@ -283,40 +279,5 @@
       transform: translateY(-80px) scale(0.8);
       opacity: 0;
     }
-  }
-
-  /* CSS 3D Museum */
-  .scene {
-    perspective: 1000px;
-    perspective-origin: 50% 50%;
-  }
-
-  .cube {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    transform-style: preserve-3d;
-    transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1);
-  }
-
-  .cube__face {
-    position: absolute;
-    width: 60vw;
-    height: 50vh;
-    max-width: 800px;
-    backface-visibility: hidden;
-  }
-
-  .cube__face--front {
-    transform: rotateY(0deg) translateZ(30vw);
-  }
-  .cube__face--right {
-    transform: rotateY(90deg) translateZ(30vw);
-  }
-  .cube__face--back {
-    transform: rotateY(180deg) translateZ(30vw);
-  }
-  .cube__face--left {
-    transform: rotateY(-90deg) translateZ(30vw);
   }
 }
