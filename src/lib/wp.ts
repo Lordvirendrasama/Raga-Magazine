@@ -29,7 +29,7 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 
 export async function getPosts(params: Record<string, any> = {}, postType: string = 'posts'): Promise<Post[]> {
   const isEventsCalendar = postType === 'event';
-  const apiPath = isEventsCalendar ? '/tribe/events/v1/events' : '/wp/v2/posts';
+  const apiPath = isEventsCalendar ? '/tribe/events/v1/events' : `/wp/v2/${postType}`;
   
   const defaultParams: Record<string, string> = {
     per_page: '12',
