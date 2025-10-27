@@ -24,8 +24,11 @@ export default function CategoryClientPage({ slug }: { slug: string }) {
         }
         setCategory(cat);
 
-        const postType = slug === 'live' ? 'event' : 'posts';
-        const fetchedPosts = await getPosts({ categories: cat.id, per_page: 12 }, postType);
+        const isLiveCategory = slug === 'live';
+        const postType = isLiveCategory ? 'event' : 'posts';
+        const params = isLiveCategory ? { per_page: 12 } : { categories: cat.id, per_page: 12 };
+        
+        const fetchedPosts = await getPosts(params, postType);
         setPosts(fetchedPosts);
       } catch (error) {
         console.error(`Failed to fetch data for category ${slug}:`, error);
