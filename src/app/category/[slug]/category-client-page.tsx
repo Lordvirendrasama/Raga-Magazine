@@ -14,35 +14,34 @@ export default function CategoryClientPage({ slug }: { slug: string }) {
 
   useEffect(() => {
     async function fetchData() {
-      if (!slug) return;
       try {
         setLoading(true);
-        let cat;
         const isLiveCategory = slug === 'live';
+        let cat;
+        let fetchedPosts: Post[] = [];
 
         if (isLiveCategory) {
-          // 'live' is not a real category, so we mock it.
+          // 'live' is not a real category, so we mock it and fetch events.
           cat = { name: 'Live' };
+          fetchedPosts = await getPosts({ per_page: 12 }, 'event');
         } else {
+          // For all other categories, fetch category details and then posts.
           cat = await getCategoryBySlug(slug);
+          if (cat) {
+            fetchedPosts = await getPosts({ categories: cat.id, per_page: 12 }, 'posts');
+          }
         }
 
         if (!cat) {
           notFound();
           return;
         }
-        setCategory(cat);
 
-        const postType = isLiveCategory ? 'event' : 'posts';
-        // For 'live' (events), we don't filter by category ID as the API might not support it well.
-        const params = isLiveCategory ? { per_page: 12 } : { categories: cat.id, per_page: 12 };
-        
-        const fetchedPosts = await getPosts(params, postType);
+        setCategory(cat);
         setPosts(fetchedPosts);
       } catch (error) {
         console.error(`Failed to fetch data for category ${slug}:`, error);
-        // Set posts to an empty array on error to show the message.
-        setPosts([]);
+        setPosts([]); // Clear posts on error to show the message.
       } finally {
         setLoading(false);
       }
@@ -79,7 +78,7 @@ export default function CategoryClientPage({ slug }: { slug: string }) {
         Category: {category.name}
       </h1>
       {posts.length === 0 ? (
-         <p className="text-center text-destructive">Could not load posts for this category. Please try again later.</p>
+         <p className="text-center text-muted-foreground">Could not load posts for this category. Please try again later.</p>
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
