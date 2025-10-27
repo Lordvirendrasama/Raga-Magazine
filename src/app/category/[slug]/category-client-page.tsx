@@ -17,21 +17,32 @@ export default function CategoryClientPage({ slug }: { slug: string }) {
       if (!slug) return;
       try {
         setLoading(true);
-        const cat = await getCategoryBySlug(slug);
+        let cat;
+        const isLiveCategory = slug === 'live';
+
+        if (isLiveCategory) {
+          // 'live' is not a real category, so we mock it.
+          cat = { name: 'Live' };
+        } else {
+          cat = await getCategoryBySlug(slug);
+        }
+
         if (!cat) {
           notFound();
           return;
         }
         setCategory(cat);
 
-        const isLiveCategory = slug === 'live';
         const postType = isLiveCategory ? 'event' : 'posts';
+        // For 'live' (events), we don't filter by category ID.
         const params = isLiveCategory ? { per_page: 12 } : { categories: cat.id, per_page: 12 };
         
         const fetchedPosts = await getPosts(params, postType);
         setPosts(fetchedPosts);
       } catch (error) {
         console.error(`Failed to fetch data for category ${slug}:`, error);
+        // Set posts to an empty array on error to show the message.
+        setPosts([]);
       } finally {
         setLoading(false);
       }
