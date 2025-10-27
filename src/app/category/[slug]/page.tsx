@@ -1,78 +1,9 @@
 
-'use client';
+import React from 'react';
+import { use } from 'react';
+import CategoryClientPage from './category-client-page';
 
-import { useState, useEffect } from 'react';
-import { getPosts, getCategoryBySlug } from '@/lib/wp';
-import { notFound } from 'next/navigation';
-import { ArticleCard, type Post } from '@/components/article-card';
-import { Skeleton } from '@/components/ui/skeleton';
-
-export default function CategoryPage({ params }: { params: { slug: string } }) {
-  const [category, setCategory] = useState<any>(null);
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchData() {
-      const slug = params.slug;
-      if (!slug) return;
-      try {
-        setLoading(true);
-        const cat = await getCategoryBySlug(slug);
-        if (!cat) {
-          notFound();
-          return;
-        }
-        setCategory(cat);
-
-        const fetchedPosts = await getPosts({ categories: cat.id, per_page: 12 });
-        setPosts(fetchedPosts);
-      } catch (error) {
-        console.error(`Failed to fetch data for category ${slug}:`, error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, [params.slug]);
-  
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 lg:py-12">
-        <Skeleton className="h-12 w-1/3 mb-8" />
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="space-y-4">
-              <Skeleton className="aspect-video w-full" />
-              <Skeleton className="h-6 w-2/3" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-1/2" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!category) {
-    // This will be caught by notFound in useEffect, but as a fallback
-    return notFound();
-  }
-
-  return (
-    <div className="container mx-auto px-4 py-8 lg:py-12">
-      <h1 className="mb-8 font-headline text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-        Category: {category.name}
-      </h1>
-      {posts.length === 0 ? (
-         <p className="text-center text-destructive">Could not load posts for this category. Please try again later.</p>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
-            <ArticleCard key={post.id} post={post} variant="default" />
-          ))}
-        </div>
-      )}
-    </div>
-  );
+export default function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params);
+  return <CategoryClientPage slug={slug} />;
 }
