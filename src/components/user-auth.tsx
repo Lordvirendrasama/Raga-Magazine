@@ -107,11 +107,20 @@ export function UserAuth() {
     );
   }
 
-  if (user === undefined || !isFirebaseReady) {
+  if (user === undefined) {
     return (
       <Button variant="outline" disabled>
         <LogIn className="mr-2 h-4 w-4" />
         Loading...
+      </Button>
+    )
+  }
+
+  if (!isFirebaseReady) {
+    return (
+      <Button variant="outline" disabled title="Firebase is not configured in your .env file">
+        <LogIn className="mr-2 h-4 w-4" />
+        Auth Not Configured
       </Button>
     )
   }
@@ -227,5 +236,3 @@ export function UserAuth() {
     </Dialog>
   );
 }
-
-    
