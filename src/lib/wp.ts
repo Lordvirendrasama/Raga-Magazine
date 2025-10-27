@@ -9,20 +9,23 @@ const BASE_URL = 'https://darkgrey-gazelle-504232.hostingersite.com/wp-json';
 async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
   
-  try {
-    const res = await fetch(url, { ...options });
+  const res = await fetch(url, {
+    ...options,
+    next: { revalidate: 60 } // Revalidate every 60 seconds
+  });
 
-    if (!res.ok) {
-      console.error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
+  if (!res.ok) {
+    console.error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
+    return null;
+  }
+  const text = await res.text();
+  if (!text) {
       return null;
-    }
-    const text = await res.text();
-    if (!text) {
-        return null;
-    }
+  }
+  try {
     return JSON.parse(text);
-  } catch (error: any) {
-    console.error(`Network error fetching ${url}:`, error.message);
+  } catch (error) {
+    console.error('Failed to parse JSON from WP API:', text);
     return null;
   }
 }
@@ -71,8 +74,6 @@ export async function getPostBySlug(slug: string) {
 export async function getEventBySlug(slug: string) {
   const result = await fetchAPI(`/tribe/events/v1/events/by-slug/${slug}`);
   if (result) {
-    // The events endpoint doesn't support _embed, so we need to process it.
-    // The result from by-slug is a single object, not an array.
     return result;
   }
   return null;
@@ -135,9 +136,15 @@ export function transformPost(wpPost: any): Post | null {
   const excerpt = decode((wpPost?.excerpt?.rendered || wpPost?.description || '').replace(/<[^>]+>/g, ''));
   
   let category = 'Uncategorized';
-  if (isEvent && wpPost?.categories?.[0]?.name) {
-    category = wpPost.categories[0].name;
+  if (isEvent) {
+    // For events, category data is in a different structure
+    if (wpPost.categories && wpPost.categories.length > 0) {
+      category = wpPost.categories[0].name;
+    } else {
+      category = 'Event'; // Default category for events if none assigned
+    }
   } else {
+    // For regular posts, get category from _embedded field
     const terms = wpPost?._embedded?.['wp:term']?.[0];
     if (terms && Array.isArray(terms) && terms.length > 0) {
         const categoryTerm = terms.find((term: any) => term.taxonomy === 'category');
@@ -152,8 +159,18 @@ export function transformPost(wpPost: any): Post | null {
   const authorName = wpPost?._embedded?.author?.[0]?.name || wpPost?.author?.display_name || 'RagaMagazine Staff';
   const authorAvatar = wpPost?._embedded?.author?.[0]?.avatar_urls?.['96'] || 'https://secure.gravatar.com/avatar/?s=96&d=mm&r=g';
 
-  const wpTags = wpPost?._embedded?.['wp:term']?.[1] || wpPost?.tags || [];
-  const tags = Array.isArray(wpTags) ? wpTags.map((tag: any) => tag.name) : [];
+  // For events, tags are structured differently
+  let tags: string[] = [];
+  if (isEvent) {
+    if (wpPost.tags && Array.isArray(wpPost.tags)) {
+      tags = wpPost.tags.map((tag: any) => tag.name);
+    }
+  } else {
+    const wpTags = wpPost?._embedded?.['wp:term']?.[1] || [];
+    if (Array.isArray(wpTags)) {
+      tags = wpTags.map((tag: any) => tag.name);
+    }
+  }
 
   const { url: imageUrl, hint: imageHint } = getFeaturedImage(wpPost);
 
