@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getPostBySlug } from '@/lib/wp';
+import { getPostBySlug, getPosts } from '@/lib/wp';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { format } from 'date-fns';
@@ -12,9 +12,11 @@ import { decode } from 'html-entities';
 import { getFeaturedImage } from '@/lib/wp';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Post } from '@/components/article-card';
+import { SidebarTopStories } from '@/components/sidebar-top-stories';
 
 export default function PostClientPage({ slug }: { slug: string }) {
   const [postData, setPostData] = useState<any>(null); // Keep as any to handle raw WP object
+  const [sidebarPosts, setSidebarPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,12 +24,17 @@ export default function PostClientPage({ slug }: { slug: string }) {
       if (!slug) return;
       try {
         setLoading(true);
-        const post = await getPostBySlug(slug);
+        const [post, trending] = await Promise.all([
+          getPostBySlug(slug),
+          getPosts({ per_page: 5 })
+        ]);
+
         if (!post) {
           notFound();
           return;
         }
         setPostData(post);
+        setSidebarPosts(trending);
 
       } catch (error) {
         console.error(`Failed to fetch post ${slug}:`, error);
@@ -44,12 +51,19 @@ export default function PostClientPage({ slug }: { slug: string }) {
     return (
        <>
         <Skeleton className="h-[50vh] min-h-[300px] w-full" />
-        <div className="container mx-auto max-w-4xl px-4 py-8 lg:py-16">
-            <div className="space-y-6">
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-8 w-2/3" />
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
+        <div className="container mx-auto px-4 py-8 lg:py-12">
+            <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                <div className="space-y-6">
+                    <Skeleton className="h-8 w-full" />
+                    <Skeleton className="h-8 w-2/3" />
+                    <Skeleton className="h-32 w-full" />
+                    <Skeleton className="h-32 w-full" />
+                </div>
+              </div>
+              <div className="lg:col-span-1">
+                <Skeleton className="h-96 w-full" />
+              </div>
             </div>
         </div>
        </>
@@ -102,22 +116,29 @@ export default function PostClientPage({ slug }: { slug: string }) {
         </div>
       </header>
 
-      <div className="container mx-auto max-w-4xl px-4 py-8 lg:py-16">
-        <div 
-          className="wp-content"
-          dangerouslySetInnerHTML={{ __html: content }} 
-        />
+      <div className="container mx-auto px-4 py-8 lg:py-16">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
+            <div className="lg:col-span-2">
+                <div 
+                  className="wp-content"
+                  dangerouslySetInnerHTML={{ __html: content }} 
+                />
 
-        {tags.length > 0 && (
-          <div className="mt-12 border-t pt-8">
-            <h3 className="text-lg font-semibold">Tags</h3>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {tags.map((tag: string) => (
-                <Badge key={tag} variant="secondary">{tag}</Badge>
-              ))}
+                {tags.length > 0 && (
+                  <div className="mt-12 border-t pt-8">
+                    <h3 className="text-lg font-semibold">Tags</h3>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {tags.map((tag: string) => (
+                        <Badge key={tag} variant="secondary">{tag}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
             </div>
-          </div>
-        )}
+            <div className="lg:col-span-1">
+                <SidebarTopStories posts={sidebarPosts} />
+            </div>
+        </div>
       </div>
     </article>
   );
