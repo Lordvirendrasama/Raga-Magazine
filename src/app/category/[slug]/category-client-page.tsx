@@ -14,34 +14,25 @@ export default function CategoryClientPage({ slug }: { slug: string }) {
 
   useEffect(() => {
     async function fetchData() {
+      setLoading(true);
       try {
-        setLoading(true);
-        const isLiveCategory = slug === 'live';
-        let cat;
-        let fetchedPosts: Post[] = [];
-
-        if (isLiveCategory) {
-          // 'live' is not a real category, so we mock it and fetch events.
-          cat = { name: 'Live' };
-          fetchedPosts = await getPosts({ per_page: 12 }, 'event');
+        if (slug === 'live') {
+          const fetchedPosts = await getPosts({ per_page: 12 }, 'event');
+          setCategory({ name: 'Live' });
+          setPosts(fetchedPosts);
         } else {
-          // For all other categories, fetch category details and then posts.
-          cat = await getCategoryBySlug(slug);
-          if (cat) {
-            fetchedPosts = await getPosts({ categories: cat.id, per_page: 12 }, 'posts');
+          const cat = await getCategoryBySlug(slug);
+          if (!cat) {
+            notFound();
+            return;
           }
+          const fetchedPosts = await getPosts({ categories: cat.id, per_page: 12 }, 'posts');
+          setCategory(cat);
+          setPosts(fetchedPosts);
         }
-
-        if (!cat) {
-          notFound();
-          return;
-        }
-
-        setCategory(cat);
-        setPosts(fetchedPosts);
       } catch (error) {
         console.error(`Failed to fetch data for category ${slug}:`, error);
-        setPosts([]); // Clear posts on error to show the message.
+        setPosts([]);
       } finally {
         setLoading(false);
       }
@@ -68,8 +59,9 @@ export default function CategoryClientPage({ slug }: { slug: string }) {
   }
 
   if (!category) {
-    // This will be caught by notFound in useEffect, but as a fallback
-    return notFound();
+    // This can happen if fetching fails, e.g., notFound() was called or an error occurred.
+    // The notFound() call in useEffect will render the 404 page, but this is a fallback.
+    return null;
   }
 
   return (
