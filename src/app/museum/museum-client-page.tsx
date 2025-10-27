@@ -1,29 +1,15 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { type MuseumWall } from '@/lib/museum-content';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { useTheme } from 'next-themes';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'a-scene': any;
-      'a-camera': any;
-      'a-entity': any;
-      'a-light': any;
-      'a-plane': any;
-      'a-image': any;
-      'a-text': any;
-      'a-sky': any;
-    }
-  }
-}
-
-// Component to render a single wall
-const MuseumWallComponent = ({ wall, wallConfig, colors, onPlayVideo }: { wall: MuseumWall, wallConfig: any, colors: any, onPlayVideo: (url: string) => void }) => {
+const MuseumWallComponent = ({ wall, onPlayVideo }: { wall: MuseumWall; onPlayVideo: (url: string) => void }) => {
   let youtubeId = '';
   if (wall.youtubeUrl && wall.youtubeUrl.includes('embed')) {
     try {
@@ -36,91 +22,55 @@ const MuseumWallComponent = ({ wall, wallConfig, colors, onPlayVideo }: { wall: 
     }
   }
 
-  const videoEntityRef = useRef<any>(null);
-
-  useEffect(() => {
-    if (videoEntityRef.current && youtubeId) {
-      const handler = () => onPlayVideo(wall.youtubeUrl);
-      const el = videoEntityRef.current;
-      el.addEventListener('click', handler);
-      return () => {
-        el.removeEventListener('click', handler);
-      };
-    }
-  }, [wall.youtubeUrl, onPlayVideo, youtubeId]);
-
   return (
-    <a-entity position={wallConfig.position} rotation={wallConfig.rotation}>
-      <a-plane
-        width="10"
-        height="6"
-        color={colors.wallColor}
-        material="shader: flat;"
-      ></a-plane>
-      
-      {/* Text on the right */}
-       <a-entity
-        text={`value: ${wall.text}; color: ${colors.textColor}; align: left; baseline: top; wrapCount: 35; width: 4.5;`}
-        position="0.25 1.5 0.01"
-      ></a-entity>
-
-      {/* Video on the left */}
+    <div className="flex h-full w-full flex-col items-center justify-center gap-8 rounded-lg border bg-card p-6 shadow-lg md:flex-row">
       {youtubeId && (
-        <a-entity ref={videoEntityRef} position="-2.5 0 0.01">
-          <a-plane width="4" height="2.25" color="#000000"></a-plane>
-          <a-image
+        <div 
+          className="group relative h-48 w-full cursor-pointer overflow-hidden rounded-md md:h-64 md:w-1/2"
+          onClick={() => onPlayVideo(wall.youtubeUrl)}
+        >
+          <Image
             src={`https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`}
-            width="3.9"
-            height="2.15"
-            position="0 0 0.01"
-          ></a-image>
-        </a-entity>
+            alt={`Video thumbnail for ${wall.text.substring(0, 20)}`}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black/30 transition-opacity group-hover:bg-black/10" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="rounded-full bg-red-600/80 p-3 text-white transition-transform group-hover:scale-110">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
+            </div>
+          </div>
+        </div>
       )}
-    </a-entity>
+      <p className="text-muted-foreground md:w-1/2">{wall.text}</p>
+    </div>
   );
 };
 
-
-export default function MuseumClientPage({ initialWalls, onLoaded }: { initialWalls: MuseumWall[], onLoaded: () => void }) {
-  const [isMounted, setIsMounted] = useState(false);
+export default function MuseumClientPage({ initialWalls }: { initialWalls: MuseumWall[] }) {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
-  const { resolvedTheme } = useTheme();
-  const sceneRef = useRef<any>(null);
+  const [currentWall, setCurrentWall] = useState(0);
 
-  useEffect(() => {
-    setIsMounted(true);
-    const sceneEl = sceneRef.current;
-    if (sceneEl) {
-      const handleLoaded = () => {
-        onLoaded();
-      };
-      sceneEl.addEventListener('loaded', handleLoaded);
-      return () => {
-        sceneEl.removeEventListener('loaded', handleLoaded);
-      };
-    }
-  }, [onLoaded]);
+  const wallRotations = [0, -90, -180, -270];
+
+  const showNextWall = () => {
+    setCurrentWall((prev) => (prev + 1) % initialWalls.length);
+  };
+
+  const showPrevWall = () => {
+    setCurrentWall((prev) => (prev - 1 + initialWalls.length) % initialWalls.length);
+  };
   
-  if (!isMounted) {
-    return (
-        <div className="h-[80vh] w-full flex items-center justify-center bg-muted">
-            <Skeleton className="w-3/4 h-3/4" />
-        </div>
-    );
-  }
-
-  const wallConfigs = [
-    { position: '0 3 -5', rotation: '0 0 0' },   // Front
-    { position: '5 3 0', rotation: '0 -90 0' },  // Right
-    { position: '0 3 5', rotation: '0 180 0' }, // Back
-    { position: '-5 3 0', rotation: '0 90 0' },  // Left
-  ];
-
-  const colors = {
-      skyColor: resolvedTheme === 'dark' ? '#1A1A1A' : '#E0E0E0',
-      wallColor: resolvedTheme === 'dark' ? '#111111' : '#F0F0F0',
-      textColor: resolvedTheme === 'dark' ? '#FFFFFF' : '#000000',
-  }
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'ArrowRight') showNextWall();
+        if (e.key === 'ArrowLeft') showPrevWall();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handlePlayVideo = (url: string) => {
     setVideoUrl(url);
@@ -128,37 +78,42 @@ export default function MuseumClientPage({ initialWalls, onLoaded }: { initialWa
 
   return (
     <>
-      <div className="h-[80vh] w-full">
-        <a-scene ref={sceneRef} embedded vr-mode-ui="enabled: false">
-          <a-camera position="0 2.2 0" wasd-controls="enabled: true; acceleration: 60;" look-controls="pointerLockEnabled: true"></a-camera>
-          
-          <a-sky color={colors.skyColor}></a-sky>
-          <a-light type="ambient" color="#FFF" intensity="0.7"></a-light>
-          
-          <a-entity id="content-container">
-            {initialWalls.length > 0 ? (
-                initialWalls.map((wall, index) => (
-                    <MuseumWallComponent
-                        key={wall.id}
-                        wall={wall}
-                        wallConfig={wallConfigs[index]}
-                        colors={colors}
-                        onPlayVideo={handlePlayVideo}
-                    />
-                ))
-            ) : (
-                 <a-text value="Could not load museum content." color={colors.textColor} position="0 1.6 -3" align="center" width="4"></a-text>
-            )}
-          </a-entity>
-        </a-scene>
+      <div className="flex h-[80vh] flex-col items-center justify-center overflow-hidden bg-background p-4">
+        <div className="scene h-[50vh] w-[60vw] max-w-[800px]">
+          <div
+            className="cube"
+            style={{ transform: `translateZ(-30vw) rotateY(${wallRotations[currentWall]}deg)` }}
+          >
+            {initialWalls.map((wall, index) => (
+              <div key={wall.id} className={cn('cube__face', `cube__face--${['front', 'right', 'back', 'left'][index]}`)}>
+                <MuseumWallComponent wall={wall} onPlayVideo={handlePlayVideo} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-8 flex items-center gap-4">
+          <Button onClick={showPrevWall} variant="outline" size="icon">
+            <ChevronLeft className="h-4 w-4" />
+            <span className="sr-only">Previous Wall</span>
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Wall {currentWall + 1} of {initialWalls.length}
+          </span>
+          <Button onClick={showNextWall} variant="outline" size="icon">
+            <ChevronRight className="h-4 w-4" />
+            <span className="sr-only">Next Wall</span>
+          </Button>
+        </div>
       </div>
+
       <Dialog open={!!videoUrl} onOpenChange={() => setVideoUrl(null)}>
-        <DialogContent className="max-w-4xl h-[70vh] p-0">
+        <DialogContent className="h-[70vh] max-w-4xl p-0">
           {videoUrl && (
             <iframe
               width="100%"
               height="100%"
-              src={videoUrl}
+              src={`${videoUrl}?autoplay=1`}
               title="YouTube video player"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
