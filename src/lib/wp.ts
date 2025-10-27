@@ -10,7 +10,7 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   const url = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
   
   try {
-    const res = await fetch(url, { cache: 'no-store', ...options });
+    const res = await fetch(url, { ...options });
 
     if (!res.ok) {
       console.error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
