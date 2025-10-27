@@ -5,7 +5,6 @@ import { collection, doc, getDocs, writeBatch, query, orderBy } from 'firebase/f
 export interface MuseumWall {
     id: string;
     text: string;
-    youtubeUrl: string;
 }
 
 const COLLECTION_NAME = 'museum_walls';
@@ -13,19 +12,15 @@ const COLLECTION_NAME = 'museum_walls';
 const defaultContent: Omit<MuseumWall, 'id'>[] = [
     {
         text: "Artist One is known for blending traditional sounds with modern electronic beats, redefining the genre in the early 2000s.",
-        youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     },
     {
         text: "A master of the sitar, Artist Two is celebrated for their flawless technique and deep understanding of classical ragas.",
-        youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     },
     {
         text: "Pioneering the use of microtonal keyboards, Artist Three opened new harmonic possibilities in contemporary music.",
-        youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     },
     {
         text: "With an electrifying stage presence, Artist Four's live shows are legendary, captivating audiences worldwide.",
-        youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     }
 ];
 
@@ -45,7 +40,6 @@ export async function getMuseumContent(): Promise<MuseumWall[]> {
             walls.push({
                 id: doc.id,
                 ...data,
-                youtubeUrl: data.youtubeUrl || "",
             } as MuseumWall);
         });
         return walls;
@@ -57,7 +51,6 @@ export async function getMuseumContent(): Promise<MuseumWall[]> {
         walls.push({ 
             id: doc.id, 
             ...data,
-            youtubeUrl: data.youtubeUrl || "",
         } as MuseumWall);
     });
     

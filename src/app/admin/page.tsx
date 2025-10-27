@@ -3,7 +3,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from 'react';
@@ -91,10 +90,6 @@ export default function AdminPage() {
                                         <Skeleton className="h-4 w-1/6" />
                                         <Skeleton className="h-20 w-full" />
                                     </div>
-                                     <div className="space-y-2">
-                                        <Skeleton className="h-4 w-1/6" />
-                                        <Skeleton className="h-10 w-full" />
-                                    </div>
                                  </div>
                             ))
                         )}
@@ -120,7 +115,7 @@ export default function AdminPage() {
             <CardHeader>
             <CardTitle>Museum Content</CardTitle>
             <CardDescription>
-                Edit the text paragraph and YouTube video for the four walls of the 3D museum.
+                Edit the text paragraph for the four walls of the 3D museum.
             </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -130,12 +125,7 @@ export default function AdminPage() {
                         
                         <div className="space-y-2">
                           <Label htmlFor={`walls[${index}].text`}>Text Paragraph</Label>
-                          <Textarea {...register(`walls.${index}.text`)} id={`walls[${index}].text`} rows={3} />
-                        </div>
-                        
-                        <div className="space-y-2">
-                            <Label htmlFor={`walls[${index}].youtubeUrl`}>YouTube Embed URL</Label>
-                            <Input {...register(`walls.${index}.youtubeUrl`)} id={`walls[${index}].youtubeUrl`} placeholder="e.g., https://www.youtube.com/embed/VIDEO_ID" />
+                          <Textarea {...register(`walls.${index}.text`)} id={`walls[${index}].text`} rows={5} />
                         </div>
                     </div>
                 ))}
