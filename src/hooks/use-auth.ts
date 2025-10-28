@@ -2,8 +2,9 @@
 'use client';
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { auth } from '@/lib/firebase';
+import app from '@/lib/firebase';
 import { 
+  getAuth,
   onAuthStateChanged, 
   User as FirebaseUser,
   createUserWithEmailAndPassword,
@@ -51,7 +52,9 @@ const formatUser = (user: FirebaseUser): User => {
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null | undefined>(undefined);
-  const isFirebaseReady = !!auth;
+  const [auth, setAuth] = useState(app ? getAuth(app) : null);
+  
+  const isFirebaseReady = !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY && !!auth;
 
   useEffect(() => {
     if (!isFirebaseReady) {
@@ -80,7 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, [isFirebaseReady]);
+  }, [isFirebaseReady, auth]);
 
   const login = async (email: string, pass: string) => {
     if (!auth) throw new Error('Firebase is not configured.');
@@ -107,5 +110,3 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return React.createElement(AuthContext.Provider, { value }, children);
 };
-
-    

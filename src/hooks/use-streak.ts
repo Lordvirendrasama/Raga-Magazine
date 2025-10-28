@@ -3,8 +3,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from './use-auth';
-import { db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import app from '@/lib/firebase';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
 
 // Helper to get date in YYYY-MM-DD format
@@ -20,6 +20,7 @@ interface StreakData {
 export const useStreak = () => {
   const { user } = useAuth();
   const [streak, setStreak] = useState(0);
+  const [db, setDb] = useState(app ? getFirestore(app) : null);
 
   useEffect(() => {
     if (typeof window === 'undefined' || user === undefined) {
@@ -48,7 +49,7 @@ export const useStreak = () => {
 
     const updateStreak = async () => {
         try {
-            if (user) {
+            if (user && db) {
                 // Logged-in user logic (Firestore)
                 const streakRef = doc(db, 'streaks', user.uid);
                 const streakSnap = await getDoc(streakRef);
@@ -77,7 +78,7 @@ export const useStreak = () => {
 
     updateStreak();
 
-  }, [user]);
+  }, [user, db]);
 
   const { title, message } = useMemo(() => {
     if (streak >= 30) {
