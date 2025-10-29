@@ -29,7 +29,7 @@ export default function PlaylistsPage() {
       try {
         const playlistCategory = await getCategoryBySlug('playlists');
         if (!playlistCategory) {
-          console.error("Playlist category not found.");
+          console.error("The 'playlists' category was not found in your WordPress site. Please create it and add posts to it.");
           setPlaylists([]);
           setLoading(false);
           return;

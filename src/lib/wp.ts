@@ -76,8 +76,11 @@ export async function getCategories() {
 }
 
 export async function getCategoryBySlug(slug:string) {
-    const categories = await getCategories();
-    return categories.find((cat: any) => cat.slug === slug) || null;
+    const result = await fetchAPI(`/wp/v2/categories?slug=${slug}`);
+    if (result && Array.isArray(result) && result.length > 0) {
+        return result[0];
+    }
+    return null;
 }
 
 export async function getTags() {
