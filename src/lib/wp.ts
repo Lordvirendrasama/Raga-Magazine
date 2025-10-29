@@ -36,8 +36,7 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   }
 }
 
-// Fetches raw, untransformed post objects from the WP API.
-export async function getRawPosts(params: Record<string, any> = {}): Promise<any[]> {
+export async function getPosts(params: Record<string, any> = {}): Promise<Post[]> {
   const apiPath = `/wp/v2/posts`;
   
   const defaultParams: Record<string, string> = {
@@ -55,18 +54,17 @@ export async function getRawPosts(params: Record<string, any> = {}): Promise<any
   if (!result || !Array.isArray(result)) {
     return [];
   }
-  return result;
-}
-
-export async function getPosts(params: Record<string, any> = {}): Promise<Post[]> {
-  const result = await getRawPosts(params);
   return result.map(transformPost).filter(p => p !== null) as Post[];
 }
 
 export async function getPostBySlug(slug: string) {
-    const data = await getRawPosts({ slug: slug, per_page: 1 });
+    const data = await getPosts({ slug: slug, per_page: 1 });
     if (data && data.length > 0) {
-        return data[0];
+        // Since getPosts returns transformed posts, we need to fetch the raw post for full content
+        const rawPosts = await fetchAPI(`/wp/v2/posts?slug=${slug}&_embed=1`);
+        if (rawPosts && rawPosts.length > 0) {
+            return rawPosts[0];
+        }
     }
     return null;
 }
