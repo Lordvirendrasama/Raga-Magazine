@@ -16,9 +16,9 @@ interface NavLink {
 }
 
 const fallbackLinks: NavLink[] = [
-  { name: 'Technology', href: '/category/technology' },
-  { name: 'Culture', href: '/category/culture' },
-  { name: 'Design', href: '/category/design' },
+  { name: 'Featured', href: '/category/featured' },
+  { name: 'Fun Reads', href: '/category/fun-reads' },
+  { name: 'News', href: '/category/news' },
 ];
 
 const allStaticLinks: NavLink[] = [
@@ -34,23 +34,34 @@ export function Header() {
   useEffect(() => {
     async function fetchMenu() {
       try {
-        const baseLinks = [...allStaticLinks];
+        const baseLinks = [...allStaticFunctions];
         
-        const categories = await getCategories();
+        const categories = await getCategories({per_page: 10});
         if (categories && categories.length > 0) {
-            const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0 && cat.slug !== 'playlists' && cat.slug !== 'live');
-            const links = filteredCategories.slice(0,3).map((cat: any) => ({
+            const dynamicSlugs = ['featured', 'fun-reads', 'news'];
+            const staticSlugs = baseLinks.map(l => l.href.split('/').pop());
+
+            const filteredCategories = categories.filter((cat: any) => 
+                dynamicSlugs.includes(cat.slug) && 
+                cat.name !== 'Uncategorized' && 
+                cat.count > 0
+            );
+
+            const links = filteredCategories.map((cat: any) => ({
               name: cat.name,
               href: `/category/${cat.slug}`,
             }));
-            setNavLinks([...links, ...baseLinks]);
+            
+            // If fetching works, use fetched names, otherwise stick with fallbacks
+            const finalDynamicLinks = links.length > 0 ? links : fallbackLinks;
+
+            setNavLinks([...finalDynamicLinks, ...baseLinks]);
         } else {
              setNavLinks([...fallbackLinks, ...baseLinks]);
         }
       } catch (error) {
         console.error('Failed to fetch categories for header, using fallback:', error);
-        const baseLinks = [...allStaticLinks];
-        setNavLinks([...fallbackLinks, ...baseLinks]);
+        setNavLinks([...fallbackLinks, ...allStaticLinks]);
       }
     }
     fetchMenu();

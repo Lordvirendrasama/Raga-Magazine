@@ -13,9 +13,9 @@ interface CategoryLink {
 }
 
 const fallbackLinks: CategoryLink[] = [
-    { name: 'Technology', href: '/category/technology' },
-    { name: 'Culture', href: '/category/culture' },
-    { name: 'Design', href: '/category/design' },
+    { name: 'Featured', href: '/category/featured' },
+    { name: 'Fun Reads', href: '/category/fun-reads' },
+    { name: 'News', href: '/category/news' },
 ];
 
 const allStaticLinks: CategoryLink[] = [
@@ -32,14 +32,30 @@ export function Footer() {
 
     async function fetchLinks() {
       try {
-        const categories = await getCategories();
+        const categories = await getCategories({per_page: 10});
         if (categories && categories.length > 0) {
-            const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0 && cat.slug !== 'playlists' && cat.slug !== 'live');
-            const categoryLinks = filteredCategories.slice(0, 3).map((cat: any) => ({
+            const dynamicSlugs = ['featured', 'fun-reads', 'news'];
+            const staticSlugs = allStaticLinks.map(l => l.href.split('/').pop());
+            const allSlugs = [...dynamicSlugs, ...staticSlugs];
+
+            const filteredCategories = categories.filter((cat: any) => 
+                allSlugs.includes(cat.slug) &&
+                cat.name !== 'Uncategorized' && 
+                cat.count > 0
+            );
+
+            const categoryLinks = filteredCategories.map((cat: any) => ({
               name: cat.name,
               href: `/category/${cat.slug}`,
             }));
-            setNavLinks([...categoryLinks, ...allStaticLinks]);
+            
+            // Re-order to match desired nav order and include fallbacks for missing items
+            const finalNavLinks = [
+                ...dynamicSlugs.map(slug => categoryLinks.find(l => l.href.endsWith(slug)) || fallbackLinks.find(f => f.href.endsWith(slug))),
+                ...allStaticLinks.map(link => categoryLinks.find(l => l.href === link.href) || link),
+            ].filter(Boolean) as CategoryLink[];
+            
+            setNavLinks(finalNavLinks);
         }
       } catch (error) {
         console.error('Failed to fetch categories for footer, using fallback:', error);
