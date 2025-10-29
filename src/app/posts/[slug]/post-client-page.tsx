@@ -13,10 +13,12 @@ import { getFeaturedImage } from '@/lib/wp';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Post } from '@/components/article-card';
 import { SidebarTopStories } from '@/components/sidebar-top-stories';
+import { RelatedArticles } from '@/components/related-articles';
 
 export default function PostClientPage({ slug }: { slug: string }) {
   const [postData, setPostData] = useState<any>(null); // Keep as any to handle raw WP object
   const [sidebarPosts, setSidebarPosts] = useState<Post[]>([]);
+  const [relatedPosts, setRelatedPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,6 +37,15 @@ export default function PostClientPage({ slug }: { slug: string }) {
         }
         setPostData(post);
         setSidebarPosts(trending.map(p => transformPost(p)).filter(p => p !== null) as Post[]);
+
+        const categoryId = post._embedded?.['wp:term']?.[0]?.[0]?.id;
+        if (categoryId) {
+          const related = await getPosts({ categories: categoryId, per_page: 4 });
+          const filteredRelated = related
+            .map(p => transformPost(p))
+            .filter(p => p !== null && p.id !== post.id) as Post[];
+          setRelatedPosts(filteredRelated.slice(0, 3));
+        }
 
       } catch (error) {
         console.error(`Failed to fetch post ${slug}:`, error);
@@ -134,6 +145,11 @@ export default function PostClientPage({ slug }: { slug: string }) {
                     </div>
                   </div>
                 )}
+                 {relatedPosts.length > 0 && (
+                    <div className="mt-12 border-t pt-8">
+                        <RelatedArticles posts={relatedPosts} />
+                    </div>
+                 )}
             </div>
             <div className="lg:col-span-1">
                 <SidebarTopStories posts={sidebarPosts} />
