@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from './use-auth';
-import app from '@/lib/firebase';
+import app from '@/lib/firebaseconfig';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
 
