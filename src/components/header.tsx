@@ -9,6 +9,7 @@ import { SearchOverlay } from './search-overlay';
 import { getCategories } from '@/lib/wp';
 import { ThemeToggle } from './theme-toggle';
 import { MuteToggle } from './mute-toggle';
+import { Input } from '@/components/ui/input';
 
 interface NavLink {
   name: string;
@@ -34,30 +35,28 @@ export function Header() {
   useEffect(() => {
     async function fetchMenu() {
       try {
-        const baseLinks = [...allStaticLinks];
-        
         const categories = await getCategories({per_page: 10});
         if (categories && categories.length > 0) {
             const dynamicSlugs = ['featured', 'fun-reads', 'news'];
-            const staticSlugs = baseLinks.map(l => l.href.split('/').pop());
-
-            const filteredCategories = categories.filter((cat: any) => 
+            
+            const filteredDynamicCategories = categories.filter((cat: any) => 
                 dynamicSlugs.includes(cat.slug) && 
                 cat.name !== 'Uncategorized' && 
                 cat.count > 0
             );
 
-            const links = filteredCategories.map((cat: any) => ({
+            const dynamicLinks = filteredDynamicCategories.map((cat: any) => ({
               name: cat.name,
               href: `/category/${cat.slug}`,
             }));
             
-            // If fetching works, use fetched names, otherwise stick with fallbacks
-            const finalDynamicLinks = links.length > 0 ? links : fallbackLinks;
+            const finalDynamicLinks = fallbackLinks.map(fallback => 
+                dynamicLinks.find(l => l.href.endsWith(fallback.href.split('/').pop()!)) || fallback
+            );
 
-            setNavLinks([...finalDynamicLinks, ...baseLinks]);
+            setNavLinks([...finalDynamicLinks, ...allStaticLinks]);
         } else {
-             setNavLinks([...fallbackLinks, ...baseLinks]);
+             setNavLinks([...fallbackLinks, ...allStaticLinks]);
         }
       } catch (error) {
         console.error('Failed to fetch categories for header, using fallback:', error);
@@ -88,18 +87,33 @@ export function Header() {
             </Link>
           </div>
           <nav className="hidden md:flex md:items-center md:gap-4 lg:gap-6">
-            {navLinks.map((link, index) => (
+            {navLinks.map((link) => (
               <Link key={link.name} href={link.href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
                 {link.name}
               </Link>
             ))}
           </nav>
           <div className="flex items-center gap-0.5 md:gap-2">
+            <div 
+                className="relative w-10 md:w-40 lg:w-64 transition-all duration-300 ease-in-out"
+                onFocus={() => setIsSearchOpen(true)}
+            >
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                    type="search"
+                    placeholder="Search..."
+                    className="h-9 w-full rounded-full bg-muted pl-9 pr-3 md:bg-background"
+                    onClick={() => setIsSearchOpen(true)}
+                    onKeyDown={(e) => {
+                        if (e.key) {
+                            setIsSearchOpen(true);
+                        }
+                    }}
+                    readOnly 
+                />
+            </div>
             <MuteToggle />
             <ThemeToggle />
-            <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)} aria-label="Open search">
-              <Search className="h-5 w-5" />
-            </Button>
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
@@ -108,7 +122,7 @@ export function Header() {
         {isMenuOpen && (
           <div className="absolute top-16 left-0 w-full h-[calc(100vh-4rem)] bg-background z-50 md:hidden">
             <nav className="flex flex-col items-center gap-2 p-4">
-              {navLinks.map((link, index) => (
+              {navLinks.map((link) => (
                 <Link key={link.name} href={link.href} className="w-full rounded-md py-3 text-center text-lg font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground" onClick={() => setIsMenuOpen(false)}>
                   {link.name}
                 </Link>
