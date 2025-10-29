@@ -27,7 +27,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
       setIsLoading(true);
       try {
         const results = await getPosts({ search: term, per_page: 10 });
-        setFilteredPosts(results.map(transformPost));
+        setFilteredPosts(results.map(transformPost).filter(p => p !== null) as Post[]);
       } catch (error) {
         console.error("Search failed:", error);
         setFilteredPosts([]);
@@ -99,7 +99,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               )}
               <div className="space-y-4">
                 {filteredPosts.map((post, index) => {
-                  const href = post.isEvent ? `/events/${post.slug}` : `/posts/${post.slug}`;
+                  const href = `/posts/${post.slug}`;
                   return (
                     <Link href={href} key={post.id} onClick={handleClose} className="group flex items-center gap-4 rounded-lg p-2 transition-colors hover:bg-accent/50">
                       <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md">

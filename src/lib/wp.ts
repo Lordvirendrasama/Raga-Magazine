@@ -37,21 +37,13 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   }
 }
 
-export async function getPosts(params: Record<string, any> = {}, postType: string = 'posts'): Promise<Post[]> {
-  const isEventsCalendar = postType === 'event';
-  const apiPath = isEventsCalendar ? '/tribe/events/v1/events' : `/wp/v2/${postType}`;
+export async function getPosts(params: Record<string, any> = {}): Promise<Post[]> {
+  const apiPath = `/wp/v2/posts`;
   
   const defaultParams: Record<string, string> = {};
 
-  if (isEventsCalendar) {
-    defaultParams['status'] = 'publish';
-    if (!params.per_page) {
-        params.per_page = 100;
-    }
-  } else {
-    defaultParams['per_page'] = params.per_page || '12';
-    defaultParams['_embed'] = '1';
-  }
+  defaultParams['per_page'] = params.per_page || '12';
+  defaultParams['_embed'] = '1';
 
   const query = new URLSearchParams({
     ...defaultParams,
@@ -60,16 +52,11 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
 
   const result = await fetchAPI(`${apiPath}?${query.toString()}`);
   
-  if (!result) {
+  if (!result || !Array.isArray(result)) {
     return [];
   }
 
-  const postsData = isEventsCalendar ? result.events : result;
-  if (!Array.isArray(postsData)) {
-    return [];
-  }
-
-  return postsData.map(transformPost).filter(p => p !== null) as Post[];
+  return result.map(transformPost).filter(p => p !== null) as Post[];
 }
 
 export async function getPostBySlug(slug: string) {
@@ -78,14 +65,6 @@ export async function getPostBySlug(slug: string) {
         return data[0];
     }
     return null;
-}
-
-export async function getEventBySlug(slug: string) {
-  const result = await fetchAPI(`/tribe/events/v1/events/by-slug/${slug}`);
-  if (result) {
-    return result;
-  }
-  return null;
 }
 
 export async function getCategories() {
@@ -113,24 +92,16 @@ export function getFeaturedImage(post: any): { url: string; hint?: string } {
       return defaultImage;
     }
     
-    // 1. Check for event image (from /tribe/events/v1/events)
-    if (post.image && post.image.url) {
-        return { url: post.image.url, hint: post.slug };
-    }
-
-    // 2. Check for standard embedded featured media (from /wp/v2/posts)
     const featuredMedia = post._embedded?.['wp:featuredmedia']?.[0];
     if (featuredMedia && featuredMedia.source_url) {
         return { url: featuredMedia.source_url, hint: post.slug };
     }
     
-    // 3. Fallback to placeholder if no image is found, using post ID for variety
     if (post.id) {
         const index = post.id % placeholderImages.images.length;
         return placeholderImages.images[index] || defaultImage;
     }
 
-    // 4. Ultimate fallback
     return defaultImage;
 }
 
@@ -139,43 +110,27 @@ export function transformPost(wpPost: any): Post | null {
     return null;
   }
 
-  const isEvent = wpPost?.type === 'tribe_events' || wpPost?.hasOwnProperty('start_date');
-
-  const title = decode(wpPost?.title?.rendered || wpPost?.title || 'Untitled');
-  const excerpt = decode((wpPost?.excerpt?.rendered || wpPost?.description || '').replace(/<[^>]+>/g, ''));
+  const title = decode(wpPost?.title?.rendered || 'Untitled');
+  const excerpt = decode((wpPost?.excerpt?.rendered || '').replace(/<[^>]+>/g, ''));
   
   let category = 'Uncategorized';
-  if (isEvent) {
-    if (wpPost.categories && wpPost.categories.length > 0) {
-      category = wpPost.categories[0].name;
-    } else {
-      category = 'Event';
-    }
-  } else {
-    const terms = wpPost?._embedded?.['wp:term']?.[0];
-    if (terms && Array.isArray(terms) && terms.length > 0) {
-        const categoryTerm = terms.find((term: any) => term.taxonomy === 'category' && term.slug !== 'uncategorized');
-        if (categoryTerm) {
-          category = categoryTerm.name;
-        }
-    }
+  const terms = wpPost?._embedded?.['wp:term']?.[0];
+  if (terms && Array.isArray(terms) && terms.length > 0) {
+      const categoryTerm = terms.find((term: any) => term.taxonomy === 'category' && term.slug !== 'uncategorized');
+      if (categoryTerm) {
+        category = categoryTerm.name;
+      }
   }
 
   const slug = wpPost.slug || '';
   
-  const authorName = wpPost?._embedded?.author?.[0]?.name || wpPost?.author?.display_name || 'RagaMagazine Staff';
+  const authorName = wpPost?._embedded?.author?.[0]?.name || 'RagaMagazine Staff';
   const authorAvatar = wpPost?._embedded?.author?.[0]?.avatar_urls?.['96'] || 'https://secure.gravatar.com/avatar/?s=96&d=mm&r=g';
 
   let tags: string[] = [];
-  if (isEvent) {
-    if (wpPost.tags && Array.isArray(wpPost.tags)) {
-      tags = wpPost.tags.map((tag: any) => tag.name);
-    }
-  } else {
-    const wpTags = wpPost?._embedded?.['wp:term']?.[1] || [];
-    if (Array.isArray(wpTags)) {
-      tags = wpTags.map((tag: any) => tag.name);
-    }
+  const wpTags = wpPost?._embedded?.['wp:term']?.[1] || [];
+  if (Array.isArray(wpTags)) {
+    tags = wpTags.map((tag: any) => tag.name);
   }
   
   if (wpPost.tags?.nodes) { // Handle GraphQL-like tag structure if present
@@ -195,10 +150,9 @@ export function transformPost(wpPost: any): Post | null {
       name: authorName,
       avatarUrl: authorAvatar,
     },
-    date: wpPost.start_date || wpPost.date_gmt,
+    date: wpPost.date_gmt,
     excerpt,
     tags,
     views: 0,
-    isEvent,
   };
 }

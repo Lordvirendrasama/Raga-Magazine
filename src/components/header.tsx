@@ -22,7 +22,7 @@ const fallbackLinks: NavLink[] = [
 ];
 
 const allStaticLinks: NavLink[] = [
-  { name: 'Events', href: '/events' },
+  { name: 'Playlists', href: '/playlists' },
 ];
 
 export function Header() {

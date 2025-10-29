@@ -76,7 +76,6 @@ export interface Post {
   fullContent?: string; // Optional full content for gallery
   tags: string[];
   views: number;
-  isEvent?: boolean;
 }
 
 interface ArticleCardProps extends VariantProps<typeof cardVariants> {
@@ -85,7 +84,7 @@ interface ArticleCardProps extends VariantProps<typeof cardVariants> {
 }
 
 export function ArticleCard({ post, variant, className }: ArticleCardProps) {
-  const href = post.isEvent ? `/events/${post.slug}` : `/posts/${post.slug}`;
+  const href = `/posts/${post.slug}`;
   const [isHovering, setIsHovering] = useState(false);
 
   return (

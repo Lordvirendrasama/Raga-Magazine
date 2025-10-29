@@ -30,7 +30,7 @@ export function SidebarTopStories({ posts }: SidebarTopStoriesProps) {
       </h2>
       <div className="space-y-6">
         {posts.map((post, index) => (
-          <Link href={post.isEvent ? `/events/${post.slug}` : `/posts/${post.slug}`} key={post.id} className="group flex items-start gap-4">
+          <Link href={`/posts/${post.slug}`} key={post.id} className="group flex items-start gap-4">
             <span className="font-headline text-3xl font-bold text-muted-foreground">
               {String(index + 1).padStart(2, '0')}
             </span>
