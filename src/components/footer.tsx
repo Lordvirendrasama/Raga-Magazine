@@ -19,8 +19,8 @@ const fallbackLinks: CategoryLink[] = [
 ];
 
 const allStaticLinks: CategoryLink[] = [
-  { name: 'Playlists', href: '/playlists' },
-  { name: 'Live', href: '/live' },
+  { name: 'Playlists', href: '/category/playlists' },
+  { name: 'Live', href: '/category/live' },
 ];
 
 export function Footer() {
@@ -34,7 +34,7 @@ export function Footer() {
       try {
         const categories = await getCategories();
         if (categories && categories.length > 0) {
-            const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0);
+            const filteredCategories = categories.filter((cat: any) => cat.name !== 'Uncategorized' && cat.count > 0 && cat.slug !== 'playlists' && cat.slug !== 'live');
             const categoryLinks = filteredCategories.slice(0, 3).map((cat: any) => ({
               name: cat.name,
               href: `/category/${cat.slug}`,
