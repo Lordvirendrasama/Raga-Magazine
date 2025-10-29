@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Search, Menu, X } from 'lucide-react';
+import { Search, Menu, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchOverlay } from './search-overlay';
 import { getCategories } from '@/lib/wp';
@@ -113,6 +113,11 @@ export function Header() {
                     readOnly 
                 />
             </div>
+            <Link href="/admin">
+              <Button variant="ghost" size="icon" aria-label="Admin Dashboard">
+                <User className="h-5 w-5" />
+              </Button>
+            </Link>
             <MuteToggle />
             <ThemeToggle />
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
