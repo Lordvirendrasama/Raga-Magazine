@@ -29,7 +29,6 @@ import {
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { createSubmission } from '@/lib/submissions';
 import { Loader2 } from 'lucide-react';
 
 const GENRES = ['Pop', 'Rock', 'Indie', 'Electronic', 'Hip-Hop', 'Classical', 'Other'];
@@ -50,7 +49,6 @@ const formSchema = z.object({
 
 export function SubmitMusicForm() {
   const { toast } = useToast();
-  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -65,27 +63,37 @@ export function SubmitMusicForm() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    try {
-      await createSubmission(values);
-      toast({
-        title: 'Submission Received!',
-        description: "Thanks for sending your music! Our editorial team will review it soon.",
-        variant: 'default',
-      });
-      form.reset();
-      router.refresh();
-    } catch (error) {
-      console.error('Submission failed:', error);
-      toast({
-        title: 'Submission Failed',
-        description: 'Something went wrong. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    
+    const recipient = 'theragamagazine@gmail.com';
+    const subject = `Music Submission: ${values.artistName}`;
+    const body = `
+      Artist Name: ${values.artistName}
+      Genre: ${values.genre}
+      Streaming Link: ${values.streamingLink}
+      Contact Email: ${values.contactEmail}
+      Instagram: ${values.instagramHandle || 'N/A'}
+
+      Bio:
+      ${values.bio}
+
+      ---
+      Agreed to terms: ${values.agreeToTerms ? 'Yes' : 'No'}
+    `;
+
+    const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    window.location.href = mailtoLink;
+
+    toast({
+      title: 'Opening Email Client',
+      description: "Please send the pre-filled email to complete your submission.",
+      variant: 'default',
+    });
+    
+    form.reset();
+    setIsSubmitting(false);
   }
 
   return (
@@ -220,7 +228,7 @@ export function SubmitMusicForm() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Submitting...
+                      Opening Email...
                     </>
                   ) : (
                     'Send My Music'
