@@ -4,7 +4,9 @@
 import Link from 'next/link';
 import { type Post } from './article-card';
 import { Badge } from './ui/badge';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Music, Mic } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
+import { Button } from './ui/button';
 
 interface SidebarTopStoriesProps {
   posts: Post[];
@@ -12,8 +14,8 @@ interface SidebarTopStoriesProps {
 
 export function SidebarTopStories({ posts }: SidebarTopStoriesProps) {
   return (
-    <aside className="sticky top-20">
-      <div className="mb-8">
+    <aside className="sticky top-20 space-y-8">
+      <div>
         <iframe
           style={{ borderRadius: '12px' }}
           src="https://open.spotify.com/embed/playlist/3uyM6sSqMepnevczhOfxUT?utm_source=generator&theme=0"
@@ -25,25 +27,50 @@ export function SidebarTopStories({ posts }: SidebarTopStoriesProps) {
           loading="lazy"
         ></iframe>
       </div>
-      <h2 className="mb-6 font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-        Top Stories
-      </h2>
-      <div className="space-y-6">
-        {posts.map((post, index) => (
-          <Link href={`/posts/${post.slug}`} key={post.id} className="group flex items-start gap-4">
-            <span className="font-headline text-3xl font-bold text-muted-foreground">
-              {String(index + 1).padStart(2, '0')}
-            </span>
-            <div className="flex-1">
-              <h3 className="font-semibold leading-tight group-hover:text-accent">{post.title}</h3>
-              <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                <span>{post.author.name}</span>
-                <Badge variant="outline">{post.category}</Badge>
+
+      <Card className="bg-accent/10 border-accent/30">
+        <CardHeader className="flex-row items-center gap-4 space-y-0">
+          <div className="grid h-12 w-12 place-items-center rounded-full bg-accent text-accent-foreground">
+            <Mic className="h-6 w-6" />
+          </div>
+          <div>
+            <CardTitle className="text-xl font-headline">Submit Your Music</CardTitle>
+            <CardDescription className="text-muted-foreground">Get your sound featured</CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Are you an artist or band? We want to hear from you! Submit your music for a chance to be featured on RagaMagazine.
+          </p>
+          <Button asChild className="w-full" variant="default">
+            <Link href="/submit-your-music">
+              Submit Now <ArrowUpRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
+
+      <div>
+        <h2 className="mb-6 font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+          Top Stories
+        </h2>
+        <div className="space-y-6">
+          {posts.map((post, index) => (
+            <Link href={`/posts/${post.slug}`} key={post.id} className="group flex items-start gap-4">
+              <span className="font-headline text-3xl font-bold text-muted-foreground">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <div className="flex-1">
+                <h3 className="font-semibold leading-tight group-hover:text-accent">{post.title}</h3>
+                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>{post.author.name}</span>
+                  <Badge variant="outline">{post.category}</Badge>
+                </div>
               </div>
-            </div>
-            <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-          </Link>
-        ))}
+              <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+            </Link>
+          ))}
+        </div>
       </div>
     </aside>
   );
