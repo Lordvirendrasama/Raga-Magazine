@@ -16,6 +16,13 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 
   if (!res.ok) {
     console.error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
+    // Try to get more error info from body
+    try {
+      const errorBody = await res.json();
+      console.error('Error body:', errorBody);
+    } catch(e) {
+       // Ignore if body isn't json
+    }
     return null;
   }
   const text = await res.text();
@@ -38,10 +45,8 @@ export async function getPosts(params: Record<string, any> = {}, postType: strin
 
   if (isEventsCalendar) {
     defaultParams['status'] = 'publish';
-    // The events API might not use per_page in the same way, or we want all of them for the calendar.
-    // So we don't set a per_page limit for events unless it's explicitly passed in params.
     if (!params.per_page) {
-        delete params.per_page; 
+        params.per_page = 100;
     }
   } else {
     defaultParams['per_page'] = params.per_page || '12';
@@ -190,7 +195,7 @@ export function transformPost(wpPost: any): Post | null {
       name: authorName,
       avatarUrl: authorAvatar,
     },
-    date: wpPost.date_gmt || wpPost.start_date,
+    date: wpPost.start_date || wpPost.date_gmt,
     excerpt,
     tags,
     views: 0,
