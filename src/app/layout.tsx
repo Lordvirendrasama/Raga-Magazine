@@ -11,8 +11,6 @@ import { PageFlipper } from '@/components/page-flipper';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { MuteProvider } from '@/hooks/use-mute';
-import { AuthProvider } from '@/hooks/use-auth';
-import StreakPopup from '@/components/streak-popup';
 import { useState, useEffect } from 'react';
 import LoadingScreen from '@/components/loading-screen';
 import { GlobalLinkSound } from '@/components/global-link-sound';
@@ -44,25 +42,22 @@ export default function RootLayout({
         {isLoading && <LoadingScreen />}
         <div className={cn('transition-opacity duration-500', isLoading ? 'opacity-0' : 'opacity-100')}>
           <MuteProvider>
-            <AuthProvider>
-              <ThemeProvider
-                  attribute="class"
-                  defaultTheme="dark"
-                  enableSystem
-                  disableTransitionOnChange
-              >
-                <Header />
-                <main className="flex-1 flex flex-col relative z-10">
-                  <MouseFollower />
-                  <PageFlipper>{children}</PageFlipper>
-                </main>
-                <StreakPopup />
-                <Footer />
-                <Marquee />
-                <Toaster />
-                <GlobalLinkSound />
-              </ThemeProvider>
-            </AuthProvider>
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="dark"
+                enableSystem
+                disableTransitionOnChange
+            >
+              <Header />
+              <main className="flex-1 flex flex-col relative z-10">
+                <MouseFollower />
+                <PageFlipper>{children}</PageFlipper>
+              </main>
+              <Footer />
+              <Marquee />
+              <Toaster />
+              <GlobalLinkSound />
+            </ThemeProvider>
           </MuteProvider>
         </div>
       </body>

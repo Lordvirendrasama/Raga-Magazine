@@ -9,9 +9,6 @@ import { SearchOverlay } from './search-overlay';
 import { getCategories } from '@/lib/wp';
 import { ThemeToggle } from './theme-toggle';
 import { MuteToggle } from './mute-toggle';
-import { StreakCounter } from './streak-counter';
-import { UserAuth } from './user-auth';
-import { useAuth } from '@/hooks/use-auth';
 
 interface NavLink {
   name: string;
@@ -29,7 +26,6 @@ const allStaticLinks: NavLink[] = [
 ];
 
 export function Header() {
-  const { user } = useAuth();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [navLinks, setNavLinks] = useState<NavLink[]>([...fallbackLinks, ...allStaticLinks]);
@@ -57,7 +53,7 @@ export function Header() {
       }
     }
     fetchMenu();
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -78,7 +74,6 @@ export function Header() {
             <Link href="/" className="flex items-center gap-2">
               <h1 className="font-headline text-xl font-bold tracking-tighter md:text-2xl">RagaMagazine</h1>
             </Link>
-            <StreakCounter />
           </div>
           <nav className="hidden md:flex md:items-center md:gap-4 lg:gap-6">
             {navLinks.map((link, index) => (
@@ -88,7 +83,6 @@ export function Header() {
             ))}
           </nav>
           <div className="flex items-center gap-0.5 md:gap-2">
-            <UserAuth />
             <MuteToggle />
             <ThemeToggle />
             <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)} aria-label="Open search">
