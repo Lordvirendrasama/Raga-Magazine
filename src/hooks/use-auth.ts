@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import app from '@/lib/firebaseconfig';
+import { getFirebaseApp } from '@/lib/firebaseconfig';
 import { 
   getAuth,
   onAuthStateChanged, 
@@ -12,7 +12,8 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithRedirect,
-  getRedirectResult
+  getRedirectResult,
+  type Auth
 } from 'firebase/auth';
 
 interface User {
@@ -52,16 +53,23 @@ const formatUser = (user: FirebaseUser): User => {
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null | undefined>(undefined);
-  const [auth, setAuth] = useState(app ? getAuth(app) : null);
-  
-  const isFirebaseReady = !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY && !!auth;
+  const [auth, setAuth] = useState<Auth | null>(null);
+  const [isFirebaseReady, setIsFirebaseReady] = useState(false);
 
   useEffect(() => {
-    if (!isFirebaseReady) {
+    const app = getFirebaseApp();
+    if (app) {
+      setAuth(getAuth(app));
+      setIsFirebaseReady(true);
+    } else {
+      setIsFirebaseReady(false);
       setUser(null); // Firebase is not configured, so no user.
       console.warn("Firebase is not configured. Please check your environment variables.");
-      return;
     }
+  }, []);
+  
+  useEffect(() => {
+    if (!isFirebaseReady || !auth) return;
 
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {

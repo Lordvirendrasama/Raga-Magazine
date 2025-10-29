@@ -1,5 +1,5 @@
 
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,7 +10,16 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// A function to get the initialized Firebase app, or initialize it if it doesn't exist.
+export function getFirebaseApp(): FirebaseApp | null {
+  // Return null if Firebase is not configured.
+  if (!firebaseConfig.apiKey) {
+    return null;
+  }
 
-export default app;
+  if (!getApps().length) {
+    return initializeApp(firebaseConfig);
+  } else {
+    return getApp();
+  }
+}
