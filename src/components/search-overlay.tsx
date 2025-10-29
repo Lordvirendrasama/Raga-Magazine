@@ -27,7 +27,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
       setIsLoading(true);
       try {
         const results = await getPosts({ search: term, per_page: 10 });
-        setFilteredPosts(results.map(transformPost).filter(p => p !== null) as Post[]);
+        setFilteredPosts(results.map(p => transformPost(p)).filter(p => p !== null) as Post[]);
       } catch (error) {
         console.error("Search failed:", error);
         setFilteredPosts([]);

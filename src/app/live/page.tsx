@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getPosts, getCategoryBySlug } from '@/lib/wp';
+import { getPosts, getCategoryBySlug, transformPost } from '@/lib/wp';
 import type { Post } from '@/components/article-card';
 import { ArticleCard } from '@/components/article-card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -29,7 +29,7 @@ export default function LivePage() {
 
         setCategoryName(liveCategory.name);
         const fetchedPosts = await getPosts({ categories: liveCategory.id, per_page: 12 });
-        setPosts(fetchedPosts);
+        setPosts(fetchedPosts.map(p => transformPost(p)).filter(p => p !== null) as Post[]);
 
       } catch (error) {
         console.error("Failed to fetch posts for live category:", error);

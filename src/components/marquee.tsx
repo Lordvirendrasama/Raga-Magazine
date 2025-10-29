@@ -4,7 +4,7 @@
 import { Newspaper } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
-import { getPosts, getTags } from '@/lib/wp';
+import { getPosts, getTags, transformPost } from '@/lib/wp';
 import type { Post } from './article-card';
 
 export const Marquee = ({ className }: { className?: string }) => {
@@ -20,7 +20,7 @@ export const Marquee = ({ className }: { className?: string }) => {
         if (featuredTag) {
           const featuredPosts = await getPosts({ tags: featuredTag.id, per_page: 10 });
           if (featuredPosts.length > 0) {
-            setHeadlines(featuredPosts.map((post: Post) => post.title));
+            setHeadlines(featuredPosts.map((post: any) => transformPost(post)?.title || ''));
             setIsLoaded(true);
           } else {
             setHeadlines(["No featured articles found."]);
@@ -29,7 +29,7 @@ export const Marquee = ({ className }: { className?: string }) => {
             // Fallback if 'featured' tag doesn't exist. Fetch latest posts.
             const latestPosts = await getPosts({per_page: 10});
             if (latestPosts.length > 0) {
-                 setHeadlines(latestPosts.map((post: Post) => post.title));
+                 setHeadlines(latestPosts.map((post: any) => transformPost(post)?.title || ''));
                  setIsLoaded(true);
             } else {
                 setHeadlines(["Welcome to RagaMagazine."]);

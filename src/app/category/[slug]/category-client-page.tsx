@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getPosts, getCategoryBySlug } from '@/lib/wp';
+import { getPosts, getCategoryBySlug, transformPost } from '@/lib/wp';
 import { notFound } from 'next/navigation';
 import { ArticleCard, type Post } from '@/components/article-card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,7 +24,7 @@ export default function CategoryClientPage({ slug }: { slug: string }) {
         setCategory(cat);
 
         const fetchedPosts = await getPosts({ categories: cat.id, per_page: 12 });
-        setPosts(fetchedPosts);
+        setPosts(fetchedPosts.map(p => transformPost(p)).filter(p => p !== null) as Post[]);
       } catch (error) {
         console.error(`Failed to fetch data for category ${slug}:`, error);
         setPosts([]);

@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getPostBySlug, getPosts } from '@/lib/wp';
+import { getPostBySlug, getPosts, transformPost } from '@/lib/wp';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { format } from 'date-fns';
@@ -34,7 +34,7 @@ export default function PostClientPage({ slug }: { slug: string }) {
           return;
         }
         setPostData(post);
-        setSidebarPosts(trending);
+        setSidebarPosts(trending.map(p => transformPost(p)).filter(p => p !== null) as Post[]);
 
       } catch (error) {
         console.error(`Failed to fetch post ${slug}:`, error);

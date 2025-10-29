@@ -36,35 +36,31 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   }
 }
 
-export async function getPosts(params: Record<string, any> = {}): Promise<Post[]> {
+export async function getPosts(params: Record<string, any> = {}): Promise<any[]> {
   const apiPath = `/wp/v2/posts`;
   
   const defaultParams: Record<string, string> = {
-    'per_page': params.per_page || '12',
-    '_embed': '1',
+    per_page: params.per_page || '12',
+    _embed: '1',
   };
 
   const query = new URLSearchParams({
     ...defaultParams,
     ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
   });
-
+  
   const result = await fetchAPI(`${apiPath}?${query.toString()}`);
   
   if (!result || !Array.isArray(result)) {
     return [];
   }
-  return result.map(transformPost).filter(p => p !== null) as Post[];
+  return result;
 }
 
 export async function getPostBySlug(slug: string) {
-    const data = await getPosts({ slug: slug, per_page: 1 });
-    if (data && data.length > 0) {
-        // Since getPosts returns transformed posts, we need to fetch the raw post for full content
-        const rawPosts = await fetchAPI(`/wp/v2/posts?slug=${slug}&_embed=1`);
-        if (rawPosts && rawPosts.length > 0) {
-            return rawPosts[0];
-        }
+    const rawPosts = await fetchAPI(`/wp/v2/posts?slug=${slug}&_embed=1`);
+    if (rawPosts && rawPosts.length > 0) {
+        return rawPosts[0];
     }
     return null;
 }
@@ -86,7 +82,7 @@ export async function getCategoryBySlug(slug:string) {
 }
 
 export async function getTags() {
-  const result = await fetchAPI('/wp/v2/tags');
+  const result = await fetchAPI('/wp/v2/tags?_embed=1');
   return Array.isArray(result) ? result : [];
 }
 
@@ -119,11 +115,14 @@ export function transformPost(wpPost: any): Post | null {
   const excerpt = decode((wpPost?.excerpt?.rendered || '').replace(/<[^>]+>/g, ''));
   
   let category = 'Uncategorized';
-  const terms = wpPost?._embedded?.['wp:term']?.[0];
-  if (terms && Array.isArray(terms) && terms.length > 0) {
-      const categoryTerm = terms.find((term: any) => term.taxonomy === 'category' && term.slug !== 'uncategorized');
-      category = categoryTerm ? categoryTerm.name : 'Uncategorized';
+  if (wpPost?._embedded?.['wp:term']?.[0]) {
+      const terms = wpPost._embedded['wp:term'][0];
+      if (terms && Array.isArray(terms) && terms.length > 0) {
+          const categoryTerm = terms.find((term: any) => term.taxonomy === 'category' && term.slug !== 'uncategorized');
+          category = categoryTerm ? categoryTerm.name : 'Uncategorized';
+      }
   }
+
 
   const slug = wpPost.slug || '';
   
@@ -131,9 +130,11 @@ export function transformPost(wpPost: any): Post | null {
   const authorAvatar = wpPost?._embedded?.author?.[0]?.avatar_urls?.['96'] || 'https://secure.gravatar.com/avatar/?s=96&d=mm&r=g';
 
   let tags: string[] = [];
-  const wpTags = wpPost?._embedded?.['wp:term']?.[1] || [];
-  if (Array.isArray(wpTags)) {
-    tags = wpTags.map((tag: any) => tag.name);
+  if (wpPost?._embedded?.['wp:term']?.[1]) {
+      const wpTags = wpPost._embedded['wp:term'][1] || [];
+      if (Array.isArray(wpTags)) {
+        tags = wpTags.map((tag: any) => tag.name);
+      }
   }
   
   if (wpPost.tags?.nodes) { // Handle GraphQL-like tag structure if present

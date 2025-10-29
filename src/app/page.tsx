@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { HeroCarousel } from "@/components/hero-carousel";
 import { MagazineGrid } from "@/components/magazine-grid";
 import { SidebarTopStories } from "@/components/sidebar-top-stories";
-import { getPosts } from "@/lib/wp";
+import { getPosts, transformPost } from "@/lib/wp";
 import type { Post } from "@/components/article-card";
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -17,7 +17,8 @@ export default function Home() {
     async function fetchData() {
       try {
         const fetchedPosts = await getPosts({ per_page: 20 });
-        setPosts(fetchedPosts);
+        const transformed = fetchedPosts.map(p => transformPost(p)).filter(p => p !== null) as Post[];
+        setPosts(transformed);
       } catch (error) {
         console.error('Failed to fetch posts:', error);
       } finally {

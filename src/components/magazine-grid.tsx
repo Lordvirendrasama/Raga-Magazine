@@ -4,10 +4,14 @@
 import { useState, useEffect } from 'react';
 import { ArticleCard, type Post } from './article-card';
 import { Button } from './ui/button';
-import { getPosts } from '@/lib/wp';
+import { getPosts, transformPost } from '@/lib/wp';
 import { Skeleton } from './ui/skeleton';
 
 const POSTS_PER_PAGE = 8;
+
+interface MagazineGridProps {
+  initialPosts: Post[];
+}
 
 export function MagazineGrid({ initialPosts }: MagazineGridProps) {
   const [posts, setPosts] = useState<Post[]>(initialPosts.slice(0, POSTS_PER_PAGE));
@@ -20,10 +24,11 @@ export function MagazineGrid({ initialPosts }: MagazineGridProps) {
     if (initialPosts.length < 20) {
       setLoading(true);
       getPosts({ per_page: 100 }).then(fullPostList => {
-        setAllPosts(fullPostList);
-        const initialSlice = fullPostList.slice(0, POSTS_PER_PAGE);
+        const transformedPosts = fullPostList.map(p => transformPost(p)).filter(p => p !== null) as Post[];
+        setAllPosts(transformedPosts);
+        const initialSlice = transformedPosts.slice(0, POSTS_PER_PAGE);
         setPosts(initialSlice);
-        setHasMore(fullPostList.length > POSTS_PER_PAGE);
+        setHasMore(transformedPosts.length > POSTS_PER_PAGE);
         setLoading(false);
       });
     }
@@ -78,8 +83,4 @@ export function MagazineGrid({ initialPosts }: MagazineGridProps) {
       )}
     </section>
   );
-}
-
-interface MagazineGridProps {
-  initialPosts: Post[];
 }
