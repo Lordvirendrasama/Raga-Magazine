@@ -45,8 +45,9 @@ const formSchema = z.object({
   contactEmail: z.string().email('Please enter a valid email address.'),
   pressPhoto: z
     .instanceof(File)
-    .refine(file => file.size < 5000000, `Max file size is 5MB.`)
-    .refine(file => ["image/jpeg", "image/png", "image/webp"].includes(file.type),
+    .optional()
+    .refine(file => !file || file.size <= 5000000, `Max file size is 5MB.`)
+    .refine(file => !file || ["image/jpeg", "image/png", "image/webp"].includes(file.type),
       "Only .jpg, .png, and .webp formats are supported."
     ),
   agreeToTerms: z.boolean().refine(val => val === true, {
@@ -208,7 +209,7 @@ export function SubmitMusicForm() {
                   name="pressPhoto"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Press Photo</FormLabel>
+                      <FormLabel>Press Photo (Optional)</FormLabel>
                       <FormControl>
                         <Input className="rounded-md file:text-foreground" type="file" {...fileRef} />
                       </FormControl>
