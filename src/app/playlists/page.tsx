@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getPosts, getCategoryBySlug } from '@/lib/wp';
+import { getRawPosts, getCategoryBySlug, transformPost } from '@/lib/wp';
 import type { Post } from '@/components/article-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Music4 } from 'lucide-react';
@@ -12,7 +12,6 @@ interface PlaylistPost extends Post {
   spotifyEmbedUrl?: string;
 }
 
-// Function to extract Spotify embed URL from post content
 function getSpotifyEmbedUrl(content: string): string | undefined {
   if (!content) return undefined;
   const match = content.match(/<iframe.*?src="(https?:\/\/(?:open|embed)\.spotify\.com\/[^"]+)".*?<\/iframe>/);
@@ -27,7 +26,6 @@ export default function PlaylistsPage() {
     async function fetchPlaylists() {
       setLoading(true);
       try {
-        // Use the plural 'playlists' slug as indicated by the WordPress URL structure.
         const playlistCategory = await getCategoryBySlug('playlists');
         
         if (!playlistCategory) {
@@ -37,15 +35,19 @@ export default function PlaylistsPage() {
           return;
         }
         
-        // Fetch posts from the "playlists" category
-        const rawPosts = await getPosts({ categories: playlistCategory.id, per_page: 12 });
+        // Fetch raw posts to ensure we get the full content for iframe parsing
+        const rawPosts = await getRawPosts({ categories: playlistCategory.id, per_page: 12 });
         
         const playlistPosts: PlaylistPost[] = rawPosts
-          .map(post => {
-            // The fullContent should be available now from our updated transformPost
-            const spotifyEmbedUrl = getSpotifyEmbedUrl(post.fullContent || '');
+          .map(rawPost => {
+            const spotifyEmbedUrl = getSpotifyEmbedUrl(rawPost.content.rendered);
+            
             if (spotifyEmbedUrl) {
-              return { ...post, spotifyEmbedUrl };
+              // Transform the post for consistent rendering, and add the embed URL
+              const transformed = transformPost(rawPost);
+              if (transformed) {
+                 return { ...transformed, spotifyEmbedUrl };
+              }
             }
             return null;
           })

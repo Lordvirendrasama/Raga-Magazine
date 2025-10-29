@@ -16,7 +16,6 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 
   if (!res.ok) {
     console.error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
-    // Try to get more error info from body
     try {
       const errorBody = await res.json();
       console.error('Error body:', errorBody);
@@ -37,13 +36,14 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   }
 }
 
-export async function getPosts(params: Record<string, any> = {}): Promise<Post[]> {
+// Fetches raw, untransformed post objects from the WP API.
+export async function getRawPosts(params: Record<string, any> = {}): Promise<any[]> {
   const apiPath = `/wp/v2/posts`;
   
-  const defaultParams: Record<string, string> = {};
-
-  defaultParams['per_page'] = params.per_page || '12';
-  defaultParams['_embed'] = '1';
+  const defaultParams: Record<string, string> = {
+    'per_page': params.per_page || '12',
+    '_embed': '1',
+  };
 
   const query = new URLSearchParams({
     ...defaultParams,
@@ -55,12 +55,16 @@ export async function getPosts(params: Record<string, any> = {}): Promise<Post[]
   if (!result || !Array.isArray(result)) {
     return [];
   }
+  return result;
+}
 
+export async function getPosts(params: Record<string, any> = {}): Promise<Post[]> {
+  const result = await getRawPosts(params);
   return result.map(transformPost).filter(p => p !== null) as Post[];
 }
 
 export async function getPostBySlug(slug: string) {
-    const data = await fetchAPI(`/wp/v2/posts?slug=${slug}&_embed=1`);
+    const data = await getRawPosts({ slug: slug, per_page: 1 });
     if (data && data.length > 0) {
         return data[0];
     }
@@ -120,9 +124,7 @@ export function transformPost(wpPost: any): Post | null {
   const terms = wpPost?._embedded?.['wp:term']?.[0];
   if (terms && Array.isArray(terms) && terms.length > 0) {
       const categoryTerm = terms.find((term: any) => term.taxonomy === 'category' && term.slug !== 'uncategorized');
-      if (categoryTerm) {
-        category = categoryTerm.name;
-      }
+      category = categoryTerm ? categoryTerm.name : 'Uncategorized';
   }
 
   const slug = wpPost.slug || '';
