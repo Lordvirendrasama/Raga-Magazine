@@ -43,13 +43,6 @@ const formSchema = z.object({
   bio: z.string().min(10, 'Bio must be at least 10 characters.').max(500, 'Bio cannot exceed 500 characters.'),
   instagramHandle: z.string().optional(),
   contactEmail: z.string().email('Please enter a valid email address.'),
-  pressPhoto: z
-    .instanceof(File)
-    .optional()
-    .refine(file => !file || file.size <= 5000000, `Max file size is 5MB.`)
-    .refine(file => !file || ["image/jpeg", "image/png", "image/webp"].includes(file.type),
-      "Only .jpg, .png, and .webp formats are supported."
-    ),
   agreeToTerms: z.boolean().refine(val => val === true, {
     message: "You must agree to the terms to submit.",
   }),
@@ -71,8 +64,6 @@ export function SubmitMusicForm() {
       agreeToTerms: false,
     },
   });
-  
-  const fileRef = form.register('pressPhoto');
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
@@ -203,23 +194,6 @@ export function SubmitMusicForm() {
                       )}
                     />
                 </div>
-
-                <FormField
-                  control={form.control}
-                  name="pressPhoto"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Press Photo (Optional)</FormLabel>
-                      <FormControl>
-                        <Input className="rounded-md file:text-foreground" type="file" {...fileRef} />
-                      </FormControl>
-                      <FormDescription>
-                        A high-quality photo for your feature. Max 5MB.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 
                 <FormField
                   control={form.control}
