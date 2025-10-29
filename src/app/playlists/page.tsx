@@ -1,39 +1,82 @@
 
+'use client';
+
+import { useState, useEffect } from 'react';
+import { getPosts, getCategoryBySlug } from '@/lib/wp';
+import type { Post } from '@/components/article-card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Music4 } from 'lucide-react';
+import { decode } from 'html-entities';
+
+interface PlaylistPost extends Post {
+  spotifyEmbedUrl?: string;
+}
+
+// Function to extract Spotify embed URL from post content
+function getSpotifyEmbedUrl(content: string): string | undefined {
+  if (!content) return undefined;
+  const match = content.match(/<iframe.*?src="(https?:\/\/(?:open|embed)\.spotify\.com\/[^"]+)".*?<\/iframe>/);
+  return match ? match[1] : undefined;
+}
 
 export default function PlaylistsPage() {
-  const playlists = [
-    {
-      id: '37i9dQZF1DXcBWIGoYBM5M',
-      title: 'Today\'s Top Hits',
-      description: 'The most played tracks in the world right now.',
-    },
-    {
-      id: '37i9dQZF1DWXRqgorJj26U',
-      title: 'RapCaviar',
-      description: 'The freshest tracks in the hip-hop world.',
-    },
-    {
-      id: '37i9dQZF1DX1lVhptIYRda',
-      title: 'Viva Latino',
-      description: 'The hottest Latin hits. Updated weekly.',
-    },
-    {
-      id: '3uyM6sSqMepnevczhOfxUT',
-      title: 'RagaMagazine Picks',
-      description: 'Our special selection of tracks featured in the magazine.',
-    },
-     {
-      id: '37i9dQZF1DX4sWSpwq3LiO',
-      title: 'Peaceful Piano',
-      description: 'Relax and indulge with beautiful piano pieces.',
-    },
-    {
-      id: '37i9dQZF1DX0XUfTFmNBRM',
-      title: 'Rock Classics',
-      description: 'Rock legends and epic songs that continue to inspire.',
+  const [playlists, setPlaylists] = useState<PlaylistPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchPlaylists() {
+      setLoading(true);
+      try {
+        const playlistCategory = await getCategoryBySlug('playlists');
+        if (!playlistCategory) {
+          console.error("Playlist category not found.");
+          setPlaylists([]);
+          setLoading(false);
+          return;
+        }
+        
+        // Fetch posts from the "playlist" category, including full content
+        const rawPosts = await getPosts({ categories: playlistCategory.id, per_page: 12 });
+        
+        const playlistPosts: PlaylistPost[] = rawPosts
+          .map(post => {
+            const spotifyEmbedUrl = getSpotifyEmbedUrl(post.fullContent || '');
+            if (spotifyEmbedUrl) {
+              return { ...post, spotifyEmbedUrl };
+            }
+            return null;
+          })
+          .filter((p): p is PlaylistPost => p !== null);
+
+        setPlaylists(playlistPosts);
+
+      } catch (error) {
+        console.error("Failed to fetch playlists:", error);
+        setPlaylists([]);
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    fetchPlaylists();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 lg:py-12">
+        <Skeleton className="h-12 w-1/3 mx-auto mb-4" />
+        <Skeleton className="h-6 w-2/3 mx-auto mb-8" />
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="space-y-4">
+              <Skeleton className="h-6 w-3/4" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-80 w-full" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 lg:py-12">
@@ -42,34 +85,37 @@ export default function PlaylistsPage() {
           Curated Playlists
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-          Handpicked playlists to soundtrack your reading journey. Discover new music and enjoy the classics.
+          Handpicked playlists to soundtrack your reading journey. Discover new music and enjoy the classics from our articles.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {playlists.map((playlist) => (
-          <div key={playlist.id} className="group rounded-lg border bg-card p-4 shadow-sm transition-shadow hover:shadow-lg">
-            <h2 className="flex items-center gap-2 font-headline text-2xl font-bold">
-              <Music4 className="h-6 w-6 text-primary" />
-              {playlist.title}
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">{playlist.description}</p>
-            <div className="mt-4">
-              <iframe
-                style={{ borderRadius: '12px' }}
-                src={`https://open.spotify.com/embed/playlist/${playlist.id}?utm_source=generator&theme=0`}
-                width="100%"
-                height="352"
-                frameBorder="0"
-                allowFullScreen
-                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-                title={`Spotify Embed: ${playlist.title}`}
-              ></iframe>
+      {playlists.length > 0 ? (
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {playlists.map((playlist) => (
+            <div key={playlist.id} className="group rounded-lg border bg-card p-4 shadow-sm transition-shadow hover:shadow-lg">
+              <h2 className="flex items-center gap-2 font-headline text-2xl font-bold" dangerouslySetInnerHTML={{ __html: playlist.title }} />
+              <p className="mt-2 text-sm text-muted-foreground">{decode(playlist.excerpt)}</p>
+              {playlist.spotifyEmbedUrl && (
+                <div className="mt-4">
+                  <iframe
+                    style={{ borderRadius: '12px' }}
+                    src={playlist.spotifyEmbedUrl.replace('open.spotify.com', 'embed.spotify.com')}
+                    width="100%"
+                    height="352"
+                    frameBorder="0"
+                    allowFullScreen
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy"
+                    title={`Spotify Embed: ${playlist.title}`}
+                  ></iframe>
+                </div>
+              )}
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-center text-muted-foreground">No playlists found. Check back soon!</p>
+      )}
     </div>
   );
 }

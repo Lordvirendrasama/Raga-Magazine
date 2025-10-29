@@ -138,6 +138,8 @@ export function transformPost(wpPost: any): Post | null {
   }
 
   const { url: imageUrl, hint: imageHint } = getFeaturedImage(wpPost);
+  
+  const fullContent = wpPost?.content?.rendered || '';
 
   return {
     id: wpPost.id,
@@ -154,5 +156,6 @@ export function transformPost(wpPost: any): Post | null {
     excerpt,
     tags,
     views: 0,
+    fullContent,
   };
 }
