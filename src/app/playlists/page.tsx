@@ -27,19 +27,22 @@ export default function PlaylistsPage() {
     async function fetchPlaylists() {
       setLoading(true);
       try {
-        const playlistCategory = await getCategoryBySlug('playlists');
+        // WordPress category slugs are often singular. Let's try 'playlist'
+        const playlistCategory = await getCategoryBySlug('playlist');
+        
         if (!playlistCategory) {
-          console.error("The 'playlists' category was not found in your WordPress site. Please create it and add posts to it.");
+          console.error("The 'playlist' category was not found in your WordPress site. Please create it and add posts with Spotify embeds to it.");
           setPlaylists([]);
           setLoading(false);
           return;
         }
         
-        // Fetch posts from the "playlist" category, including full content
+        // Fetch posts from the "playlist" category
         const rawPosts = await getPosts({ categories: playlistCategory.id, per_page: 12 });
         
         const playlistPosts: PlaylistPost[] = rawPosts
           .map(post => {
+            // The fullContent should be available now from our updated transformPost
             const spotifyEmbedUrl = getSpotifyEmbedUrl(post.fullContent || '');
             if (spotifyEmbedUrl) {
               return { ...post, spotifyEmbedUrl };
