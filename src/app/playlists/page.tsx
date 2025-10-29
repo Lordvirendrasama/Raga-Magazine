@@ -27,17 +27,17 @@ export default function PlaylistsPage() {
     async function fetchPlaylists() {
       setLoading(true);
       try {
-        // WordPress category slugs are often singular. Let's try 'playlist'
-        const playlistCategory = await getCategoryBySlug('playlist');
+        // Use the plural 'playlists' slug as indicated by the WordPress URL structure.
+        const playlistCategory = await getCategoryBySlug('playlists');
         
         if (!playlistCategory) {
-          console.error("The 'playlist' category was not found in your WordPress site. Please create it and add posts with Spotify embeds to it.");
+          console.error("The 'playlists' category was not found in your WordPress site. Please create it and add posts with Spotify embeds to it.");
           setPlaylists([]);
           setLoading(false);
           return;
         }
         
-        // Fetch posts from the "playlist" category
+        // Fetch posts from the "playlists" category
         const rawPosts = await getPosts({ categories: playlistCategory.id, per_page: 12 });
         
         const playlistPosts: PlaylistPost[] = rawPosts
