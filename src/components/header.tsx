@@ -34,7 +34,7 @@ export function Header() {
   useEffect(() => {
     async function fetchMenu() {
       try {
-        const baseLinks = [...allStaticFunctions];
+        const baseLinks = [...allStaticLinks];
         
         const categories = await getCategories({per_page: 10});
         if (categories && categories.length > 0) {
