@@ -85,8 +85,8 @@ export function FunReadsChart() {
   }
 
   return (
-    <section className="bg-accent-deep py-12 md:py-16 px-4">
-      <div className="text-center">
+    <section className="w-full bg-accent-deep py-12 md:py-16">
+      <div className="container mx-auto px-4 text-center">
         <h2 className="mb-4 font-headline text-3xl font-bold tracking-tight text-accent-foreground md:text-4xl">
           Top Fun Reads
         </h2>
