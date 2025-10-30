@@ -14,7 +14,7 @@ import { format } from 'date-fns';
 const ChartItem = ({ post, rank }: { post: Post; rank: number }) => (
   <Link href={`/posts/${post.slug}`} className="group flex flex-col items-center text-center">
     <div className="relative mb-2 w-full">
-      <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 z-10 font-bold text-lg text-accent bg-accent-foreground rounded-full h-6 w-6 flex items-center justify-center">
+      <span className="absolute -bottom-2 left-2 z-10 font-bold text-lg text-accent bg-accent-foreground rounded-full h-6 w-6 flex items-center justify-center">
         {rank}
       </span>
       <div className="aspect-square w-full overflow-hidden rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105">
@@ -85,17 +85,17 @@ export function FunReadsChart() {
   }
 
   return (
-    <section className="w-full bg-accent-deep py-12 md:py-16">
+    <section className="w-full bg-accent-deep py-8 md:py-12">
       <div className="container mx-auto px-4 text-center">
-        <h2 className="mb-4 font-headline text-3xl font-bold tracking-tight text-accent-foreground md:text-4xl">
+        <h2 className="mb-4 font-headline text-3xl font-bold tracking-tight text-accent-foreground">
           Top Fun Reads
         </h2>
-        <div className="mb-8 flex justify-center space-x-2">
-            <Button variant="outline" className="border-accent-foreground/50 bg-accent-soft text-accent-foreground hover:bg-accent-soft/80">Hot 100</Button>
-            <Button variant="outline" className="border-accent-foreground/50 text-accent-foreground hover:bg-accent-soft/80">Billboard 200</Button>
-            <Button variant="outline" className="border-accent-foreground/50 text-accent-foreground hover:bg-accent-soft/80">Global 200</Button>
-            <Button variant="outline" className="border-accent-foreground/50 text-accent-foreground hover:bg-accent-soft/80">Artist 100</Button>
-            <Button variant="outline" className="border-accent-foreground/50 text-accent-foreground hover:bg-accent-soft/80">Top Streaming</Button>
+        <div className="mb-6 flex justify-center space-x-2">
+            <Button variant="outline" size="sm" className="border-accent-foreground/50 bg-accent-soft text-accent-foreground hover:bg-accent-soft/80">Hot 100</Button>
+            <Button variant="outline" size="sm" className="border-accent-foreground/50 text-accent-foreground hover:bg-accent-soft/80">Billboard 200</Button>
+            <Button variant="outline" size="sm" className="border-accent-foreground/50 text-accent-foreground hover:bg-accent-soft/80">Global 200</Button>
+            <Button variant="outline" size="sm" className="border-accent-foreground/50 text-accent-foreground hover:bg-accent-soft/80">Artist 100</Button>
+            <Button variant="outline" size="sm" className="border-accent-foreground/50 text-accent-foreground hover:bg-accent-soft/80">Top Streaming</Button>
         </div>
         
         {loading ? (
@@ -108,9 +108,9 @@ export function FunReadsChart() {
             </div>
         )}
 
-        <div className="mt-8 flex flex-col items-center justify-center space-y-2 md:flex-row md:space-y-0 md:space-x-4">
-            <p className="text-sm uppercase tracking-widest text-accent-foreground/80">Week of {format(new Date(), 'MM/dd/yyyy')}</p>
-            <Button variant="outline" className="border-accent-foreground/50 text-accent-foreground hover:bg-accent-soft/80" asChild>
+        <div className="mt-6 flex flex-col items-center justify-center space-y-2 md:flex-row md:space-y-0 md:space-x-4">
+            <p className="text-xs uppercase tracking-widest text-accent-foreground/80">Week of {format(new Date(), 'MM/dd/yyyy')}</p>
+            <Button variant="outline" size="sm" className="border-accent-foreground/50 text-accent-foreground hover:bg-accent-soft/80" asChild>
                 <Link href="/category/fun-reads">View All</Link>
             </Button>
         </div>
