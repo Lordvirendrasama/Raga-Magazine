@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -92,8 +91,12 @@ export function SubmitMusicForm() {
       variant: 'default',
     });
     
-    form.reset();
-    setIsSubmitting(false);
+    // We can't know for sure if the email was sent, but we can reset the form and state
+    // after a short delay to give the mail client time to open.
+    setTimeout(() => {
+        form.reset();
+        setIsSubmitting(false);
+    }, 1000);
   }
 
   return (
