@@ -2,14 +2,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -21,9 +13,10 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent } from './ui/card';
+import { Label } from '@/components/ui/label';
 
-// Note: react-hook-form is temporarily disabled for basic HTML submission
-// to ensure Formspree activation works correctly. We can re-enable it later.
+// Note: This form is a basic HTML form configured for Formspree.
+// react-hook-form is not used here to ensure basic submission works first.
 
 export function SubmitMusicForm() {
   return (
@@ -35,12 +28,12 @@ export function SubmitMusicForm() {
           className="space-y-6"
         >
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-              <FormLabel htmlFor="name">Artist/Project Name</FormLabel>
+            <div className="space-y-2">
+              <Label htmlFor="name">Artist/Project Name</Label>
               <Input id="name" name="name" placeholder="e.g., The Midnight Bloom" required />
             </div>
-            <div>
-              <FormLabel htmlFor="genre">Genre</FormLabel>
+            <div className="space-y-2">
+              <Label htmlFor="genre">Genre</Label>
               <Select name="genre" required>
                 <SelectTrigger id="genre">
                   <SelectValue placeholder="Select a genre" />
@@ -58,13 +51,13 @@ export function SubmitMusicForm() {
             </div>
           </div>
 
-          <div>
-            <FormLabel htmlFor="streamingLink">Streaming Link (Spotify, Apple Music, YouTube, etc.)</FormLabel>
+          <div className="space-y-2">
+            <Label htmlFor="streamingLink">Streaming Link (Spotify, Apple Music, YouTube, etc.)</Label>
             <Input id="streamingLink" name="streamingLink" type="url" placeholder="https://..." required />
           </div>
 
-          <div>
-            <FormLabel htmlFor="bio">Short Artist Bio</FormLabel>
+          <div className="space-y-2">
+            <Label htmlFor="bio">Short Artist Bio</Label>
             <Textarea
               id="bio"
               name="bio"
@@ -77,12 +70,12 @@ export function SubmitMusicForm() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-              <FormLabel htmlFor="instagram">Instagram Handle (Optional)</FormLabel>
+            <div className="space-y-2">
+              <Label htmlFor="instagram">Instagram Handle (Optional)</Label>
               <Input id="instagram" name="instagram" placeholder="@yourhandle" />
             </div>
-            <div>
-              <FormLabel htmlFor="email">Contact Email</FormLabel>
+            <div className="space-y-2">
+              <Label htmlFor="email">Contact Email</Label>
               <Input id="email" name="email" type="email" placeholder="you@example.com" required />
             </div>
           </div>
@@ -90,9 +83,9 @@ export function SubmitMusicForm() {
           <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
             <Checkbox id="agreement" name="agreement" required />
             <div className="space-y-1 leading-none">
-              <FormLabel htmlFor="agreement">
+              <Label htmlFor="agreement">
                 I agree to be featured on Raga Magazine and its social platforms.
-              </FormLabel>
+              </Label>
             </div>
           </div>
 
