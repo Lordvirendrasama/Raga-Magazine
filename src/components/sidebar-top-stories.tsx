@@ -7,63 +7,71 @@ import { Badge } from './ui/badge';
 import { ArrowUpRight, Music } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
+import { Separator } from './ui/separator';
+import { formatDistanceToNow } from 'date-fns';
 
 interface SidebarTopStoriesProps {
   posts: Post[];
+  title?: string;
+  hideMusicPromo?: boolean;
 }
 
-export function SidebarTopStories({ posts }: SidebarTopStoriesProps) {
+export function SidebarTopStories({ posts, title = "Top Stories", hideMusicPromo = false }: SidebarTopStoriesProps) {
   return (
     <aside className="sticky top-20 space-y-8">
-      <div>
-        <iframe
-          style={{ borderRadius: '12px' }}
-          src="https://open.spotify.com/embed/playlist/3uyM6sSqMepnevczhOfxUT?utm_source=generator&theme=0"
-          width="100%"
-          height="352"
-          frameBorder="0"
-          allowFullScreen
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy"
-        ></iframe>
-      </div>
-      
-      <Card className="bg-gradient-to-br from-primary/10 to-accent/10">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Music className="h-6 w-6 text-primary" />
-            <span>Are you an artist?</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground mb-4">
-            Get your music featured on RagaMagazine. We are always looking for new sounds.
-          </p>
-          <Button asChild className="w-full">
-            <Link href="/submit-your-music">Submit Your Music</Link>
-          </Button>
-        </CardContent>
-      </Card>
+      {!hideMusicPromo && (
+        <>
+            <div>
+                <iframe
+                style={{ borderRadius: '12px' }}
+                src="https://open.spotify.com/embed/playlist/3uyM6sSqMepnevczhOfxUT?utm_source=generator&theme=0"
+                width="100%"
+                height="352"
+                frameBorder="0"
+                allowFullScreen
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+                ></iframe>
+            </div>
+            
+            <Card className="bg-gradient-to-br from-primary/10 to-accent/10">
+                <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Music className="h-6 w-6 text-primary" />
+                    <span>Are you an artist?</span>
+                </CardTitle>
+                </CardHeader>
+                <CardContent>
+                <p className="text-muted-foreground mb-4">
+                    Get your music featured on RagaMagazine. We are always looking for new sounds.
+                </p>
+                <Button asChild className="w-full">
+                    <Link href="/submit-your-music">Submit Your Music</Link>
+                </Button>
+                </CardContent>
+            </Card>
+        </>
+      )}
 
       <div>
-        <h2 className="mb-6 font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-          Top Stories
+        <h2 className="mb-4 font-headline text-2xl font-bold tracking-tight text-foreground">
+          {title}
         </h2>
-        <div className="space-y-6">
+        <div className="space-y-4">
           {posts.map((post, index) => (
-            <Link href={`/posts/${post.slug}`} key={post.id} className="group flex items-start gap-4">
-              <span className="font-headline text-3xl font-bold text-muted-foreground">
-                {String(index + 1).padStart(2, '0')}
-              </span>
-              <div className="flex-1">
-                <h3 className="font-semibold leading-tight group-hover:text-accent">{post.title}</h3>
-                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>{post.author.name}</span>
-                  <Badge variant="outline">{post.category}</Badge>
+            <React.Fragment key={post.id}>
+              <Link href={`/posts/${post.slug}`} className="group flex items-start gap-4">
+                <div className="flex-1">
+                  <h3 className="font-semibold leading-tight group-hover:underline">{post.title}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    <time dateTime={post.date}>
+                        {formatDistanceToNow(new Date(post.date), { addSuffix: true })}
+                    </time>
+                  </p>
                 </div>
-              </div>
-              <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-            </Link>
+              </Link>
+              {index < posts.length - 1 && <Separator />}
+            </React.Fragment>
           ))}
         </div>
       </div>

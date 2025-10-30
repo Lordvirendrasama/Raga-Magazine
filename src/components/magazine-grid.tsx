@@ -20,18 +20,9 @@ export function MagazineGrid({ initialPosts }: MagazineGridProps) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // If initialPosts is small, fetch all posts to allow "Load More" to work.
-    if (initialPosts.length < 20) {
-      setLoading(true);
-      getPosts({ per_page: 100 }).then(fullPostList => {
-        const transformedPosts = fullPostList.map(p => transformPost(p)).filter(p => p !== null) as Post[];
-        setAllPosts(transformedPosts);
-        const initialSlice = transformedPosts.slice(0, POSTS_PER_PAGE);
-        setPosts(initialSlice);
-        setHasMore(transformedPosts.length > POSTS_PER_PAGE);
-        setLoading(false);
-      });
-    }
+    setPosts(initialPosts.slice(0, POSTS_PER_PAGE));
+    setAllPosts(initialPosts);
+    setHasMore(initialPosts.length > POSTS_PER_PAGE);
   }, [initialPosts]);
 
 
@@ -54,13 +45,12 @@ export function MagazineGrid({ initialPosts }: MagazineGridProps) {
       <h2 className="mb-6 font-headline text-3xl font-bold tracking-tight text-foreground md:text-4xl">
         From the Magazine
       </h2>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {posts.map((post, index) => (
           <ArticleCard
             key={post.id}
             post={post}
-            variant={index === 0 ? 'featured' : 'default'}
-            className={index === 0 ? "md:col-span-2" : ""}
+            variant={'default'}
           />
         ))}
          {loading && hasMore && (

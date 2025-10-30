@@ -19,7 +19,7 @@ const cardVariants = cva(
       variant: {
         default: 'flex-col',
         featured: 'col-span-1 md:col-span-2 lg:row-span-2 flex-col',
-        compact: 'flex-row items-center',
+        compact: 'flex-col',
       },
     },
     defaultVariants: {
@@ -35,7 +35,7 @@ const imageContainerVariants = cva(
       variant: {
         default: 'aspect-video',
         featured: 'aspect-video',
-        compact: 'w-1/3 aspect-square flex-shrink-0',
+        compact: 'aspect-[4/3]',
       },
     },
     defaultVariants: {
@@ -51,7 +51,7 @@ const contentVariants = cva(
       variant: {
         default: 'p-4',
         featured: 'p-4 md:p-6',
-        compact: 'p-3 md:p-4 w-2/3',
+        compact: 'p-4',
       },
     },
     defaultVariants: {
@@ -118,8 +118,12 @@ export function ArticleCard({ post, variant, className }: ArticleCardProps) {
         )}
         <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
           <span>{post.author.name}</span>
-          <span>&middot;</span>
-          <time dateTime={post.date}>{format(new Date(post.date), 'MMM d, yyyy')}</time>
+          {variant !== 'compact' && (
+            <>
+                <span>&middot;</span>
+                <time dateTime={post.date}>{format(new Date(post.date), 'MMM d, yyyy')}</time>
+            </>
+          )}
         </div>
       </div>
     </article>

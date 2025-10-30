@@ -2,9 +2,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { HeroCarousel } from "@/components/hero-carousel";
+import { HeroGrid } from "@/components/hero-grid";
 import { MagazineGrid } from "@/components/magazine-grid";
-import { SidebarTopStories } from "@/components/sidebar-top-stories";
 import { getPosts, transformPost } from "@/lib/wp";
 import type { Post } from "@/components/article-card";
 import { Skeleton } from '@/components/ui/skeleton';
@@ -31,27 +30,24 @@ export default function Home() {
   
   if (loading) {
     return (
-      <>
-        <Skeleton className="h-[65vh] w-full" />
-        <div className="container mx-auto px-4 py-8 lg:py-12">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
-            <div className="lg:col-span-2 space-y-6">
-              <Skeleton className="h-96 w-full" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="container mx-auto px-4 py-8 lg:py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="md:col-span-1 space-y-6">
                 <Skeleton className="h-64 w-full" />
                 <Skeleton className="h-64 w-full" />
-              </div>
             </div>
-            <div className="lg:col-span-1 space-y-4">
-              <Skeleton className="h-16 w-full" />
-              <Skeleton className="h-16 w-full" />
-              <Skeleton className="h-16 w-full" />
-              <Skeleton className="h-16 w-full" />
-              <Skeleton className="h-16 w-full" />
+            <div className="md:col-span-2">
+                <Skeleton className="h-[40rem] w-full" />
             </div>
-          </div>
+            <div className="md:col-span-1 space-y-4">
+                 <Skeleton className="h-10 w-2/3 mb-4" />
+                 <Skeleton className="h-20 w-full" />
+                 <Skeleton className="h-20 w-full" />
+                 <Skeleton className="h-20 w-full" />
+                 <Skeleton className="h-20 w-full" />
+            </div>
         </div>
-      </>
+      </div>
     );
   }
   
@@ -64,26 +60,26 @@ export default function Home() {
     );
   }
   
-  const featuredPosts = posts.filter(p => p.tags.includes('featured')).slice(0, 5);
-  const magazinePosts = posts.slice(0, 9);
-  const trendingPosts = [...posts].sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-  }).slice(0, 5);
+  const heroFeaturedPost = posts.find(p => p.tags.includes('featured')) || posts[0];
+  const heroSidePosts = posts.filter(p => p.id !== heroFeaturedPost.id).slice(0, 2);
+  const heroTrendingPosts = posts.slice(0, 5);
+  
+  const magazinePosts = posts.filter(p => 
+      p.id !== heroFeaturedPost.id && !heroSidePosts.some(sp => sp.id === p.id)
+  ).slice(0, 9);
+
 
   return (
-    <>
-      <HeroCarousel posts={featuredPosts.length > 0 ? featuredPosts : posts.slice(0,3)} />
-      <div className="container mx-auto px-4 py-8 lg:py-12">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
-          <div className="lg:col-span-2">
-            <MagazineGrid initialPosts={magazinePosts} />
-          </div>
-          <div className="lg:col-span-1">
-            <SidebarTopStories posts={trendingPosts} />
-          </div>
+    <div className="container mx-auto px-4 py-8 lg:py-12">
+        <HeroGrid 
+            featuredPost={heroFeaturedPost}
+            sidePosts={heroSidePosts}
+            trendingPosts={heroTrendingPosts}
+        />
+        <div className="mt-12">
+             <MagazineGrid initialPosts={magazinePosts} />
         </div>
-      </div>
-      <FunReadsChart />
-    </>
+        <FunReadsChart />
+    </div>
   );
 }
