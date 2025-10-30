@@ -37,8 +37,11 @@ export default function Home() {
                 <Skeleton className="h-48 w-full" />
                 <Skeleton className="h-48 w-full" />
             </div>
-            <div className="md:col-span-3">
+            <div className="md:col-span-2">
                 <Skeleton className="h-[28rem] w-full" />
+            </div>
+            <div className="md:col-span-1">
+                <Skeleton className="h-96 w-full" />
             </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -83,6 +86,7 @@ export default function Home() {
             <HeroGrid 
                 featuredPost={heroFeaturedPost}
                 sidePosts={heroSidePosts}
+                topStories={trendingPosts}
             />
         </div>
 

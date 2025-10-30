@@ -6,15 +6,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArticleCard, type Post } from './article-card';
 import { Badge } from './ui/badge';
+import { Separator } from './ui/separator';
+import { formatDistanceToNow } from 'date-fns';
 
 interface HeroGridProps {
   featuredPost: Post;
   sidePosts: Post[];
+  topStories: Post[];
 }
 
-export function HeroGrid({ featuredPost, sidePosts }: HeroGridProps) {
+export function HeroGrid({ featuredPost, sidePosts, topStories }: HeroGridProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
       
       {/* Left Column */}
       <div className="md:col-span-1 space-y-6">
@@ -23,7 +26,7 @@ export function HeroGrid({ featuredPost, sidePosts }: HeroGridProps) {
         ))}
       </div>
 
-      {/* Right Column */}
+      {/* Middle Column */}
       <div className="md:col-span-2">
         <Link href={`/posts/${featuredPost.slug}`} className="group block">
             <div className="relative aspect-video w-full overflow-hidden rounded-lg">
@@ -45,6 +48,30 @@ export function HeroGrid({ featuredPost, sidePosts }: HeroGridProps) {
                 <p className="mt-2 text-sm font-semibold text-foreground">{featuredPost.author.name}</p>
             </div>
         </Link>
+      </div>
+      
+      {/* Right Column */}
+      <div className="md:col-span-1">
+        <h2 className="mb-4 font-headline text-2xl font-bold tracking-tight text-foreground">
+          Top Stories
+        </h2>
+        <div className="space-y-4">
+          {topStories.map((post, index) => (
+            <React.Fragment key={post.id}>
+              <Link href={`/posts/${post.slug}`} className="group flex items-start gap-4">
+                <div className="flex-1">
+                  <h3 className="font-semibold leading-tight group-hover:underline">{post.title}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    <time dateTime={post.date}>
+                        {formatDistanceToNow(new Date(post.date), { addSuffix: true })}
+                    </time>
+                  </p>
+                </div>
+              </Link>
+              {index < topStories.length - 1 && <Separator />}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
     </div>
   );
