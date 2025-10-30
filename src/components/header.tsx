@@ -25,7 +25,6 @@ const fallbackLinks: NavLink[] = [
 const allStaticLinks: NavLink[] = [
   { name: 'Playlists', href: '/category/playlists' },
   { name: 'Live', href: '/category/live' },
-  { name: 'Submit Your Music', href: '/submit-your-music' },
 ];
 
 export function Header() {
@@ -113,11 +112,6 @@ export function Header() {
                     readOnly 
                 />
             </div>
-            <Link href="/admin">
-              <Button variant="ghost" size="icon" aria-label="Admin Dashboard">
-                <User className="h-5 w-5" />
-              </Button>
-            </Link>
             <MuteToggle />
             <ThemeToggle />
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">

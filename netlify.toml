@@ -1,9 +1,0 @@
-[build]
-  command = "next build"
-  publish = ".next"
-
-[site]
-  id = "extraordinary-starship-0e6fb5"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"

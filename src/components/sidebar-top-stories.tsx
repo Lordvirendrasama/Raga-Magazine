@@ -4,9 +4,7 @@
 import Link from 'next/link';
 import { type Post } from './article-card';
 import { Badge } from './ui/badge';
-import { ArrowUpRight, Music, Mic } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
-import { Button } from './ui/button';
+import { ArrowUpRight } from 'lucide-react';
 
 interface SidebarTopStoriesProps {
   posts: Post[];
@@ -27,28 +25,6 @@ export function SidebarTopStories({ posts }: SidebarTopStoriesProps) {
           loading="lazy"
         ></iframe>
       </div>
-
-      <Card className="bg-accent/10 border-accent/30">
-        <CardHeader className="flex-row items-center gap-4 space-y-0">
-          <div className="grid h-12 w-12 place-items-center rounded-full bg-accent text-accent-foreground">
-            <Mic className="h-6 w-6" />
-          </div>
-          <div>
-            <CardTitle className="text-xl font-headline">Submit Your Music</CardTitle>
-            <CardDescription className="text-muted-foreground">Get your sound featured</CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="mb-4 text-sm text-muted-foreground">
-            Are you an artist or band? We want to hear from you! Submit your music for a chance to be featured on RagaMagazine.
-          </p>
-          <Button asChild className="w-full" variant="default">
-            <Link href="/submit-your-music">
-              Submit Now <ArrowUpRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
 
       <div>
         <h2 className="mb-6 font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
