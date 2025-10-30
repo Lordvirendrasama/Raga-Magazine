@@ -85,8 +85,8 @@ export function FunReadsChart() {
   }
 
   return (
-    <section className="bg-accent-deep py-12 md:py-16">
-      <div className="container mx-auto px-4 text-center">
+    <section className="bg-accent-deep py-12 md:py-16 px-4">
+      <div className="text-center">
         <h2 className="mb-4 font-headline text-3xl font-bold tracking-tight text-accent-foreground md:text-4xl">
           Top Fun Reads
         </h2>
@@ -101,7 +101,7 @@ export function FunReadsChart() {
         {loading ? (
             <ChartSkeleton />
         ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-6 max-w-6xl mx-auto">
                 {posts.map((post, index) => (
                     <ChartItem key={post.id} post={post} rank={index + 1} />
                 ))}
