@@ -15,18 +15,17 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent } from './ui/card';
 import { Label } from '@/components/ui/label';
 
-// Note: This form is a basic HTML form configured for Formspree.
-// react-hook-form is not used here to ensure basic submission works first.
-
 export function SubmitMusicForm() {
   return (
     <Card>
       <CardContent className="p-6">
         <form
-          action="https://formspree.io/f/mqkrvadv"
+          name="music-submissions"
           method="POST"
+          data-netlify="true"
           className="space-y-6"
         >
+          <input type="hidden" name="form-name" value="music-submissions" />
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Artist/Project Name</Label>
