@@ -72,6 +72,7 @@ export function SubmitMusicForm() {
             <input type="hidden" name="_subject" value={`New Music Submission: ${form.watch('name')}`} />
             <input type="hidden" name="_next" value={redirectUrl} />
             <input type="text" name="_honey" style={{ display: 'none' }} />
+            <input type="hidden" name="_captcha" value="false" />
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <FormField
