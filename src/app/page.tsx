@@ -8,6 +8,7 @@ import { SidebarTopStories } from "@/components/sidebar-top-stories";
 import { getPosts, transformPost } from "@/lib/wp";
 import type { Post } from "@/components/article-card";
 import { Skeleton } from '@/components/ui/skeleton';
+import { FunReadsChart } from '@/components/fun-reads-chart';
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -82,6 +83,7 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <FunReadsChart />
     </>
   );
 }

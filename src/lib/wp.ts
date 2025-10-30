@@ -65,13 +65,27 @@ export async function getPostBySlug(slug: string) {
     return null;
 }
 
-export async function getCategories() {
-  const result = await fetchAPI('/wp/v2/categories?per_page=50');
+export async function getCategories(params: Record<string, any> = {}) {
+  const query = new URLSearchParams({
+    per_page: '50',
+    ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])),
+  });
+  const result = await fetchAPI(`/wp/v2/categories?${query.toString()}`);
   if (Array.isArray(result)) {
     return result;
   }
   return [];
 }
+
+
+export async function getCategoryIdBySlug(slug: string): Promise<number | null> {
+    const categories = await getCategories({ slug: slug });
+    if (categories && categories.length > 0) {
+        return categories[0].id;
+    }
+    return null;
+}
+
 
 export async function getCategoryBySlug(slug:string) {
     const result = await fetchAPI(`/wp/v2/categories?slug=${slug}`);

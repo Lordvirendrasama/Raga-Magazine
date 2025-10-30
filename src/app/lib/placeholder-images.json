@@ -15,6 +15,11 @@
     { "url": "https://picsum.photos/seed/12/1200/800", "hint": "event concert" },
     { "url": "https://picsum.photos/seed/13/1200/800", "hint": "stage lights" },
     { "url": "https://picsum.photos/seed/14/1200/800", "hint": "sitar instrument" },
-    { "url": "https://picsum.photos/seed/15/1200/800", "hint": "music festival" }
+    { "url": "https://picsum.photos/seed/15/1200/800", "hint": "music festival" },
+    { "url": "https://picsum.photos/seed/16/600/600", "hint": "pop art" },
+    { "url": "https://picsum.photos/seed/17/600/600", "hint": "abstract texture" },
+    { "url": "https://picsum.photos/seed/18/600/600", "hint": "colorful pattern" },
+    { "url": "https://picsum.photos/seed/19/600/600", "hint": "modern art" },
+    { "url": "https://picsum.photos/seed/20/600/600", "hint": "quirky character" }
   ]
 }
