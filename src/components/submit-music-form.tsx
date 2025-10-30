@@ -39,14 +39,6 @@ const formSchema = z.object({
 });
 
 export function SubmitMusicForm() {
-    const [redirectUrl, setRedirectUrl] = useState('');
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            setRedirectUrl(window.location.href);
-        }
-    }, []);
-    
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -64,16 +56,10 @@ export function SubmitMusicForm() {
       <CardContent className="p-6">
         <Form {...form}>
           <form
-            action="https://formsubmit.co/theragamagazine@gmail.com"
+            action="https://formspree.io/f/mqkrvadv"
             method="POST"
             className="space-y-6"
           >
-            {/* FormSubmit.co hidden fields */}
-            <input type="hidden" name="_subject" value={`New Music Submission: ${form.watch('name')}`} />
-            <input type="hidden" name="_next" value={redirectUrl} />
-            <input type="text" name="_honey" style={{ display: 'none' }} />
-            <input type="hidden" name="_captcha" value="false" />
-
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <FormField
                 control={form.control}
