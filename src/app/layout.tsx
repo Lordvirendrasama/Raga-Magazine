@@ -15,6 +15,7 @@ import { useState, useEffect } from 'react';
 import LoadingScreen from '@/components/loading-screen';
 import { GlobalLinkSound } from '@/components/global-link-sound';
 import { Marquee } from '@/components/marquee';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export default function RootLayout({
   children,
@@ -41,24 +42,26 @@ export default function RootLayout({
       <body className={cn('min-h-screen bg-background font-body antialiased')} suppressHydrationWarning>
         {isLoading && <LoadingScreen />}
         <div className={cn('transition-opacity duration-500', isLoading ? 'opacity-0' : 'opacity-100')}>
-          <MuteProvider>
-            <ThemeProvider
-                attribute="class"
-                defaultTheme="dark"
-                enableSystem
-                disableTransitionOnChange
-            >
-              <Header />
-              <main className="flex-1 flex flex-col relative z-10">
-                <MouseFollower />
-                <PageFlipper>{children}</PageFlipper>
-              </main>
-              <Footer />
-              <Marquee />
-              <Toaster />
-              <GlobalLinkSound />
-            </ThemeProvider>
-          </MuteProvider>
+          <FirebaseClientProvider>
+            <MuteProvider>
+              <ThemeProvider
+                  attribute="class"
+                  defaultTheme="dark"
+                  enableSystem
+                  disableTransitionOnChange
+              >
+                <Header />
+                <main className="flex-1 flex flex-col relative z-10">
+                  <MouseFollower />
+                  <PageFlipper>{children}</PageFlipper>
+                </main>
+                <Footer />
+                <Marquee />
+                <Toaster />
+                <GlobalLinkSound />
+              </ThemeProvider>
+            </MuteProvider>
+          </FirebaseClientProvider>
         </div>
       </body>
     </html>

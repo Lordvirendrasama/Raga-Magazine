@@ -3,13 +3,20 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Search, Menu, X, User } from 'lucide-react';
+import { Search, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchOverlay } from './search-overlay';
 import { getCategories } from '@/lib/wp';
 import { ThemeToggle } from './theme-toggle';
 import { MuteToggle } from './mute-toggle';
 import { Input } from '@/components/ui/input';
+import dynamic from 'next/dynamic';
+import { Skeleton } from './ui/skeleton';
+
+const UserNav = dynamic(() => import('./user-nav').then(mod => mod.UserNav), {
+  ssr: false,
+  loading: () => <Skeleton className="h-10 w-10 rounded-full" />,
+});
 
 interface NavLink {
   name: string;
@@ -113,6 +120,7 @@ export function Header() {
                     readOnly 
                 />
             </div>
+            <UserNav />
             <MuteToggle />
             <ThemeToggle />
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
