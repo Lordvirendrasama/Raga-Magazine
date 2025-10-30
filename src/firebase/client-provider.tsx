@@ -18,10 +18,7 @@ import {
   getFirestore,
 } from 'firebase/firestore';
 
-import { FirebaseContext, useFirebase } from './provider';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
+import { FirebaseContext } from './provider';
 
 export interface FirebaseClientProviderProps {
   children: ReactNode;
@@ -67,8 +64,9 @@ export function FirebaseClientProvider({
   }, [instances]);
 
   if (!instances) {
-    // Render a loading state or null while Firebase is initializing
-    return null; 
+    // Render nothing until Firebase is initialized on the client.
+    // Children that depend on Firebase (like UserNav) have their own loading states.
+    return <>{children}</>;
   }
   
   return (
