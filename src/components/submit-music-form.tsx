@@ -29,6 +29,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Loader2 } from 'lucide-react';
+import { handleMusicSubmission } from '@/lib/submissions';
+
 
 const GENRES = ['Pop', 'Rock', 'Indie', 'Electronic', 'Hip-Hop', 'Classical', 'Other'];
 
@@ -62,41 +64,32 @@ export function SubmitMusicForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     
-    const recipient = 'theragamagazine@gmail.com';
-    const subject = `Music Submission: ${values.artistName}`;
-    const body = `
-      Artist Name: ${values.artistName}
-      Genre: ${values.genre}
-      Streaming Link: ${values.streamingLink}
-      Contact Email: ${values.contactEmail}
-      Instagram: ${values.instagramHandle || 'N/A'}
+    try {
+      const result = await handleMusicSubmission(values);
 
-      Bio:
-      ${values.bio}
-
-      ---
-      Agreed to terms: ${values.agreeToTerms ? 'Yes' : 'No'}
-    `;
-
-    const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-    window.location.href = mailtoLink;
-
-    toast({
-      title: 'Opening Email Client',
-      description: "Please send the pre-filled email to complete your submission.",
-      variant: 'default',
-    });
-    
-    // We can't know for sure if the email was sent, but we can reset the form and state
-    // after a short delay to give the mail client time to open.
-    setTimeout(() => {
+      if (result.success) {
+        toast({
+            title: 'Submission Sent!',
+            description: "Thanks for sending your music! Our editorial team will review it soon.",
+            variant: 'default',
+        });
         form.reset();
+      } else {
+        throw new Error(result.error || 'An unknown error occurred.');
+      }
+
+    } catch (error) {
+        toast({
+            title: 'Submission Failed',
+            description: (error as Error).message || "There was a problem sending your submission. Please try again later.",
+            variant: 'destructive',
+        });
+    } finally {
         setIsSubmitting(false);
-    }, 1000);
+    }
   }
 
   return (
@@ -231,7 +224,7 @@ export function SubmitMusicForm() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Opening Email...
+                      Sending...
                     </>
                   ) : (
                     'Send My Music'
