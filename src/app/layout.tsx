@@ -41,13 +41,13 @@ export default function RootLayout({
       <body className={cn('min-h-screen bg-background font-body antialiased')} suppressHydrationWarning>
         {isLoading && <LoadingScreen />}
         <div className={cn('transition-opacity duration-500', isLoading ? 'opacity-0' : 'opacity-100')}>
-            <MuteProvider>
-              <ThemeProvider
-                  attribute="class"
-                  defaultTheme="dark"
-                  enableSystem
-                  disableTransitionOnChange
-              >
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="dark"
+                enableSystem
+                disableTransitionOnChange
+            >
+              <MuteProvider>
                 <Header />
                 <main className="flex-1 flex flex-col relative z-10">
                   <MouseFollower />
@@ -57,8 +57,8 @@ export default function RootLayout({
                 <Marquee />
                 <Toaster />
                 <GlobalLinkSound />
-              </ThemeProvider>
-            </MuteProvider>
+              </MuteProvider>
+            </ThemeProvider>
         </div>
       </body>
     </html>
