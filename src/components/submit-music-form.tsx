@@ -23,6 +23,7 @@ export function SubmitMusicForm() {
           name="music-submissions"
           method="POST"
           data-netlify="true"
+          action="/submit-your-music/success"
           className="space-y-6"
         >
           <input type="hidden" name="form-name" value="music-submissions" />
