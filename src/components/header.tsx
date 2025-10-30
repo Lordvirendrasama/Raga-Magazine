@@ -25,6 +25,7 @@ const fallbackLinks: NavLink[] = [
 const allStaticLinks: NavLink[] = [
   { name: 'Playlists', href: '/category/playlists' },
   { name: 'Live', href: '/category/live' },
+  { name: 'Submit Your Music', href: '/submit-your-music' },
 ];
 
 export function Header() {

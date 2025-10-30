@@ -21,6 +21,7 @@ const fallbackLinks: CategoryLink[] = [
 const allStaticLinks: CategoryLink[] = [
   { name: 'Playlists', href: '/category/playlists' },
   { name: 'Live', href: '/category/live' },
+  { name: 'Submit Your Music', href: '/submit-your-music' },
 ];
 
 export function Footer() {

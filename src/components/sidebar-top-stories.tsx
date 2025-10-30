@@ -4,7 +4,9 @@
 import Link from 'next/link';
 import { type Post } from './article-card';
 import { Badge } from './ui/badge';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Music } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
 
 interface SidebarTopStoriesProps {
   posts: Post[];
@@ -25,6 +27,23 @@ export function SidebarTopStories({ posts }: SidebarTopStoriesProps) {
           loading="lazy"
         ></iframe>
       </div>
+      
+      <Card className="bg-gradient-to-br from-primary/10 to-accent/10">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Music className="h-6 w-6 text-primary" />
+            <span>Are you an artist?</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground mb-4">
+            Get your music featured on RagaMagazine. We are always looking for new sounds.
+          </p>
+          <Button asChild className="w-full">
+            <Link href="/submit-your-music">Submit Your Music</Link>
+          </Button>
+        </CardContent>
+      </Card>
 
       <div>
         <h2 className="mb-6 font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl">
