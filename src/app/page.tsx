@@ -81,24 +81,26 @@ export default function Home() {
 
 
   return (
-    <div className="container mx-auto px-4 py-8 lg:py-12">
-        <div className="mb-12">
-            <HeroGrid 
-                featuredPost={heroFeaturedPost}
-                sidePosts={heroSidePosts}
-                topStories={trendingPosts}
-            />
-        </div>
+    <>
+        <div className="container mx-auto px-4 py-8 lg:py-12">
+            <div className="mb-12">
+                <HeroGrid 
+                    featuredPost={heroFeaturedPost}
+                    sidePosts={heroSidePosts}
+                    topStories={trendingPosts}
+                />
+            </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-2 space-y-12">
-                <MagazineGrid initialPosts={magazinePosts} />
-                <FunReadsChart />
-            </div>
-            <div className="lg:col-span-1">
-                <SidebarTopStories posts={trendingPosts} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                <div className="lg:col-span-2 space-y-12">
+                    <MagazineGrid initialPosts={magazinePosts} />
+                </div>
+                <div className="lg:col-span-1">
+                    <SidebarTopStories posts={trendingPosts} />
+                </div>
             </div>
         </div>
-    </div>
+        <FunReadsChart />
+    </>
   );
 }
