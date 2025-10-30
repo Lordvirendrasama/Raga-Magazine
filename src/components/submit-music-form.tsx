@@ -11,7 +11,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -29,7 +28,6 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Loader2 } from 'lucide-react';
-import { handleMusicSubmission } from '@/lib/submissions';
 
 
 const GENRES = ['Pop', 'Rock', 'Indie', 'Electronic', 'Hip-Hop', 'Classical', 'Other'];
@@ -64,22 +62,28 @@ export function SubmitMusicForm() {
     },
   });
 
+  const encode = (data: Record<string, any>) => {
+    return Object.keys(data)
+      .map(key => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
+      .join("&");
+  }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     
     try {
-      const result = await handleMusicSubmission(values);
+      await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: encode({ "form-name": "music-submissions", ...values })
+      });
 
-      if (result.success) {
-        toast({
-            title: 'Submission Sent!',
-            description: "Thanks for sending your music! Our editorial team will review it soon.",
-            variant: 'default',
-        });
-        form.reset();
-      } else {
-        throw new Error(result.error || 'An unknown error occurred.');
-      }
+      toast({
+          title: 'Submission Sent!',
+          description: "Thanks for sending your music! Our editorial team will review it soon.",
+          variant: 'default',
+      });
+      form.reset();
 
     } catch (error) {
         toast({
@@ -99,7 +103,13 @@ export function SubmitMusicForm() {
         </CardHeader>
         <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form 
+                name="music-submissions"
+                data-netlify="true"
+                onSubmit={form.handleSubmit(onSubmit)} 
+                className="space-y-6"
+              >
+                <input type="hidden" name="form-name" value="music-submissions" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
