@@ -1,16 +1,16 @@
 
 'use client';
 
-import React, { createContext, useState, useContext, ReactNode, useEffect, useRef } from 'react';
-import { useToast } from './use-toast';
-import { Info, Music } from 'lucide-react';
+import React, { useState, ReactNode, useRef, createContext, useContext } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { Music } from 'lucide-react';
 
-interface MuteContextType {
+export interface MuteContextType {
   isMuted: boolean;
   toggleMute: () => void;
 }
 
-const MuteContext = createContext<MuteContextType | undefined>(undefined);
+export const MuteContext = createContext<MuteContextType | undefined>(undefined);
 
 export const useMute = () => {
   const context = useContext(MuteContext);
