@@ -81,12 +81,26 @@ const config = {
           '0%, 100%': { transform: 'scale(1)', opacity: '1' },
           '50%': { transform: 'scale(0.95)', opacity: '0.9' },
         },
+        "float-up": {
+          '0%': {
+            transform: 'translateY(100vh) scale(0.5)',
+            opacity: '0',
+          },
+          '50%': {
+            opacity: '1',
+          },
+          '100%': {
+            transform: 'translateY(-100vh) scale(1.2)',
+            opacity: '0',
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "marquee": "marquee 60s linear infinite",
         "breathing-logo": "breathing-logo 4s ease-in-out infinite",
+        "float-up": 'float-up linear infinite',
       },
     },
   },

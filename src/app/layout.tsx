@@ -12,7 +12,7 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { MuteProvider } from '@/hooks/use-mute';
 import { useState, useEffect } from 'react';
-import GlitchLoader from '@/components/glitch-loader';
+import LoadingScreen from '@/components/loading-screen';
 import { GlobalLinkSound } from '@/components/global-link-sound';
 import { Marquee } from '@/components/marquee';
 
@@ -45,9 +45,9 @@ export default function RootLayout({
         <meta name="description" content="The future of reading is here." />
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased flex flex-col')} suppressHydrationWarning>
-        {isLoading && isClient ? (
-          <div className="flex-1 flex">
-            <GlitchLoader />
+        {isClient && isLoading ? (
+           <div className="flex-1 flex">
+            <LoadingScreen />
           </div>
         ) : (
           <div className={cn('flex flex-col min-h-screen transition-opacity duration-500', isLoading ? 'opacity-0' : 'opacity-100')}>

@@ -10,7 +10,7 @@ import { ScrollArea } from './ui/scroll-area';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getPosts, transformPost } from '@/lib/wp';
-import GlitchLoader from './glitch-loader';
+import { Skeleton } from './ui/skeleton';
 
 interface SearchOverlayProps {
   isOpen: boolean;
@@ -92,7 +92,17 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
           <div className="mt-6 flex-1 overflow-hidden">
             <ScrollArea className="h-full pr-4">
               {isLoading && (
-                 <GlitchLoader />
+                 <div className="space-y-4">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="flex items-center gap-4">
+                        <Skeleton className="h-16 w-16" />
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-48" />
+                          <Skeleton className="h-4 w-64" />
+                        </div>
+                      </div>
+                    ))}
+                 </div>
               )}
               {!isLoading && searchTerm.length > 2 && filteredPosts.length === 0 && (
                 <p className="text-center text-muted-foreground">No results found for "{searchTerm}".</p>
