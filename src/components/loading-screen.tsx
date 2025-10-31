@@ -1,7 +1,9 @@
 
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import { Logo } from './logo';
 import { Music, Music2, Music3, Music4 } from 'lucide-react';
-import React from 'react';
 
 const noteTypes = [
   { Icon: Music, baseSize: 6 },
@@ -10,10 +12,16 @@ const noteTypes = [
   { Icon: Music4, baseSize: 8 },
 ];
 
-const noteCount = 20;
+const noteCount = 40;
 
 const LoadingScreen = () => {
-  const notes = Array.from({ length: noteCount }).map((_, i) => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const notes = isClient ? Array.from({ length: noteCount }).map((_, i) => {
     const { Icon, baseSize } = noteTypes[i % noteTypes.length];
     const size = Math.random() * 4 + baseSize;
     const style = {
@@ -24,7 +32,7 @@ const LoadingScreen = () => {
       animationDelay: `${Math.random() * 5}s`,
     };
     return { Icon, style };
-  });
+  }) : [];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background overflow-hidden">
