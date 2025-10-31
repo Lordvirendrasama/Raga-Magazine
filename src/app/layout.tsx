@@ -12,7 +12,7 @@ import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { MuteProvider } from '@/hooks/use-mute';
 import { useState, useEffect } from 'react';
-import LoadingScreen from '@/components/loading-screen';
+import GlitchLoader from '@/components/glitch-loader';
 import { GlobalLinkSound } from '@/components/global-link-sound';
 import { Marquee } from '@/components/marquee';
 
@@ -44,9 +44,13 @@ export default function RootLayout({
         <title>RagaMagazine</title>
         <meta name="description" content="The future of reading is here." />
       </head>
-      <body className={cn('min-h-screen bg-background font-body antialiased')} suppressHydrationWarning>
-        {isLoading && isClient && <LoadingScreen />}
-        <div className={cn('transition-opacity duration-500', isLoading ? 'opacity-0' : 'opacity-100')}>
+      <body className={cn('min-h-screen bg-background font-body antialiased flex flex-col')} suppressHydrationWarning>
+        {isLoading && isClient ? (
+          <div className="flex-1 flex">
+            <GlitchLoader />
+          </div>
+        ) : (
+          <div className={cn('flex flex-col min-h-screen transition-opacity duration-500', isLoading ? 'opacity-0' : 'opacity-100')}>
             <ThemeProvider
                 attribute="class"
                 defaultTheme="dark"
@@ -65,7 +69,8 @@ export default function RootLayout({
                 <GlobalLinkSound />
               </MuteProvider>
             </ThemeProvider>
-        </div>
+          </div>
+        )}
       </body>
     </html>
   );

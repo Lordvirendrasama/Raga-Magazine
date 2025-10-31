@@ -1,10 +1,11 @@
+
 'use client';
 
 import React from 'react';
 
 const GlitchLoader = () => {
   return (
-    <div className="flex items-center justify-center h-full">
+    <div className="flex items-center justify-center h-full w-full bg-background">
       <div className="glitch" data-text="Loading...">Loading...</div>
     </div>
   );
