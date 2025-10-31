@@ -86,7 +86,9 @@ export function Header() {
         <div className="container mx-auto flex h-16 items-center justify-between px-2">
           <div className="flex items-center gap-2 md:gap-4">
             <Link href="/" className="flex items-center gap-2">
-               <Logo className="w-48 h-14" />
+                <div className="transition-transform duration-300 ease-in-out hover:scale-105 hover:drop-shadow-[0_0_5px_hsl(var(--primary))]">
+                    <Logo className="w-48 h-14" />
+                </div>
             </Link>
           </div>
           <nav className="hidden md:flex md:items-center md:gap-4 lg:gap-6">

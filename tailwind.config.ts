@@ -77,11 +77,16 @@ const config = {
           '0%': { transform: 'translateX(0%)' },
           '100%': { transform: 'translateX(-50%)' },
         },
+        "breathing-logo": {
+          '0%, 100%': { transform: 'scale(1)', opacity: '1' },
+          '50%': { transform: 'scale(0.95)', opacity: '0.9' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "marquee": "marquee 60s linear infinite",
+        "breathing-logo": "breathing-logo 4s ease-in-out infinite",
       },
     },
   },
