@@ -1,5 +1,8 @@
 
+'use server';
+
 import * as admin from 'firebase-admin';
+import 'dotenv/config';
 
 if (!admin.apps.length) {
   try {
