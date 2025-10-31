@@ -81,12 +81,18 @@ const config = {
           '0%, 100%': { transform: 'scale(1)', opacity: '1' },
           '50%': { transform: 'scale(0.95)', opacity: '0.9' },
         },
+        "radiate-out": {
+          '0%': { transform: 'rotate(var(--initial-rotate, 0deg)) scaleX(0)', opacity: '0' },
+          '50%': { transform: 'rotate(var(--initial-rotate, 0deg)) scaleX(1)', opacity: '1' },
+          '100%': { transform: 'rotate(var(--initial-rotate, 0deg)) scaleX(1)', opacity: '0' },
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "marquee": "marquee 60s linear infinite",
         "breathing-logo": "breathing-logo 4s ease-in-out infinite",
+        "radiate-out": 'radiate-out 2s ease-out infinite',
       },
     },
   },
