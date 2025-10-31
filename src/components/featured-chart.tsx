@@ -14,7 +14,7 @@ import { format } from 'date-fns';
 const ChartItem = ({ post, rank }: { post: Post; rank: number }) => (
   <Link href={`/posts/${post.slug}`} className="group flex flex-col items-center text-center">
     <div className="relative mb-2 w-full">
-      <span className="absolute -bottom-2 -left-2 z-10 font-bold text-lg text-primary-foreground bg-primary rounded-full h-6 w-6 flex items-center justify-center dark:bg-primary-deep dark:text-primary-foreground">
+      <span className="absolute -bottom-2 -left-2 z-10 font-bold text-lg text-primary-foreground bg-primary rounded-full h-6 w-6 flex items-center justify-center">
         {rank}
       </span>
       <div className="aspect-square w-full overflow-hidden rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105">
@@ -28,8 +28,8 @@ const ChartItem = ({ post, rank }: { post: Post; rank: number }) => (
         />
       </div>
     </div>
-    <h3 className="mt-2 font-semibold leading-tight text-white group-hover:underline dark:text-primary-foreground">{post.title}</h3>
-    <p className="text-sm text-gray-200 dark:text-primary-foreground/80">{post.author.name}</p>
+    <h3 className="mt-2 font-semibold leading-tight text-white group-hover:underline">{post.title}</h3>
+    <p className="text-sm text-gray-200">{post.author.name}</p>
   </Link>
 );
 
@@ -85,7 +85,7 @@ export function FeaturedChart() {
   return (
     <section className="w-full bg-primary-soft py-4 md:py-6 dark:bg-primary-deep">
       <div className="container mx-auto px-4 text-center">
-        <h2 className="mb-4 font-headline text-2xl font-bold tracking-tight text-white md:text-3xl dark:text-primary-foreground">
+        <h2 className="mb-4 font-headline text-2xl font-bold tracking-tight text-white md:text-3xl">
           This Week's Features
         </h2>
         <div className="mb-6 flex flex-wrap justify-center gap-2">
@@ -106,7 +106,7 @@ export function FeaturedChart() {
         )}
 
         <div className="mt-6 flex flex-col items-center justify-center space-y-2 md:flex-row md:space-y-0 md:space-x-4">
-            <p className="text-xs uppercase tracking-widest text-gray-200 dark:text-primary-foreground/80">Week of {format(new Date(), 'MM/dd/yyyy')}</p>
+            <p className="text-xs uppercase tracking-widest text-gray-200">Week of {format(new Date(), 'MM/dd/yyyy')}</p>
             <Button variant="outline" size="sm" className="border-primary-foreground/50 text-primary-foreground hover:bg-primary-soft/80" asChild>
                 <Link href="/category/featured">View All Features</Link>
             </Button>
