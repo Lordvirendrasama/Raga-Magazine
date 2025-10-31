@@ -2,53 +2,75 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Music, Music2, Music3, Music4 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const useMousePosition = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    const setFromEvent = (e: MouseEvent) => setPosition({ x: e.clientX, y: e.clientY });
-    window.addEventListener('mousemove', setFromEvent);
-    return () => {
-      window.removeEventListener('mousemove', setFromEvent);
-    };
+    if (typeof window !== 'undefined') {
+        const setFromEvent = (e: MouseEvent) => setPosition({ x: e.clientX, y: e.clientY });
+        window.addEventListener('mousemove', setFromEvent);
+        return () => {
+            window.removeEventListener('mousemove', setFromEvent);
+        };
+    }
   }, []);
 
   return position;
 };
 
+const noteIcons = [
+    { Icon: Music, className: 'w-4 h-4' },
+    { Icon: Music2, className: 'w-5 h-5' },
+    { Icon: Music3, className: 'w-3 h-3' },
+    { Icon: Music4, className: 'w-4 h-4' },
+];
+
 const MouseFollower = () => {
   const { x, y } = useMousePosition();
-  const [points, setPoints] = useState<{ x: number; y: number }[]>([]);
+  const [points, setPoints] = useState<{ x: number; y: number; noteIndex: number }[]>([]);
 
   useEffect(() => {
-    // Use a functional update to avoid depending on `points` in the dependency array
+    // Prevent execution on server
+    if (typeof window === 'undefined') return;
+
     setPoints(prevPoints => {
-        const newPoints = [...prevPoints, { x, y }];
-        if (newPoints.length > 10) {
+        const newPoints = [...prevPoints, { x, y, noteIndex: prevPoints.length % noteIcons.length }];
+        // Limit the number of points to prevent performance issues
+        if (newPoints.length > 20) {
             newPoints.shift();
         }
         return newPoints;
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [x, y]);
+  
+  // Render nothing on the server or if points are empty
+  if (typeof window === 'undefined' || points.length === 0) {
+      return null;
+  }
 
   return (
     <>
-      {points.map((point, index) => (
-        <div
-          key={index}
-          className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary transition-transform duration-300 ease-out"
-          style={{
-            left: `${point.x}px`,
-            top: `${point.y}px`,
-            width: `${10 - index}px`,
-            height: `${10 - index}px`,
-            opacity: (index + 1) / 10,
-            transform: `scale(${(index + 1) / 10})`,
-          }}
-        />
-      ))}
+      {points.map((point, index) => {
+        const { Icon, className } = noteIcons[point.noteIndex];
+        return (
+            <Icon
+              key={index}
+              className={cn(
+                'pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 text-primary transition-opacity duration-300 ease-out',
+                className
+              )}
+              style={{
+                left: `${point.x}px`,
+                top: `${point.y}px`,
+                opacity: (index / points.length),
+              }}
+            />
+        )
+      })}
     </>
   );
 };
