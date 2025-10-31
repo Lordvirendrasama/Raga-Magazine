@@ -14,7 +14,7 @@ import { format } from 'date-fns';
 const ChartItem = ({ post, rank }: { post: Post; rank: number }) => (
   <Link href={`/posts/${post.slug}`} className="group flex flex-col items-center text-center">
     <div className="relative mb-2 w-full">
-      <span className="absolute -bottom-2 -left-2 z-10 font-bold text-lg text-accent bg-accent-foreground rounded-full h-6 w-6 flex items-center justify-center">
+      <span className="absolute -bottom-2 left-0 z-10 font-bold text-lg text-white bg-accent rounded-full h-6 w-6 flex items-center justify-center">
         {rank}
       </span>
       <div className="aspect-square w-full overflow-hidden rounded-lg shadow-lg transition-transform duration-300 group-hover:scale-105">
@@ -85,7 +85,7 @@ export function FunReadsChart() {
   }
 
   return (
-    <section className="w-full bg-accent-deep py-8 md:py-12">
+    <section className="w-full bg-accent-deep py-4 md:py-6">
       <div className="container mx-auto px-4 text-center">
         <h2 className="mb-4 font-headline text-2xl font-bold tracking-tight text-accent-foreground md:text-3xl">
           Top Fun Reads
@@ -101,7 +101,7 @@ export function FunReadsChart() {
         {loading ? (
             <ChartSkeleton />
         ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-6 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 max-w-6xl mx-auto">
                 {posts.map((post, index) => (
                     <ChartItem key={post.id} post={post} rank={index + 1} />
                 ))}
