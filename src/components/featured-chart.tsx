@@ -57,19 +57,7 @@ export function FeaturedChart() {
         if (featuredCategory) {
           const fetchedPosts = await getPosts({ categories: featuredCategory, per_page: 5 });
           const transformed = fetchedPosts.map(p => transformPost(p)).filter(p => p !== null) as Post[];
-
-          const squareImages = [16, 17, 18, 19, 20];
-          const hints = ["pop art", "abstract texture", "colorful pattern", "modern art", "quirky character"];
-          const finalPosts = transformed.map((post, index) => {
-              const imageIndex = index % squareImages.length;
-              return {
-                  ...post,
-                  imageUrl: `https://picsum.photos/seed/${squareImages[imageIndex]}/600/600`,
-                  imageHint: hints[imageIndex]
-              }
-          });
-
-          setPosts(finalPosts);
+          setPosts(transformed);
         }
       } catch (error) {
         console.error('Failed to fetch featured posts:', error);
