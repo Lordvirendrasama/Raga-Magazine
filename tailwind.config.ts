@@ -94,6 +94,11 @@ const config = {
             opacity: '0',
           },
         },
+        'light-sweep': {
+          '0%': { left: '-150%' },
+          '50%': { left: '150%' },
+          '100%': { left: '150%' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -101,6 +106,7 @@ const config = {
         "marquee": "marquee 60s linear infinite",
         "breathing-logo": "breathing-logo 4s ease-in-out infinite",
         "float-up": 'float-up linear infinite',
+        'light-sweep': 'light-sweep 2.5s ease-in-out infinite',
       },
     },
   },
