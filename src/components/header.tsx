@@ -10,6 +10,7 @@ import { getCategories } from '@/lib/wp';
 import { ThemeToggle } from './theme-toggle';
 import { MuteToggle } from './mute-toggle';
 import { Input } from '@/components/ui/input';
+import { Logo } from './logo';
 
 interface NavLink {
   name: string;
@@ -85,7 +86,7 @@ export function Header() {
         <div className="container mx-auto flex h-16 items-center justify-between px-2 md:px-4">
           <div className="flex items-center gap-2 md:gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <h1 className="font-headline text-xl font-bold tracking-tighter md:text-2xl">RagaMagazine</h1>
+               <Logo className="w-24 h-auto" />
             </Link>
           </div>
           <nav className="hidden md:flex md:items-center md:gap-4 lg:gap-6">

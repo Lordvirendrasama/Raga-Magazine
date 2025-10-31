@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils";
 export const Logo = ({ className }: { className?: string }) => {
   return (
     <svg
-      viewBox="0 0 400 60"
+      viewBox="0 0 200 60"
       xmlns="http://www.w3.org/2000/svg"
       className={cn("font-headline", className)}
-      aria-label="RagaMagazine Logo"
+      aria-label="Raga Logo"
     >
       <defs>
         <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -16,17 +16,20 @@ export const Logo = ({ className }: { className?: string }) => {
         </linearGradient>
       </defs>
       <text
-        x="50%"
-        y="50%"
-        dy=".3em"
-        textAnchor="middle"
-        fontSize="48"
+        fontFamily="serif"
+        fontSize="50"
         fontWeight="bold"
-        letterSpacing="-1"
         fill="url(#logo-gradient)"
       >
-        RagaMagazine
+        <tspan x="0" y="45">R</tspan>
+        <tspan x="35" y="45" fontSize="40">aga</tspan>
       </text>
+      {/* Devanagari-inspired decoration */}
+      <path
+        d="M 60 25 L 120 25"
+        stroke="url(#logo-gradient)"
+        strokeWidth="2"
+      />
     </svg>
   );
 };
