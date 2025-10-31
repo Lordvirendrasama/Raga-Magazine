@@ -9,6 +9,7 @@ import type { Post } from "@/components/article-card";
 import { Skeleton } from '@/components/ui/skeleton';
 import { FunReadsChart } from '@/components/fun-reads-chart';
 import { SidebarTopStories } from '@/components/sidebar-top-stories';
+import { FeaturedChart } from '@/components/featured-chart';
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -90,7 +91,11 @@ export default function Home() {
                     topStories={trendingPosts}
                 />
             </div>
+        </div>
+        
+        <FeaturedChart />
 
+        <div className="container mx-auto px-4 py-8 lg:py-12">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <div className="lg:col-span-2 space-y-12">
                     <MagazineGrid initialPosts={magazinePosts} />
@@ -104,3 +109,5 @@ export default function Home() {
     </>
   );
 }
+
+    
