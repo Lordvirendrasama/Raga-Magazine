@@ -5,8 +5,6 @@ import 'dotenv/config';
 import { z } from 'zod';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const submitMusicSchema = z.object({
     name: z.string(),
     genre: z.string(),
@@ -26,6 +24,9 @@ export async function submitMusic(formData: unknown) {
   const { name, genre, streamingLink, bio, instagram, email } = parsed.data;
 
   try {
+    // Initialize Resend with the API key here to ensure it's loaded.
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
     const { data, error } = await resend.emails.send({
       from: 'RagaMagazine Submissions <onboarding@resend.dev>',
       to: ['theragamagazine@gmail.com'],
@@ -50,6 +51,10 @@ export async function submitMusic(formData: unknown) {
     return { success: true };
   } catch (error) {
     console.error('Submission error:', error);
+    // Check if the error is due to a missing API key and provide a specific message.
+    if (error instanceof Error && error.message.includes("Missing API key")) {
+        return { success: false, message: 'Could not send email. The RESEND_API_KEY is missing or invalid. Please check your .env file.' };
+    }
     return { success: false, message: 'An unexpected error occurred.' };
   }
 }
