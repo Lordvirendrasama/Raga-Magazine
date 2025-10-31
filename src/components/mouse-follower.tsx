@@ -53,7 +53,8 @@ const MouseFollower = () => {
     lastPointRef.current = { x, y };
 
     setPoints(prevPoints => {
-        const newPoints = [...prevPoints, { x, y, noteIndex: prevPoints.length % noteIcons.length }];
+        const randomNoteIndex = Math.floor(Math.random() * noteIcons.length);
+        const newPoints = [...prevPoints, { x, y, noteIndex: randomNoteIndex }];
         // Limit the number of points to prevent performance issues
         if (newPoints.length > 20) {
             newPoints.shift();
