@@ -57,18 +57,7 @@ export function FunReadsChart() {
         if (funReadsCategory) {
           const fetchedPosts = await getPosts({ categories: funReadsCategory, per_page: 5 });
           const transformed = fetchedPosts.map(p => transformPost(p)).filter(p => p !== null) as Post[];
-
-          const squareImages = [16, 17, 18, 19, 20];
-          const finalPosts = transformed.map((post, index) => {
-              const imageIndex = squareImages[index % squareImages.length] -1;
-              return {
-                  ...post,
-                  imageUrl: `https://picsum.photos/seed/${squareImages[index % squareImages.length]}/600/600`,
-                  imageHint: `abstract ${index}`
-              }
-          });
-
-          setPosts(finalPosts);
+          setPosts(transformed);
         }
       } catch (error) {
         console.error('Failed to fetch fun reads:', error);
@@ -92,7 +81,7 @@ export function FunReadsChart() {
         <div className="mb-6 flex flex-wrap justify-center gap-2">
             <Button variant="outline" size="sm" className="border-primary/50 bg-background text-primary hover:bg-primary/10 dark:border-accent-foreground/50 dark:bg-accent-soft dark:text-accent-foreground dark:hover:bg-accent-soft/80">Hot 100</Button>
             <Button variant="outline" size="sm" className="border-input hover:bg-accent hover:text-accent-foreground dark:border-accent-foreground/50 dark:text-accent-foreground dark:hover:bg-accent-soft/80">Billboard 200</Button>
-            <Button variant="outline" size="sm" className="border-input hover:bg-accent hover:text-accent-foreground dark:border-accent-foreground/50 dark:text-accent-foreground dark:hover:bg-accent-soft/80">Global 200</Button>
+            <Button variant="outline" size="sm" className="border-input hover:bg-accent hover:text-accent-foreground dark:border-accent-foreground/50 dark:text-accent-foreground dark:hover.bg-accent-soft/80">Global 200</Button>
             <Button variant="outline" size="sm" className="border-input hover:bg-accent hover:text-accent-foreground dark:border-accent-foreground/50 dark:text-accent-foreground dark:hover:bg-accent-soft/80">Artist 100</Button>
             <Button variant="outline" size="sm" className="border-input hover:bg-accent hover:text-accent-foreground dark:border-accent-foreground/50 dark:text-accent-foreground dark:hover:bg-accent-soft/80">Top Streaming</Button>
         </div>
