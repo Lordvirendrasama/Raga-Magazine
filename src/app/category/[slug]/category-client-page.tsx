@@ -6,10 +6,12 @@ import { getPosts, getCategoryBySlug, transformPost } from '@/lib/wp';
 import { notFound } from 'next/navigation';
 import { ArticleCard, type Post } from '@/components/article-card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SidebarTopStories } from '@/components/sidebar-top-stories';
 
 export default function CategoryClientPage({ slug }: { slug: string }) {
   const [category, setCategory] = useState<any>(null);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [sidebarPosts, setSidebarPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,8 +25,14 @@ export default function CategoryClientPage({ slug }: { slug: string }) {
         }
         setCategory(cat);
 
-        const fetchedPosts = await getPosts({ categories: cat.id, per_page: 12 });
+        const [fetchedPosts, trendingPosts] = await Promise.all([
+          getPosts({ categories: cat.id, per_page: 12 }),
+          getPosts({ per_page: 5 })
+        ]);
+        
         setPosts(fetchedPosts.map(p => transformPost(p)).filter(p => p !== null) as Post[]);
+        setSidebarPosts(trendingPosts.map(p => transformPost(p)).filter(p => p !== null) as Post[]);
+
       } catch (error) {
         console.error(`Failed to fetch data for category ${slug}:`, error);
         setPosts([]);
@@ -39,23 +47,28 @@ export default function CategoryClientPage({ slug }: { slug: string }) {
     return (
       <div className="container mx-auto px-4 py-8 lg:py-12">
         <Skeleton className="h-12 w-1/3 mb-8" />
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="space-y-4">
-              <Skeleton className="aspect-video w-full" />
-              <Skeleton className="h-6 w-2/3" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-1/2" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="lg:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="space-y-4">
+                  <Skeleton className="aspect-video w-full" />
+                  <Skeleton className="h-6 w-2/3" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+          <div className="lg:col-span-1">
+            <Skeleton className="h-96 w-full" />
+          </div>
         </div>
       </div>
     );
   }
 
   if (!category) {
-    // This can happen if fetching fails, e.g., notFound() was called or an error occurred.
-    // The notFound() call in useEffect will render the 404 page, but this is a fallback.
     return null;
   }
 
@@ -64,15 +77,22 @@ export default function CategoryClientPage({ slug }: { slug: string }) {
       <h1 className="mb-8 font-headline text-4xl font-bold tracking-tight text-foreground md:text-5xl">
         Category: {category.name}
       </h1>
-      {posts.length === 0 ? (
-         <p className="text-center text-muted-foreground">Could not load posts for this category. Please try again later.</p>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
-            <ArticleCard key={post.id} post={post} variant="default" />
-          ))}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="lg:col-span-2">
+          {posts.length === 0 ? (
+            <p className="text-center text-muted-foreground">Could not load posts for this category. Please try again later.</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {posts.map((post) => (
+                <ArticleCard key={post.id} post={post} variant="default" />
+              ))}
+            </div>
+          )}
         </div>
-      )}
+        <div className="lg:col-span-1">
+          <SidebarTopStories posts={sidebarPosts} />
+        </div>
+      </div>
     </div>
   );
 }
