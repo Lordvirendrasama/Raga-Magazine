@@ -97,7 +97,7 @@ export function FeaturedChart() {
 
         <div className="mt-6 flex flex-col items-center justify-center space-y-2 md:flex-row md:space-y-0 md:space-x-4">
             <p className="text-xs uppercase tracking-widest text-primary-foreground/80">Week of {format(new Date(), 'MM/dd/yyyy')}</p>
-            <Button variant="outline" size="sm" className="border-primary-foreground/50 text-primary-foreground hover:bg-primary/90" asChild>
+            <Button variant="secondary" size="sm" asChild>
                 <Link href="/category/featured">View All Features</Link>
             </Button>
         </div>

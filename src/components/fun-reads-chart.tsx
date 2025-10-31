@@ -98,7 +98,7 @@ export function FunReadsChart() {
 
         <div className="mt-6 flex flex-col items-center justify-center space-y-2 md:flex-row md:space-y-0 md:space-x-4">
             <p className="text-xs uppercase tracking-widest text-muted-foreground dark:text-accent-foreground/80 text-gray-200">Week of {format(new Date(), 'MM/dd/yyyy')}</p>
-            <Button variant="outline" size="sm" className="border-input hover:bg-accent hover:text-accent-foreground dark:border-accent-foreground/50 dark:text-accent-foreground dark:hover:bg-accent-soft/80" asChild>
+            <Button variant="secondary" size="sm" asChild>
                 <Link href="/category/fun-reads">View All</Link>
             </Button>
         </div>
