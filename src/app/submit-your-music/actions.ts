@@ -1,15 +1,14 @@
 
 'use server';
 
-import 'dotenv/config';
 import { z } from 'zod';
-import { Resend } from 'resend';
+import { firestore } from '@/lib/firebase/server';
 
 const submitMusicSchema = z.object({
-    name: z.string(),
+    name: z.string().min(2),
     genre: z.string(),
     streamingLink: z.string().url(),
-    bio: z.string(),
+    bio: z.string().min(10),
     instagram: z.string().optional(),
     email: z.string().email(),
 });
@@ -21,38 +20,14 @@ export async function submitMusic(formData: unknown) {
     return { success: false, message: 'Invalid form data.' };
   }
 
-  const { name, genre, streamingLink, bio, instagram, email } = parsed.data;
-
-  const resendApiKey = process.env.RESEND_API_KEY;
-
-  if (!resendApiKey) {
-    console.error('RESEND_API_KEY is not defined in the environment variables.');
-    return { success: false, message: 'Could not send email. The RESEND_API_KEY is missing or invalid. Please check your .env file.' };
-  }
-
   try {
-    const resend = new Resend(resendApiKey);
-
-    const { data, error } = await resend.emails.send({
-      from: 'RagaMagazine Submissions <onboarding@resend.dev>',
-      to: ['theragamagazine@gmail.com'],
-      subject: `New Music Submission: ${name}`,
-      html: `
-        <h1>New Music Submission</h1>
-        <p><strong>Artist/Project Name:</strong> ${name}</p>
-        <p><strong>Genre:</strong> ${genre}</p>
-        <p><strong>Streaming Link:</strong> <a href="${streamingLink}">${streamingLink}</a></p>
-        <p><strong>Bio:</strong></p>
-        <p>${bio}</p>
-        <p><strong>Instagram:</strong> ${instagram || 'Not provided'}</p>
-        <p><strong>Contact Email:</strong> ${email}</p>
-      `,
-    });
-
-    if (error) {
-      console.error('Resend error:', error);
-      return { success: false, message: `Failed to send email: ${error.message}` };
-    }
+    const submissionData = {
+        ...parsed.data,
+        submittedAt: new Date(),
+        status: 'pending',
+    };
+    
+    await firestore.collection('submissions').add(submissionData);
 
     return { success: true };
   } catch (error) {
@@ -60,6 +35,27 @@ export async function submitMusic(formData: unknown) {
     if (error instanceof Error) {
         return { success: false, message: `An unexpected error occurred: ${error.message}` };
     }
-    return { success: false, message: 'An unexpected error occurred.' };
+    return { success: false, message: 'An unexpected error occurred while saving to the database.' };
   }
+}
+
+export async function getSubmissions() {
+    try {
+        const submissionsSnapshot = await firestore.collection('submissions').orderBy('submittedAt', 'desc').get();
+        const submissions = submissionsSnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                submittedAt: data.submittedAt.toDate().toISOString(),
+            }
+        });
+        return { success: true, submissions };
+    } catch (error) {
+        console.error('Error fetching submissions:', error);
+        if (error instanceof Error) {
+            return { success: false, message: `An unexpected error occurred: ${error.message}` };
+        }
+        return { success: false, message: 'An unexpected error occurred while fetching submissions.' };
+    }
 }
