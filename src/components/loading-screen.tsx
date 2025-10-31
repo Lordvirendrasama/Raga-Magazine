@@ -14,7 +14,7 @@ const noteTypes = [
 const noteCount = 20;
 
 const LoadingScreen = () => {
-  // Guard against SSR
+  // Guard against SSR by returning a simpler, static version of the loading screen on the server.
   if (typeof window === 'undefined') {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background overflow-hidden">
