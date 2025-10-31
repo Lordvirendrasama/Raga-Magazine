@@ -1,7 +1,6 @@
 
 import { Logo } from './logo';
 import { Music, Music2, Music3, Music4 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import React from 'react';
 
 const noteTypes = [
@@ -14,25 +13,14 @@ const noteTypes = [
 const noteCount = 20;
 
 const LoadingScreen = () => {
-  // Guard against SSR by returning a simpler, static version of the loading screen on the server.
-  if (typeof window === 'undefined') {
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background overflow-hidden">
-             <div className="animate-breathing-logo">
-                <Logo className="w-48 md:w-56 h-auto text-foreground" />
-            </div>
-        </div>
-    );
-  }
-
   const notes = Array.from({ length: noteCount }).map((_, i) => {
     const { Icon, baseSize } = noteTypes[i % noteTypes.length];
-    const size = Math.random() * 4 + baseSize; // size from baseSize to baseSize + 4
+    const size = Math.random() * 4 + baseSize;
     const style = {
       left: `${Math.random() * 100}vw`,
       width: `${size}px`,
       height: `${size}px`,
-      animationDuration: `${Math.random() * 5 + 5}s`, // 5s to 10s
+      animationDuration: `${Math.random() * 5 + 5}s`,
       animationDelay: `${Math.random() * 5}s`,
     };
     return { Icon, style };
@@ -40,12 +28,9 @@ const LoadingScreen = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background overflow-hidden">
-      {/* Central Logo */}
       <div className="light-sweep-logo animate-breathing-logo z-10">
         <Logo className="w-48 md:w-56 h-auto text-foreground" />
       </div>
-
-      {/* Floating Music Notes */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
         {notes.map(({ Icon, style }, index) => (
           <Icon

@@ -22,10 +22,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [isLoading, setIsLoading] = useState(true);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // Hide the loading screen as soon as the component mounts and is interactive.
-    setIsLoading(false);
+    setIsClient(true);
+    // Hide the loading screen after a short delay to ensure assets are ready.
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500); // You can adjust this duration
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -39,7 +45,7 @@ export default function RootLayout({
         <meta name="description" content="The future of reading is here." />
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased')} suppressHydrationWarning>
-        {isLoading && <LoadingScreen />}
+        {isLoading && isClient && <LoadingScreen />}
         <div className={cn('transition-opacity duration-500', isLoading ? 'opacity-0' : 'opacity-100')}>
             <ThemeProvider
                 attribute="class"
