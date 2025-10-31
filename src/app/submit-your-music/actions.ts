@@ -23,8 +23,14 @@ export async function submitMusic(formData: unknown) {
 
   const { name, genre, streamingLink, bio, instagram, email } = parsed.data;
 
+  // Check for the API key availability.
+  if (!process.env.RESEND_API_KEY) {
+    console.error('RESEND_API_KEY is not defined in the environment variables.');
+    return { success: false, message: 'Could not send email. The RESEND_API_KEY is missing or invalid. Please check your .env file.' };
+  }
+
   try {
-    // Initialize Resend with the API key here to ensure it's loaded.
+    // Initialize Resend with the API key.
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     const { data, error } = await resend.emails.send({
