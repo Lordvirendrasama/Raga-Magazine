@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Music, Music2, Music3, Music4 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,13 +28,29 @@ const noteIcons = [
     { Icon: Music4, className: 'w-4 h-4' },
 ];
 
+const MIN_DISTANCE = 25; // The minimum distance the mouse has to travel to add a new note.
+
 const MouseFollower = () => {
   const { x, y } = useMousePosition();
   const [points, setPoints] = useState<{ x: number; y: number; noteIndex: number }[]>([]);
+  const lastPointRef = useRef<{ x: number; y: number } | null>(null);
+
 
   useEffect(() => {
     // Prevent execution on server
     if (typeof window === 'undefined') return;
+
+    const lastPoint = lastPointRef.current;
+    if (lastPoint) {
+        const dx = x - lastPoint.x;
+        const dy = y - lastPoint.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < MIN_DISTANCE) {
+            return;
+        }
+    }
+
+    lastPointRef.current = { x, y };
 
     setPoints(prevPoints => {
         const newPoints = [...prevPoints, { x, y, noteIndex: prevPoints.length % noteIcons.length }];
