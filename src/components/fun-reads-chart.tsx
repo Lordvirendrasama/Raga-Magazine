@@ -28,8 +28,8 @@ const ChartItem = ({ post, rank }: { post: Post; rank: number }) => (
         />
       </div>
     </div>
-    <h3 className="mt-2 font-semibold leading-tight text-foreground group-hover:underline dark:text-accent-foreground">{post.title}</h3>
-    <p className="text-sm text-muted-foreground dark:text-accent-foreground/80">{post.author.name}</p>
+    <h3 className="mt-2 font-semibold leading-tight text-foreground group-hover:underline dark:text-accent-foreground text-white">{post.title}</h3>
+    <p className="text-sm text-muted-foreground dark:text-accent-foreground/80 text-gray-200">{post.author.name}</p>
   </Link>
 );
 
@@ -86,7 +86,7 @@ export function FunReadsChart() {
   return (
     <section className="w-full bg-accent-soft py-4 md:py-6 dark:bg-accent-deep">
       <div className="container mx-auto px-4 text-center">
-        <h2 className="mb-4 font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl dark:text-accent-foreground">
+        <h2 className="mb-4 font-headline text-2xl font-bold tracking-tight text-foreground md:text-3xl dark:text-accent-foreground text-white">
           Top Fun Reads
         </h2>
         <div className="mb-6 flex flex-wrap justify-center gap-2">
@@ -108,7 +108,7 @@ export function FunReadsChart() {
         )}
 
         <div className="mt-6 flex flex-col items-center justify-center space-y-2 md:flex-row md:space-y-0 md:space-x-4">
-            <p className="text-xs uppercase tracking-widest text-muted-foreground dark:text-accent-foreground/80">Week of {format(new Date(), 'MM/dd/yyyy')}</p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground dark:text-accent-foreground/80 text-gray-200">Week of {format(new Date(), 'MM/dd/yyyy')}</p>
             <Button variant="outline" size="sm" className="border-input hover:bg-accent hover:text-accent-foreground dark:border-accent-foreground/50 dark:text-accent-foreground dark:hover:bg-accent-soft/80" asChild>
                 <Link href="/category/fun-reads">View All</Link>
             </Button>
