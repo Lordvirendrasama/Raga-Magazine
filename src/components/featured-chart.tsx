@@ -21,8 +21,8 @@ const ChartItem = ({ post, rank }: { post: Post; rank: number }) => (
         <Image
           src={post.imageUrl}
           alt={post.title}
-          width={200}
-          height={200}
+          width={600}
+          height={600}
           data-ai-hint={post.imageHint}
           className="h-full w-full object-cover"
         />
@@ -58,12 +58,14 @@ export function FeaturedChart() {
           const fetchedPosts = await getPosts({ categories: featuredCategory, per_page: 5 });
           const transformed = fetchedPosts.map(p => transformPost(p)).filter(p => p !== null) as Post[];
 
-          const squareImages = [16, 17, 18, 19, 20].reverse();
+          const squareImages = [16, 17, 18, 19, 20];
+          const hints = ["pop art", "abstract texture", "colorful pattern", "modern art", "quirky character"];
           const finalPosts = transformed.map((post, index) => {
+              const imageIndex = index % squareImages.length;
               return {
                   ...post,
-                  imageUrl: `https://picsum.photos/seed/${squareImages[index % squareImages.length]}/600/600`,
-                  imageHint: `abstract ${index}`
+                  imageUrl: `https://picsum.photos/seed/${squareImages[imageIndex]}/600/600`,
+                  imageHint: hints[imageIndex]
               }
           });
 
