@@ -22,6 +22,7 @@ const allStaticLinks: CategoryLink[] = [
   { name: 'Playlists', href: '/category/playlists' },
   { name: 'Live', href: '/category/live' },
   { name: 'Submit Your Music', href: '/submit-your-music' },
+  { name: 'Terms of Service', href: '/terms' },
 ];
 
 export function Footer() {
