@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Music, Music2, Music3, Music4 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,14 +28,23 @@ const noteIcons = [
     { Icon: Music4, className: 'w-4 h-4' },
 ];
 
-const MIN_DISTANCE = 25; // The minimum distance the mouse has to travel to add a new note.
+const MIN_DISTANCE = 25;
+const NOTE_LIFETIME = 1500; // 1.5 seconds in milliseconds
+
+type Point = {
+  x: number;
+  y: number;
+  noteIndex: number;
+  timestamp: number;
+};
 
 const MouseFollower = () => {
   const { x, y } = useMousePosition();
-  const [points, setPoints] = useState<{ x: number; y: number; noteIndex: number }[]>([]);
+  const [points, setPoints] = useState<Point[]>([]);
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
+  const animationFrameRef = useRef<number>();
 
-
+  // Add new points based on mouse movement
   useEffect(() => {
     // Prevent execution on server
     if (typeof window === 'undefined') return;
@@ -54,18 +63,32 @@ const MouseFollower = () => {
 
     setPoints(prevPoints => {
         const randomNoteIndex = Math.floor(Math.random() * noteIcons.length);
-        const newPoints = [...prevPoints, { x, y, noteIndex: randomNoteIndex }];
-        // Limit the number of points to prevent performance issues
-        if (newPoints.length > 20) {
-            newPoints.shift();
-        }
-        return newPoints;
+        const newPoint: Point = { x, y, noteIndex: randomNoteIndex, timestamp: Date.now() };
+        return [...prevPoints, newPoint];
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [x, y]);
+
+  // Animation loop to update and remove old points
+  const animateTrail = useCallback(() => {
+    setPoints(currentPoints => {
+      const now = Date.now();
+      const newPoints = currentPoints.filter(p => now - p.timestamp < NOTE_LIFETIME);
+      return newPoints;
+    });
+    animationFrameRef.current = requestAnimationFrame(animateTrail);
+  }, []);
+
+  useEffect(() => {
+    animationFrameRef.current = requestAnimationFrame(animateTrail);
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [animateTrail]);
   
-  // Render nothing on the server or if points are empty
-  if (typeof window === 'undefined' || points.length === 0) {
+  // Render nothing on the server
+  if (typeof window === 'undefined') {
       return null;
   }
 
@@ -73,17 +96,20 @@ const MouseFollower = () => {
     <>
       {points.map((point, index) => {
         const { Icon, className } = noteIcons[point.noteIndex];
+        const age = Date.now() - point.timestamp;
+        const opacity = 1 - (age / NOTE_LIFETIME);
+
         return (
             <Icon
               key={index}
               className={cn(
-                'pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 text-primary transition-opacity duration-300 ease-out',
+                'pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 text-primary transition-opacity duration-100 ease-linear',
                 className
               )}
               style={{
                 left: `${point.x}px`,
                 top: `${point.y}px`,
-                opacity: (index / points.length),
+                opacity: Math.max(0, opacity),
               }}
             />
         )
