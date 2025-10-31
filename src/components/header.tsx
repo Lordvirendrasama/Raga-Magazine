@@ -86,7 +86,7 @@ export function Header() {
         <div className="container mx-auto flex h-16 items-center justify-between px-2 md:px-4">
           <div className="flex items-center gap-2 md:gap-4">
             <Link href="/" className="flex items-center gap-2">
-               <Logo className="w-24 h-auto" />
+               <Logo className="w-24 h-9" />
             </Link>
           </div>
           <nav className="hidden md:flex md:items-center md:gap-4 lg:gap-6">

@@ -4,13 +4,14 @@ import { cn } from "@/lib/utils";
 
 export const Logo = ({ className }: { className?: string }) => {
   return (
-    <Image
-      src="/logo.svg"
-      alt="Raga Logo"
-      width={100}
-      height={36}
-      className={cn(className)}
-      priority
-    />
+    <div className={cn("relative", className)}>
+        <Image
+          src="/logo.svg"
+          alt="Raga Logo"
+          fill
+          className="object-contain"
+          priority
+        />
+    </div>
   );
 };
