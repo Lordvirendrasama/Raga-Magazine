@@ -26,6 +26,7 @@ const allStaticLinks: NavLink[] = [
   { name: 'Playlists', href: '/category/playlists' },
   { name: 'Live', href: '/category/live' },
   { name: 'Submit Your Music', href: '/submit-your-music' },
+  { name: 'Admin', href: '/admin' },
 ];
 
 export function Header() {
