@@ -38,10 +38,10 @@ export default function SubmitMusicPage() {
             For labels, PR agencies, or detailed submissions, send us your materials directly.
           </p>
           <Link
-            href="mailto:submissions@ragamagazine.in"
+            href="mailto:theragamagazine@gmail.com"
             className="font-semibold text-primary underline-offset-4 hover:underline"
           >
-            submissions@ragamagazine.in
+            theragamagazine@gmail.com
           </Link>
           <p className="mt-2 text-xs text-muted-foreground">
             Please include your artist bio, streaming links, high-resolution press photos, and the official release date.
