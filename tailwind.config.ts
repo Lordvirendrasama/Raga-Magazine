@@ -82,10 +82,26 @@ const config = {
           '50%': { transform: 'scale(0.95)', opacity: '0.9' },
         },
         "note-pop-out-loader": {
-            '0%': { transform: 'scale(0.5)', opacity: '0' },
-            '50%': { transform: 'scale(1.2) rotate(360deg)', opacity: '1' },
-            '100%': { transform: 'scale(1.5)', opacity: '0' },
-        }
+            '0%': { opacity: '0', transform: 'scale(0.3) translateY(0)' },
+            '20%': { opacity: '1' },
+            '100%': { opacity: '0', transform: 'scale(1.5) translateY(-100px)' },
+        },
+        "float-up": {
+          '0%': {
+            transform: 'translateY(0)',
+            opacity: '0',
+          },
+          '10%': {
+            opacity: '0.7',
+          },
+          '90%': {
+            opacity: '0.7',
+          },
+          '100%': {
+            transform: 'translateY(-100vh)',
+            opacity: '0',
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -93,6 +109,7 @@ const config = {
         "marquee": "marquee 60s linear infinite",
         "breathing-logo": "breathing-logo 4s ease-in-out infinite",
         "note-pop-out-loader": 'note-pop-out-loader 1.5s ease-out infinite',
+        "float-up": 'float-up linear infinite',
       },
     },
   },
