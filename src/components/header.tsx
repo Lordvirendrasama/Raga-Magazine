@@ -83,7 +83,7 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
-        <div className="container mx-auto flex h-20 items-center justify-between px-2">
+        <div className="container mx-auto flex h-16 items-center justify-between px-2">
           <div className="flex items-center gap-2 md:gap-4">
             <Link href="/" className="flex items-center gap-2">
                <Logo className="w-32 h-12" />
@@ -123,7 +123,7 @@ export function Header() {
           </div>
         </div>
         {isMenuOpen && (
-          <div className="absolute top-20 left-0 w-full h-[calc(100vh-5rem)] bg-background z-50 md:hidden">
+          <div className="absolute top-16 left-0 w-full h-[calc(100vh-4rem)] bg-background z-50 md:hidden">
             <nav className="flex flex-col items-center gap-2 p-4">
               {navLinks.map((link) => (
                 <Link key={link.name} href={link.href} className="w-full rounded-md py-3 text-center text-lg font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground" onClick={() => setIsMenuOpen(false)}>
