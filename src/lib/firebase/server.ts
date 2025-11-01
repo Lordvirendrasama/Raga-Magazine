@@ -2,14 +2,13 @@
 'use server';
 
 import * as admin from 'firebase-admin';
-import 'dotenv/config';
 
 if (!admin.apps.length) {
   try {
     const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
     if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !privateKey) {
-        throw new Error('Firebase credentials are not set in the environment. Please check your .env file.');
+        throw new Error('Firebase credentials are not set in the environment. Please check your Next.js config and .env file.');
     }
 
     admin.initializeApp({
@@ -21,12 +20,10 @@ if (!admin.apps.length) {
     });
   } catch (error) {
     console.error('Firebase admin initialization error:', error);
-    // Re-throwing the error is important so we don't proceed with a broken state
-    throw new Error('Firebase admin initialization failed.');
+    throw new Error('Firebase admin initialization failed. Check server logs for details.');
   }
 }
 
-// These are now guaranteed to be initialized if no error was thrown.
 const firestore = admin.firestore();
 const auth = admin.auth();
 
