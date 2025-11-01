@@ -20,7 +20,7 @@ export async function submitMusic(formData: unknown) {
     return { success: false, message: 'Invalid form data.' };
   }
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  const resend = new Resend('re_iF6oPAek_yUYnV4PsmwvFzNs9qPNH84ih');
   const { name, genre, streamingLink, bio, instagram, email } = parsed.data;
 
   try {
