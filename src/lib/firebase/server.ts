@@ -3,24 +3,33 @@
 
 import * as admin from 'firebase-admin';
 
+// This is a workaround for the Vercel deployment environment.
+// The private key is not correctly parsed from the .env file.
+const privateKey = process.env.FIREBASE_PRIVATE_KEY
+  ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
+  : undefined;
+
 if (!admin.apps.length) {
-  try {
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
-
-    if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !privateKey) {
-        throw new Error('Firebase credentials are not set in the environment. Please check your Next.js config and .env file.');
+  if (
+    process.env.FIREBASE_PROJECT_ID &&
+    process.env.FIREBASE_CLIENT_EMAIL &&
+    privateKey
+  ) {
+    try {
+      admin.initializeApp({
+        credential: admin.credential.cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey,
+        }),
+      });
+    } catch (error: any) {
+      console.error('Firebase admin initialization error', error.stack);
+      throw new Error('Firebase admin initialization failed.');
     }
-
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: privateKey,
-      }),
-    });
-  } catch (error) {
-    console.error('Firebase admin initialization error:', error);
-    throw new Error('Firebase admin initialization failed. Check server logs for details.');
+  } else {
+    // We can't initialize without credentials, so we'll throw an error.
+    throw new Error('Firebase credentials are not set in the environment.');
   }
 }
 

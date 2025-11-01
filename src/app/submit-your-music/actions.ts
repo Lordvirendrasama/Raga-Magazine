@@ -3,6 +3,7 @@
 
 import { z } from 'zod';
 import { firestore } from '@/lib/firebase/server';
+import { FieldValue } from 'firebase-admin/firestore';
 
 const submitMusicSchema = z.object({
     name: z.string().min(2),
@@ -21,12 +22,9 @@ export async function submitMusic(formData: unknown) {
   }
 
   try {
-    if (!firestore) {
-      throw new Error("Firestore is not initialized. Check your Firebase server configuration.");
-    }
     const submissionData = {
         ...parsed.data,
-        submittedAt: new Date(),
+        submittedAt: FieldValue.serverTimestamp(),
         status: 'pending',
     };
     
@@ -35,33 +33,25 @@ export async function submitMusic(formData: unknown) {
     return { success: true };
   } catch (error) {
     console.error('Submission error:', error);
-    if (error instanceof Error) {
-        return { success: false, message: `An unexpected error occurred: ${error.message}` };
-    }
     return { success: false, message: 'An unexpected error occurred while saving to the database.' };
   }
 }
 
 export async function getSubmissions() {
     try {
-        if (!firestore) {
-          throw new Error("Firestore is not initialized. Check your Firebase server configuration.");
-        }
         const submissionsSnapshot = await firestore.collection('submissions').orderBy('submittedAt', 'desc').get();
         const submissions = submissionsSnapshot.docs.map(doc => {
             const data = doc.data();
             return {
                 id: doc.id,
                 ...data,
+                // Convert Firestore Timestamp to a serializable format (ISO string)
                 submittedAt: data.submittedAt.toDate().toISOString(),
             }
         });
         return { success: true, submissions };
     } catch (error) {
         console.error('Error fetching submissions:', error);
-        if (error instanceof Error) {
-            return { success: false, message: `An unexpected error occurred: ${error.message}` };
-        }
         return { success: false, message: 'An unexpected error occurred while fetching submissions.' };
     }
 }
