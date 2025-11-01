@@ -21,6 +21,9 @@ export async function submitMusic(formData: unknown) {
   }
 
   try {
+    if (!firestore) {
+      throw new Error("Firestore is not initialized. Check your Firebase server configuration.");
+    }
     const submissionData = {
         ...parsed.data,
         submittedAt: new Date(),
@@ -41,6 +44,9 @@ export async function submitMusic(formData: unknown) {
 
 export async function getSubmissions() {
     try {
+        if (!firestore) {
+          throw new Error("Firestore is not initialized. Check your Firebase server configuration.");
+        }
         const submissionsSnapshot = await firestore.collection('submissions').orderBy('submittedAt', 'desc').get();
         const submissions = submissionsSnapshot.docs.map(doc => {
             const data = doc.data();

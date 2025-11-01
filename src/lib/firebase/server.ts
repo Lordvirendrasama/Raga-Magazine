@@ -21,12 +21,13 @@ if (!admin.apps.length) {
     });
   } catch (error) {
     console.error('Firebase admin initialization error:', error);
+    // Re-throwing the error is important so we don't proceed with a broken state
+    throw new Error('Firebase admin initialization failed.');
   }
 }
 
-export const firestore = admin.apps.length ? admin.firestore() : undefined;
-export const auth = admin.apps.length ? admin.auth() : undefined;
+// These are now guaranteed to be initialized if no error was thrown.
+const firestore = admin.firestore();
+const auth = admin.auth();
 
-if (firestore === undefined || auth === undefined) {
-    console.error("Firestore or Auth are not initialized because Firebase Admin SDK failed to initialize.");
-}
+export { firestore, auth };
