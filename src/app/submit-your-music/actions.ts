@@ -3,7 +3,6 @@
 
 import { z } from 'zod';
 import { Resend } from 'resend';
-import 'dotenv/config';
 
 const submitMusicSchema = z.object({
     name: z.string().min(2),
