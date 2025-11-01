@@ -1,7 +1,6 @@
 
-import { SubmitMusicForm } from '@/components/submit-music-form';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
 import { Mail, Music } from 'lucide-react';
 import Link from 'next/link';
 
@@ -14,37 +13,31 @@ export default function SubmitMusicPage() {
           Submit Your Music to Raga
         </h1>
         <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-          Got a new track, EP, or video? We love discovering fresh sounds. Fill out the form below or email us your press kit.
+          Got a new track, EP, or video? We love discovering fresh sounds. The best way to reach us is by email.
         </p>
       </div>
 
-      <SubmitMusicForm />
-
-      <div className="my-12 flex items-center">
-        <Separator className="flex-1" />
-        <span className="mx-4 text-sm text-muted-foreground">Or, prefer to send your full press kit?</span>
-        <Separator className="flex-1" />
-      </div>
-
-      <Card className="mx-auto max-w-lg">
+      <Card className="mx-auto max-w-lg text-center">
         <CardHeader>
-          <CardTitle className="flex items-center gap-3">
+          <CardTitle className="flex items-center justify-center gap-3">
             <Mail className="h-6 w-6 text-primary" />
             Submit via Email
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="mb-4 text-muted-foreground">
+          <p className="mb-6 text-muted-foreground">
             For labels, PR agencies, or detailed submissions, send us your materials directly.
-          </p>
-          <Link
-            href="mailto:theragamagazine@gmail.com"
-            className="font-semibold text-primary underline-offset-4 hover:underline"
-          >
-            theragamagazine@gmail.com
-          </Link>
-          <p className="mt-2 text-xs text-muted-foreground">
             Please include your artist bio, streaming links, high-resolution press photos, and the official release date.
+          </p>
+          <Button asChild size="lg">
+            <Link
+              href="mailto:theragamagazine@gmail.com"
+            >
+              <Mail className="mr-2 h-5 w-5" /> Open Email Client
+            </Link>
+          </Button>
+          <p className="mt-4 text-sm text-muted-foreground">
+             theragamagazine@gmail.com
           </p>
         </CardContent>
       </Card>
