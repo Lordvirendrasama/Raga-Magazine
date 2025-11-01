@@ -3,6 +3,7 @@
 
 import { z } from 'zod';
 import { Resend } from 'resend';
+import 'dotenv/config';
 
 const submitMusicSchema = z.object({
     name: z.string().min(2),
@@ -19,15 +20,21 @@ export async function submitMusic(formData: unknown) {
   if (!parsed.success) {
     return { success: false, message: 'Invalid form data.' };
   }
+  
+  if (!process.env.RESEND_API_KEY) {
+      console.error('Resend API key is not set.');
+      return { success: false, message: 'Server configuration error: Missing API key.' };
+  }
 
-  const resend = new Resend('re_iF6oPAek_yUYnV4PsmwvFzNs9qPNH84ih');
+  const resend = new Resend(process.env.RESEND_API_KEY);
   const { name, genre, streamingLink, bio, instagram, email } = parsed.data;
 
   try {
     const { data, error } = await resend.emails.send({
-        from: 'Raga Submissions <onboarding@resend.dev>',
+        from: 'Raga Submissions <submissions@studioprototyper.com>',
         to: ['theragamagazine@gmail.com'],
         subject: `New Music Submission: ${name}`,
+        reply_to: email,
         html: `
             <h1>New Music Submission</h1>
             <p><strong>Artist/Project Name:</strong> ${name}</p>
