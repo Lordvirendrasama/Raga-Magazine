@@ -38,7 +38,7 @@ const LoadingScreen = () => {
       animationDuration: `${Math.random() * 5 + 5}s`,
       animationDelay: `${Math.random() * 5}s`,
     };
-    return <Icon key={i} className={cn('absolute text-primary/50 animate-float-up', className)} style={style} />;
+    return <Icon key={i} className={cn('absolute bottom-0 text-primary/50 animate-float-up', className)} style={style} />;
   });
 
   return (
