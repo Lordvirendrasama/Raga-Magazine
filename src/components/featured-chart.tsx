@@ -4,12 +4,18 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getPosts, transformPost, getCategoryIdBySlug } from '@/lib/wp';
+import { getPosts, transformPost, getCategories } from '@/lib/wp';
 import type { Post } from './article-card';
 import { Button } from './ui/button';
 import { Skeleton } from './ui/skeleton';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+}
 
 const ChartItem = ({ post, rank }: { post: Post; rank: number }) => (
   <Link href={`/posts/${post.slug}`} className="group flex flex-col items-center text-center">
@@ -49,36 +55,64 @@ const ChartSkeleton = () => (
 export function FeaturedChart() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [activeCategory, setActiveCategory] = useState<Category | null>(null);
 
   useEffect(() => {
-    async function fetchFeatured() {
+    async function fetchInitialData() {
       try {
-        const featuredCategory = await getCategoryIdBySlug('featured');
-        if (featuredCategory) {
-          const fetchedPosts = await getPosts({ categories: featuredCategory, per_page: 5 });
-          const transformed = fetchedPosts.map(p => transformPost(p)).filter(p => p !== null) as Post[];
-          setPosts(transformed);
+        setLoading(true);
+        const allCategories = await getCategories({ per_page: 50 });
+        const chartsParent = allCategories.find((cat: any) => cat.slug === 'charts');
+        let chartCategories: Category[] = [];
+
+        if (chartsParent) {
+          chartCategories = allCategories
+            .filter((cat: any) => cat.parent === chartsParent.id)
+            .map((cat: any) => ({ id: cat.id, name: cat.name, slug: cat.slug }));
+        }
+        
+        if (chartCategories.length === 0) {
+           chartCategories = allCategories
+            .filter((cat: any) => cat.slug !== 'uncategorized' && cat.count > 0)
+            .slice(0, 5)
+            .map((cat: any) => ({ id: cat.id, name: cat.name, slug: cat.slug }));
+        }
+
+        setCategories(chartCategories);
+
+        if (chartCategories.length > 0) {
+          setActiveCategory(chartCategories[0]);
         }
       } catch (error) {
-        console.error('Failed to fetch featured posts:', error);
+        console.error('Failed to fetch categories:', error);
       } finally {
         setLoading(false);
       }
     }
-    fetchFeatured();
+    fetchInitialData();
   }, []);
 
-  if (posts.length === 0 && !loading) {
+  useEffect(() => {
+    async function fetchPosts() {
+      if (!activeCategory) return;
+      try {
+        setLoading(true);
+        const fetchedPosts = await getPosts({ categories: activeCategory.id, per_page: 5 });
+        const transformed = fetchedPosts.map(p => transformPost(p)).filter(p => p !== null) as Post[];
+        setPosts(transformed);
+      } catch (error) {
+        console.error(`Failed to fetch posts for category ${activeCategory.name}:`, error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPosts();
+  }, [activeCategory]);
+  
+  if (categories.length === 0 && !loading) {
     return null; 
   }
-
-  const categoryButtons = [
-    { name: "Hot 100", slug: "hot-100", active: true },
-    { name: "Billboard 200", slug: "billboard-200" },
-    { name: "Global 200", slug: "global-200" },
-    { name: "Artist 100", slug: "artist-100" },
-    { name: "Top Streaming", slug: "top-streaming" },
-  ];
 
   return (
     <section className="w-full bg-primary py-4 md:py-6">
@@ -87,9 +121,18 @@ export function FeaturedChart() {
           This Week's Features
         </h2>
         <div className="mb-6 flex flex-wrap justify-center gap-2">
-            {categoryButtons.map(button => (
-              <Button key={button.slug} variant="outline" size="sm" className={cn("border-primary-foreground/50 bg-primary/80 text-primary-foreground hover:bg-primary/90", !button.active && "opacity-80")} asChild>
-                <Link href={`/category/${button.slug}`}>{button.name}</Link>
+            {categories.map(button => (
+              <Button 
+                key={button.slug} 
+                variant="outline" 
+                size="sm" 
+                className={cn(
+                  "border-primary-foreground/50 bg-primary/80 text-primary-foreground hover:bg-primary/90", 
+                  activeCategory?.slug !== button.slug && "opacity-80"
+                )}
+                onClick={() => setActiveCategory(button)}
+              >
+                {button.name}
               </Button>
             ))}
         </div>
@@ -97,18 +140,24 @@ export function FeaturedChart() {
         {loading ? (
             <ChartSkeleton />
         ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-6 max-w-6xl mx-auto">
-                {posts.map((post, index) => (
-                    <ChartItem key={post.id} post={post} rank={index + 1} />
-                ))}
-            </div>
+            posts.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-6 max-w-6xl mx-auto">
+                    {posts.map((post, index) => (
+                        <ChartItem key={post.id} post={post} rank={index + 1} />
+                    ))}
+                </div>
+            ) : (
+                <p className="text-primary-foreground/80">No posts found for this category.</p>
+            )
         )}
 
         <div className="mt-6 flex flex-col items-center justify-center space-y-2 md:flex-row md:space-y-0 md:space-x-4">
             <p className="text-xs uppercase tracking-widest text-primary-foreground/80">Week of {format(new Date(), 'MM/dd/yyyy')}</p>
-            <Button variant="secondary" size="sm" asChild>
-                <Link href="/category/featured">View All Features</Link>
-            </Button>
+            {activeCategory && (
+              <Button variant="secondary" size="sm" asChild>
+                  <Link href={`/category/${activeCategory.slug}`}>View All Features</Link>
+              </Button>
+            )}
         </div>
       </div>
     </section>
