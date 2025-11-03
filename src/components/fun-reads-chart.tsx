@@ -62,25 +62,29 @@ export function FunReadsChart() {
     async function fetchInitialData() {
       try {
         setLoading(true);
-        const allCategories = await getCategories({ per_page: 50 });
+        const allCategories = await getCategories({ per_page: 50, orderby: 'count', order: 'desc' });
         const funReadsParent = allCategories.find((cat: any) => cat.slug === 'fun-reads');
         let funReadsCategories: Category[] = [];
 
         if (funReadsParent) {
-            funReadsCategories = allCategories
+          // Look for sub-categories of "fun-reads"
+          funReadsCategories = allCategories
             .filter((cat: any) => cat.parent === funReadsParent.id)
             .map((cat: any) => ({ id: cat.id, name: cat.name, slug: cat.slug }));
-        }
 
-        // If no child categories, use the parent 'fun-reads' itself if it exists
-        if (funReadsCategories.length === 0 && funReadsParent) {
-            funReadsCategories = [{ id: funReadsParent.id, name: funReadsParent.name, slug: funReadsParent.slug }];
+          // If no sub-categories, use the "fun-reads" category itself.
+          if (funReadsCategories.length === 0) {
+              funReadsCategories = [{ id: funReadsParent.id, name: funReadsParent.name, slug: funReadsParent.slug }];
+          }
         }
         
         setCategories(funReadsCategories);
 
         if (funReadsCategories.length > 0) {
           setActiveCategory(funReadsCategories[0]);
+        } else {
+          // If no "fun-reads" category or sub-categories are found, load empty.
+          setPosts([]);
         }
 
       } catch (error) {
@@ -95,8 +99,8 @@ export function FunReadsChart() {
   useEffect(() => {
     async function fetchPosts() {
       if (!activeCategory) {
-          if(!loading) setPosts([]);
-          return;
+        if(!loading) setPosts([]);
+        return;
       }
       try {
         setLoading(true);
@@ -111,7 +115,7 @@ export function FunReadsChart() {
       }
     }
     fetchPosts();
-  }, [activeCategory, loading]);
+  }, [activeCategory]);
 
 
   if (categories.length === 0 && !loading) {
