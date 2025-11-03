@@ -308,4 +308,20 @@
       transform: scale(1.5) translateY(-100px);
     }
   }
+
+  .animate-float-up {
+    animation-name: float-up;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  @keyframes float-up {
+    from {
+      transform: translateY(100vh);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(-100px);
+      opacity: 0;
+    }
+  }
 }
