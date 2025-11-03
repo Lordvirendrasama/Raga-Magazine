@@ -26,10 +26,9 @@ export default function RootLayout({
 
   useEffect(() => {
     setIsClient(true);
-    // Hide the loading screen after a short delay to ensure assets are ready.
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1500); // You can adjust this duration
+    }, 1500); 
 
     return () => clearTimeout(timer);
   }, []);
@@ -44,11 +43,14 @@ export default function RootLayout({
         <title>RagaMagazine</title>
         <meta name="description" content="The future of reading is here." />
       </head>
-      <body className={cn('min-h-screen bg-background font-body antialiased flex flex-col')} suppressHydrationWarning>
+      <body className={cn(
+          'min-h-screen bg-background font-body antialiased flex flex-col',
+          isClient && isLoading && 'overflow-hidden'
+        )} 
+        suppressHydrationWarning
+      >
         {isClient && isLoading ? (
-           <div className="flex-1 flex">
-            <LoadingScreen />
-          </div>
+          <LoadingScreen />
         ) : (
           <div className={cn('flex flex-col min-h-screen transition-opacity duration-500', isLoading ? 'opacity-0' : 'opacity-100')}>
             <ThemeProvider

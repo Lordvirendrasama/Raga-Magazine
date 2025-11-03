@@ -23,13 +23,10 @@ const LoadingScreen = () => {
   }, []);
 
   if (!isClient) {
+    // Render a simple centered logo for SSR to avoid hydration errors
     return (
-      <div className="flex items-center justify-center h-full w-full bg-background overflow-hidden">
-        <div className="relative flex items-center justify-center">
-            <div className="light-sweep-logo animate-breathing-logo">
-                <Logo className="w-48 h-20" />
-            </div>
-        </div>
+      <div className="fixed inset-0 flex items-center justify-center bg-background z-50">
+        <Logo className="w-48 h-20" />
       </div>
     );
   }
@@ -45,7 +42,7 @@ const LoadingScreen = () => {
   });
 
   return (
-    <div className="flex items-center justify-center h-full w-full bg-background overflow-hidden relative">
+    <div className="fixed inset-0 flex items-center justify-center bg-background z-50 overflow-hidden">
       {notes}
       <div className="relative z-10 flex items-center justify-center">
         <div className="light-sweep-logo animate-breathing-logo">
