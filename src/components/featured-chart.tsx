@@ -72,6 +72,13 @@ export function FeaturedChart() {
     return null; 
   }
 
+  const categoryButtons = [
+    { name: "Editor's Picks", slug: "editors-picks", active: true },
+    { name: "Interviews", slug: "interviews" },
+    { name: "Live Sessions", slug: "live-sessions" },
+    { name: "Album Reviews", slug: "album-reviews" },
+  ];
+
   return (
     <section className="w-full bg-primary py-4 md:py-6">
       <div className="container mx-auto px-4 text-center">
@@ -79,10 +86,11 @@ export function FeaturedChart() {
           This Week's Features
         </h2>
         <div className="mb-6 flex flex-wrap justify-center gap-2">
-            <Button variant="outline" size="sm" className="border-primary-foreground/50 bg-primary/80 text-primary-foreground hover:bg-primary/90">Editor's Picks</Button>
-            <Button variant="outline" size="sm" className="border-primary-foreground/50 bg-primary/80 text-primary-foreground hover:bg-primary/90 opacity-80">Interviews</Button>
-            <Button variant="outline" size="sm" className="border-primary-foreground/50 bg-primary/80 text-primary-foreground hover:bg-primary/90 opacity-80">Live Sessions</Button>
-            <Button variant="outline" size="sm" className="border-primary-foreground/50 bg-primary/80 text-primary-foreground hover:bg-primary/90 opacity-80">Album Reviews</Button>
+            {categoryButtons.map(button => (
+              <Button key={button.slug} variant="outline" size="sm" className={cn("border-primary-foreground/50 bg-primary/80 text-primary-foreground hover:bg-primary/90", !button.active && "opacity-80")} asChild>
+                <Link href={`/category/${button.slug}`}>{button.name}</Link>
+              </Button>
+            ))}
         </div>
         
         {loading ? (
