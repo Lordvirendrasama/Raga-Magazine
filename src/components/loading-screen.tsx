@@ -45,8 +45,8 @@ const LoadingScreen = () => {
   });
 
   return (
-    <div className="flex items-center justify-center h-full w-full bg-background overflow-hidden">
-      <div className="absolute inset-0 z-0">{notes}</div>
+    <div className="flex items-center justify-center h-full w-full bg-background overflow-hidden relative">
+      {notes}
       <div className="relative z-10 flex items-center justify-center">
         <div className="light-sweep-logo animate-breathing-logo">
           <Logo className="w-48 h-20" />
