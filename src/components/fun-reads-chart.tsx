@@ -111,7 +111,7 @@ export function FunReadsChart() {
       }
     }
     fetchPosts();
-  }, [activeCategory]);
+  }, [activeCategory, loading]);
 
 
   if (categories.length === 0 && !loading) {
@@ -157,7 +157,7 @@ export function FunReadsChart() {
 
         <div className="mt-6 flex flex-col items-center justify-center space-y-2 md:flex-row md:space-y-0 md:space-x-4">
             <p className="text-xs uppercase tracking-widest text-muted-foreground dark:text-accent-foreground/80 text-gray-200">Week of {format(new Date(), 'MM/dd/yyyy')}</p>
-             {activeCategory && (
+             {activeCategory && posts.length > 0 && (
                 <Button variant="secondary" size="sm" asChild>
                     <Link href={`/category/${activeCategory.slug}`}>View All</Link>
                 </Button>
