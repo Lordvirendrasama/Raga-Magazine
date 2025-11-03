@@ -73,10 +73,11 @@ export function FeaturedChart() {
   }
 
   const categoryButtons = [
-    { name: "Editor's Picks", slug: "editors-picks", active: true },
-    { name: "Interviews", slug: "interviews" },
-    { name: "Live Sessions", slug: "live-sessions" },
-    { name: "Album Reviews", slug: "album-reviews" },
+    { name: "Hot 100", slug: "hot-100", active: true },
+    { name: "Billboard 200", slug: "billboard-200" },
+    { name: "Global 200", slug: "global-200" },
+    { name: "Artist 100", slug: "artist-100" },
+    { name: "Top Streaming", slug: "top-streaming" },
   ];
 
   return (
