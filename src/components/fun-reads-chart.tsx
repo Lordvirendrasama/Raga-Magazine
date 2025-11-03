@@ -71,6 +71,13 @@ export function FunReadsChart() {
   if (posts.length === 0 && !loading) {
     return null; 
   }
+  const categoryButtons = [
+    { name: "Hot 100", slug: "hot-100", active: true },
+    { name: "Billboard 200", slug: "billboard-200" },
+    { name: "Global 200", slug: "global-200" },
+    { name: "Artist 100", slug: "artist-100" },
+    { name: "Top Streaming", slug: "top-streaming" },
+  ];
 
   return (
     <section className="w-full bg-accent-soft py-4 md:py-6 dark:bg-accent-deep">
@@ -79,11 +86,14 @@ export function FunReadsChart() {
           Top Fun Reads
         </h2>
         <div className="mb-6 flex flex-wrap justify-center gap-2">
-            <Button variant="outline" size="sm" className="border-primary/50 bg-background text-primary hover:bg-primary/10 dark:border-accent-foreground/50 dark:bg-accent-soft dark:text-accent-foreground dark:hover:bg-accent-soft/80">Hot 100</Button>
-            <Button variant="outline" size="sm" className="border-input hover:bg-accent hover:text-accent-foreground dark:border-accent-foreground/50 dark:text-accent-foreground dark:hover:bg-accent-soft/80">Billboard 200</Button>
-            <Button variant="outline" size="sm" className="border-input hover:bg-accent hover:text-accent-foreground dark:border-accent-foreground/50 dark:text-accent-foreground dark:hover.bg-accent-soft/80">Global 200</Button>
-            <Button variant="outline" size="sm" className="border-input hover:bg-accent hover:text-accent-foreground dark:border-accent-foreground/50 dark:text-accent-foreground dark:hover:bg-accent-soft/80">Artist 100</Button>
-            <Button variant="outline" size="sm" className="border-input hover:bg-accent hover:text-accent-foreground dark:border-accent-foreground/50 dark:text-accent-foreground dark:hover:bg-accent-soft/80">Top Streaming</Button>
+            {categoryButtons.map(button => (
+              <Button key={button.slug} variant="outline" size="sm" className={cn(
+                "border-input hover:bg-accent hover:text-accent-foreground dark:border-accent-foreground/50 dark:text-accent-foreground dark:hover:bg-accent-soft/80",
+                button.active && "border-primary/50 bg-background text-primary hover:bg-primary/10 dark:border-accent-foreground/50 dark:bg-accent-soft dark:text-accent-foreground dark:hover:bg-accent-soft/80"
+              )} asChild>
+                <Link href={`/category/${button.slug}`}>{button.name}</Link>
+              </Button>
+            ))}
         </div>
         
         {loading ? (
