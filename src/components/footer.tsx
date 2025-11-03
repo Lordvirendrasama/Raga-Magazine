@@ -71,8 +71,8 @@ export function Footer() {
   return (
     <footer className="bg-card text-card-foreground border-t-4 border-primary pb-10">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 gap-8 text-center md:grid-cols-4 md:text-left">
-          <div className="md:col-span-2">
+        <div className="grid grid-cols-1 gap-8 text-center md:grid-cols-3 md:text-left">
+          <div className="md:col-span-1">
             <Link href="/" className="inline-block mb-4">
                 <Logo className="w-48 h-14 mx-auto md:mx-0" />
             </Link>
@@ -80,10 +80,10 @@ export function Footer() {
                 Exploring the vibrant soul of Indian music, where ancient traditions meet contemporary beats. A modern take on culture, sound, and identity.
             </p>
           </div>
-          <div className="md:justify-self-center">
+          <div className="md:col-span-2 md:justify-self-end">
             <h3 className="font-semibold uppercase tracking-wider text-card-foreground">Navigate</h3>
-            <ul className="mt-4 space-y-2">
-              {navLinks.slice(0, 4).map((link, index) => (
+            <ul className="mt-4 space-y-2 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-2">
+              {navLinks.map((link) => (
                   <li key={link.name}>
                       <Link 
                         href={link.href} 
@@ -93,21 +93,6 @@ export function Footer() {
                       </Link>
                   </li>
               ))}
-            </ul>
-          </div>
-          <div className="md:justify-self-center">
-            <h3 className="font-semibold uppercase tracking-wider text-card-foreground opacity-0 md:opacity-100">.</h3>
-            <ul className="mt-4 space-y-2">
-                {navLinks.slice(4).map((link, index) => (
-                    <li key={link.name}>
-                        <Link 
-                          href={link.href} 
-                          className={cn("text-sm text-card-foreground/80 transition-colors hover:text-card-foreground")}
-                        >
-                            {link.name}
-                        </Link>
-                    </li>
-                ))}
             </ul>
           </div>
         </div>
