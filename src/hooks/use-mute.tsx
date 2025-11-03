@@ -36,7 +36,7 @@ export const MuteProvider = ({ children }: { children: ReactNode }) => {
               <span>Easter Egg Found!</span>
             </div>
           ),
-          description: "You've unmuted the site. Hover over links to hear the national anthem.",
+          description: "You've unmuted the site. Hover over links to hear one of india's most influential music.",
         });
         hasShownToastRef.current = true;
       }
