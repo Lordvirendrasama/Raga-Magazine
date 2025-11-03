@@ -62,7 +62,7 @@ export function FeaturedChart() {
     async function fetchInitialData() {
       try {
         setLoading(true);
-        const allCategories = await getCategories({ per_page: 50 });
+        const allCategories = await getCategories({ per_page: 50, orderby: 'count', order: 'desc' });
         const chartsParent = allCategories.find((cat: any) => cat.slug === 'charts');
         let chartCategories: Category[] = [];
 
@@ -72,6 +72,7 @@ export function FeaturedChart() {
             .map((cat: any) => ({ id: cat.id, name: cat.name, slug: cat.slug }));
         }
         
+        // Fallback: If no sub-categories for 'charts', use top 5 categories by post count
         if (chartCategories.length === 0) {
            chartCategories = allCategories
             .filter((cat: any) => cat.slug !== 'uncategorized' && cat.count > 0)
@@ -103,6 +104,7 @@ export function FeaturedChart() {
         setPosts(transformed);
       } catch (error) {
         console.error(`Failed to fetch posts for category ${activeCategory.name}:`, error);
+        setPosts([]);
       } finally {
         setLoading(false);
       }
@@ -128,7 +130,7 @@ export function FeaturedChart() {
                 size="sm" 
                 className={cn(
                   "border-primary-foreground/50 bg-primary/80 text-primary-foreground hover:bg-primary/90", 
-                  activeCategory?.slug !== button.slug && "opacity-80"
+                  activeCategory?.slug === button.slug && "bg-background/20"
                 )}
                 onClick={() => setActiveCategory(button)}
               >

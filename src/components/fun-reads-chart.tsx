@@ -72,25 +72,19 @@ export function FunReadsChart() {
             .map((cat: any) => ({ id: cat.id, name: cat.name, slug: cat.slug }));
         }
 
-        if (funReadsCategories.length === 0) {
-            const fallbackCategory = allCategories.find((cat: any) => cat.slug === 'fun-reads');
-            if (fallbackCategory) {
-              funReadsCategories = [fallbackCategory];
-            }
+        // If no child categories, use the parent 'fun-reads' itself if it exists
+        if (funReadsCategories.length === 0 && funReadsParent) {
+            funReadsCategories = [{ id: funReadsParent.id, name: funReadsParent.name, slug: funReadsParent.slug }];
         }
         
         setCategories(funReadsCategories);
 
         if (funReadsCategories.length > 0) {
           setActiveCategory(funReadsCategories[0]);
-        } else {
-          // If still no categories, use the main fun-reads as a last resort if it exists
-          const funReadsMain = allCategories.find((cat: any) => cat.slug === 'fun-reads');
-           if(funReadsMain) setActiveCategory(funReadsMain);
         }
 
       } catch (error) {
-        console.error('Failed to fetch categories:', error);
+        console.error('Failed to fetch categories for Fun Reads:', error);
       } finally {
         setLoading(false);
       }
@@ -102,8 +96,8 @@ export function FunReadsChart() {
     async function fetchPosts() {
       if (!activeCategory) {
           if(!loading) setPosts([]);
-          return
-      };
+          return;
+      }
       try {
         setLoading(true);
         const fetchedPosts = await getPosts({ categories: activeCategory.id, per_page: 5 });
@@ -111,12 +105,13 @@ export function FunReadsChart() {
         setPosts(transformed);
       } catch (error) {
         console.error(`Failed to fetch posts for category ${activeCategory.name}:`, error);
+        setPosts([]);
       } finally {
         setLoading(false);
       }
     }
     fetchPosts();
-  }, [activeCategory, loading]);
+  }, [activeCategory]);
 
 
   if (categories.length === 0 && !loading) {
