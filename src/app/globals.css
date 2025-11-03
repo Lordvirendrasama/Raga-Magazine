@@ -312,7 +312,8 @@
   .animate-float-up {
     animation-name: float-up;
     animation-timing-function: linear;
-    animation-iteration-count: infinite;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
   }
   @keyframes float-up {
     0% {
@@ -331,3 +332,5 @@
     }
   }
 }
+
+    
