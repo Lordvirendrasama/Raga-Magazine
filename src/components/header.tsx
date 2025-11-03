@@ -97,25 +97,21 @@ export function Header() {
               </Link>
             ))}
           </nav>
-          <div className="flex items-center gap-0.5 md:gap-2">
-            <div 
-                className="relative w-10 md:w-40 lg:w-64 transition-all duration-300 ease-in-out"
-                onFocus={() => setIsSearchOpen(true)}
-            >
+          <div className="flex items-center gap-1 md:gap-2">
+            <div className="hidden md:block relative w-40 lg:w-64">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-card-foreground/60" />
                 <Input
                     type="search"
                     placeholder="Search..."
                     className="h-9 w-full rounded-full border-card-foreground/40 bg-card/80 pl-9 pr-3 text-card-foreground placeholder:text-card-foreground/60 focus:bg-background/20"
                     onClick={() => setIsSearchOpen(true)}
-                    onKeyDown={(e) => {
-                        if (e.key) {
-                            setIsSearchOpen(true);
-                        }
-                    }}
+                    onKeyDown={(e) => { if (e.key) { setIsSearchOpen(true); } }}
                     readOnly 
                 />
             </div>
+             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsSearchOpen(true)} aria-label="Open search">
+              <Search className="h-6 w-6" />
+            </Button>
             <MuteToggle />
             <ThemeToggle />
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle menu">
@@ -139,5 +135,3 @@ export function Header() {
     </>
   );
 }
-
-    
