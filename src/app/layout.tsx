@@ -40,8 +40,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet" />
-        <title>RagaMagazine</title>
-        <meta name="description" content="The future of reading is here." />
       </head>
       <body className={cn(
           'min-h-screen bg-background font-body antialiased flex flex-col',
