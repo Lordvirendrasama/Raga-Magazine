@@ -83,14 +83,17 @@ const config = {
         },
         "float-up": {
           '0%': {
-            transform: 'translateY(100vh) scale(0.5)',
+            transform: 'translateY(100%)',
             opacity: '0',
           },
-          '50%': {
+          '25%': {
+            opacity: '1',
+          },
+          '75%': {
             opacity: '1',
           },
           '100%': {
-            transform: 'translateY(-100vh) scale(1.2)',
+            transform: 'translateY(-100vh)',
             opacity: '0',
           },
         },
@@ -105,7 +108,7 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out",
         "marquee": "marquee 60s linear infinite",
         "breathing-logo": "breathing-logo 4s ease-in-out infinite",
-        "float-up": 'float-up linear infinite',
+        "float-up": 'float-up ease-in-out infinite',
         'light-sweep': 'light-sweep 2.5s ease-in-out infinite',
       },
     },
