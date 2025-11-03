@@ -31,7 +31,7 @@ export function AdminPanel() {
         <TabsTrigger value="dev-tools">
             <Construction className="mr-2 h-4 w-4" />
             Developer Tools
-        </Tabs_Trigger>
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="general">
         <Card>
