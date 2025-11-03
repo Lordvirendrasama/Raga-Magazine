@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from './ui/button';
 import React, { useState, useEffect } from 'react';
 import { getCategories } from '@/lib/wp';
+import { Logo } from './logo';
 
 interface CategoryLink {
   name: string;
@@ -69,45 +70,59 @@ export function Footer() {
   return (
     <footer className="border-t bg-card pb-10">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-          <div>
-            <h2 className="font-headline text-2xl font-bold">RagaMagazine</h2>
-            <p className="mt-2 text-sm text-muted-foreground">The future of reading is here.</p>
+        <div className="grid grid-cols-1 gap-8 text-center md:grid-cols-4 md:text-left">
+          <div className="md:col-span-2">
+            <Link href="/" className="inline-block mb-4">
+                <Logo className="w-48 h-14 mx-auto md:mx-0" />
+            </Link>
+            <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto md:mx-0">
+                Exploring the vibrant soul of Indian music, where ancient traditions meet contemporary beats. A modern take on culture, sound, and identity.
+            </p>
           </div>
-          <div className="grid grid-cols-2 gap-8 md:col-span-2">
-            <div className="md:justify-self-center">
-              <h3 className="font-semibold uppercase tracking-wider text-foreground">Navigate</h3>
-              <ul className="mt-4 space-y-2">
-                {navLinks.map((link, index) => (
+          <div className="md:justify-self-center">
+            <h3 className="font-semibold uppercase tracking-wider text-foreground">Navigate</h3>
+            <ul className="mt-4 space-y-2">
+              {navLinks.slice(0, 4).map((link, index) => (
+                  <li key={link.name}>
+                      <Link 
+                        href={link.href} 
+                        className={`text-sm text-muted-foreground transition-colors hover:text-primary`}
+                      >
+                          {link.name}
+                      </Link>
+                  </li>
+              ))}
+            </ul>
+          </div>
+          <div className="md:justify-self-center">
+            <h3 className="font-semibold uppercase tracking-wider text-foreground opacity-0 md:opacity-100">.</h3>
+            <ul className="mt-4 space-y-2">
+                {navLinks.slice(4).map((link, index) => (
                     <li key={link.name}>
                         <Link 
                           href={link.href} 
-                          className={`text-sm text-muted-foreground hover:text-${index % 2 === 0 ? 'primary' : 'accent'}`}
+                          className={`text-sm text-muted-foreground transition-colors hover:text-accent`}
                         >
                             {link.name}
                         </Link>
                     </li>
                 ))}
-              </ul>
-            </div>
-            <div className="md:justify-self-end">
-              <h3 className="font-semibold uppercase tracking-wider text-foreground">Follow Us</h3>
-              <div className="mt-4 flex space-x-4">
-                <Button variant="ghost" size="icon" asChild>
-                  <a href="#" aria-label="Twitter"><Twitter className="h-5 w-5" /></a>
-                </Button>
-                <Button variant="ghost" size="icon" asChild>
-                  <a href="#" aria-label="Facebook"><Facebook className="h-5 w-5" /></a>
-                </Button>
-                <Button variant="ghost" size="icon" asChild>
-                  <a href="#" aria-label="Instagram"><Instagram className="h-5 w-5" /></a>
-                </Button>
-              </div>
-            </div>
+            </ul>
           </div>
         </div>
-        <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
-          {currentYear && <p>&copy; {currentYear} RagaMagazine. All rights reserved.</p>}
+        <div className="mt-12 border-t pt-8 text-center text-sm text-muted-foreground flex flex-col md:flex-row justify-between items-center gap-4">
+            {currentYear && <p className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">&copy; {currentYear} RagaMagazine. All rights reserved.</p>}
+            <div className="flex space-x-4">
+            <Button variant="ghost" size="icon" asChild>
+                <a href="#" aria-label="Twitter"><Twitter className="h-5 w-5" /></a>
+            </Button>
+            <Button variant="ghost" size="icon" asChild>
+                <a href="#" aria-label="Facebook"><Facebook className="h-5 w-5" /></a>
+            </Button>
+            <Button variant="ghost" size="icon" asChild>
+                <a href="#" aria-label="Instagram"><Instagram className="h-5 w-5" /></a>
+            </Button>
+            </div>
         </div>
       </div>
     </footer>
