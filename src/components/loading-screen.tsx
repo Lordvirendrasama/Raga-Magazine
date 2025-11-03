@@ -23,28 +23,25 @@ const LoadingScreen = () => {
   }, []);
 
   if (!isClient) {
-    // Render a simple centered logo for SSR to avoid hydration errors
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-background z-50">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
         <Logo className="w-48 h-20" />
       </div>
     );
   }
 
-  const notes = Array.from({ length: noteCount }).map((_, i) => {
-    const { Icon, className } = noteIcons[i % noteIcons.length];
-    const style = {
-      left: `${Math.random() * 100}%`,
-      animationDuration: `${Math.random() * 3 + 2}s`,
-      animationDelay: `${Math.random() * 5}s`,
-    };
-    return <Icon key={i} className={cn('absolute bottom-0 text-primary/50 animate-float-up', className)} style={style} />;
-  });
-
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
-      {notes}
-      <div className="relative z-10 flex items-center justify-center h-full">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-background">
+      {Array.from({ length: noteCount }).map((_, i) => {
+        const { Icon, className } = noteIcons[i % noteIcons.length];
+        const style = {
+          left: `${Math.random() * 100}%`,
+          animationDuration: `${Math.random() * 2 + 3}s`,
+          animationDelay: `${Math.random() * 5}s`,
+        };
+        return <Icon key={i} className={cn('absolute text-primary/50 animate-float-up', className)} style={style} />;
+      })}
+      <div className="relative z-10 flex h-full items-center justify-center">
         <div className="light-sweep-logo animate-breathing-logo">
           <Logo className="w-48 h-20" />
         </div>

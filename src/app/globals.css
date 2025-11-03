@@ -326,10 +326,8 @@
       opacity: 1;
     }
     100% {
-      transform: translateY(-100px);
+      transform: translateY(-10vh);
       opacity: 0;
     }
   }
 }
-
-    
