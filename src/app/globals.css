@@ -314,13 +314,14 @@
     animation-timing-function: linear;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
+    opacity: 0;
   }
   @keyframes float-up {
     0% {
       transform: translateY(100vh);
       opacity: 0;
     }
-    1%, 10% {
+    10% {
       opacity: 1;
     }
     90% {
