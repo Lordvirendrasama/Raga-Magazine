@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,7 +6,6 @@ import { MagazineGrid } from "@/components/magazine-grid";
 import { getPosts, transformPost } from "@/lib/wp";
 import type { Post } from "@/components/article-card";
 import { Skeleton } from '@/components/ui/skeleton';
-import { FunReadsChart } from '@/components/fun-reads-chart';
 import { SidebarTopStories } from '@/components/sidebar-top-stories';
 import { FeaturedChart } from '@/components/featured-chart';
 
@@ -105,9 +103,6 @@ export default function Home() {
                 </div>
             </div>
         </div>
-        <FunReadsChart />
     </>
   );
 }
-
-    
