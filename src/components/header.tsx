@@ -81,7 +81,7 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b bg-primary text-primary-foreground backdrop-blur-sm">
+      <header className="sticky top-0 z-40 w-full border-b bg-card text-card-foreground backdrop-blur-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-2">
           <div className="flex items-center gap-2 md:gap-4">
             <Link href="/" className="flex items-center gap-2">
@@ -92,7 +92,7 @@ export function Header() {
           </div>
           <nav className="hidden md:flex md:items-center md:gap-4 lg:gap-6">
             {navLinks.map((link) => (
-              <Link key={link.name} href={link.href} className="text-sm font-medium text-primary-foreground/80 transition-colors hover:text-primary-foreground">
+              <Link key={link.name} href={link.href} className="text-sm font-medium text-card-foreground/80 transition-colors hover:text-card-foreground">
                 {link.name}
               </Link>
             ))}
@@ -102,11 +102,11 @@ export function Header() {
                 className="relative w-10 md:w-40 lg:w-64 transition-all duration-300 ease-in-out"
                 onFocus={() => setIsSearchOpen(true)}
             >
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-foreground/60" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-card-foreground/60" />
                 <Input
                     type="search"
                     placeholder="Search..."
-                    className="h-9 w-full rounded-full border-primary-foreground/40 bg-primary/80 pl-9 pr-3 text-primary-foreground placeholder:text-primary-foreground/60 focus:bg-background/20"
+                    className="h-9 w-full rounded-full border-card-foreground/40 bg-card/80 pl-9 pr-3 text-card-foreground placeholder:text-card-foreground/60 focus:bg-background/20"
                     onClick={() => setIsSearchOpen(true)}
                     onKeyDown={(e) => {
                         if (e.key) {

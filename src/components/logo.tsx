@@ -9,7 +9,7 @@ export const Logo = ({ className }: { className?: string }) => {
           src="/Raag-Projct-e1727231867617.png"
           alt="Raga Logo"
           fill
-          className="object-contain dark:invert-0 invert"
+          className="object-contain"
           priority
         />
     </div>
