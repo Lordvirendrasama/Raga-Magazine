@@ -35,16 +35,16 @@ const LoadingScreen = () => {
     const { Icon, className } = noteIcons[i % noteIcons.length];
     const style = {
       left: `${Math.random() * 100}%`,
-      animationDuration: `${Math.random() * 5 + 5}s`,
+      animationDuration: `${Math.random() * 3 + 2}s`,
       animationDelay: `${Math.random() * 5}s`,
     };
     return <Icon key={i} className={cn('absolute bottom-0 text-primary/50 animate-float-up', className)} style={style} />;
   });
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-background z-50 overflow-hidden">
+    <div className="fixed inset-0 z-50 overflow-hidden">
       {notes}
-      <div className="relative z-10 flex items-center justify-center">
+      <div className="relative z-10 flex items-center justify-center h-full">
         <div className="light-sweep-logo animate-breathing-logo">
           <Logo className="w-48 h-20" />
         </div>
